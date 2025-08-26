@@ -20,7 +20,7 @@ const StatCard: React.FC<StatCardProps> = ({
   style,
 }) => {
   return (
-    <Card style={[styles.container, style]} elevation={2}>
+    <Card style={[styles.container, style] as any} elevation={2}>
       <View style={styles.iconContainer}>
         <Icon name={icon as any} size={24} color={color} />
       </View>

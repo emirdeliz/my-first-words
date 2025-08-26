@@ -47,7 +47,7 @@ const ProgressCard: React.FC<ProgressCardProps> = ({
   };
 
   return (
-    <Card style={[styles.container, { padding: getPadding() }, style]} elevation={2}>
+    <Card style={[styles.container, { padding: getPadding() }, style] as any} elevation={2}>
       <View style={styles.header}>
         <Typography variant="body" color="text" weight="semiBold">
           {title}

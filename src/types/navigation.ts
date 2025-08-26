@@ -9,9 +9,3 @@ export type RootParamList = {
   Practice: undefined;
   Profile: undefined;
 };
-
-declare global {
-  namespace ReactNavigation {
-    interface RootParamList extends RootParamList {}
-  }
-}

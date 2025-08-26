@@ -8,6 +8,6 @@ export * from './molecules';
 export * from './organisms';
 
 // Re-export common components for easier access
-export { Box, Text, Pressable, InputField } from './atoms';
+export { Box, Text, Pressable, InputField, Typography } from './atoms';
 export { FormField, StatCard } from './molecules';
 export { Header, ProgressCard } from './organisms';
