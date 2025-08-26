@@ -5,6 +5,7 @@ export { default as InputField } from './InputField';
 export { default as Typography } from './Typography';
 export { default as Button } from './Button';
 export { default as Card } from './Card';
+export { default as Icon } from './Icon';
 
 export type { BoxProps } from './Box';
 export type { TextProps } from './Text';
@@ -13,4 +14,5 @@ export type { InputFieldProps } from './InputField';
 export type { TypographyProps } from './Typography';
 export type { ButtonProps } from './Button';
 export type { CardProps } from './Card';
+export type { IconProps } from './Icon';
 

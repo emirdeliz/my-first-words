@@ -2,11 +2,10 @@ import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import Typography from '../../atoms/Typography';
 import Button from '../../atoms/Button';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from '../../atoms/Icon';
 
 export interface HeaderProps {
   title: string;
-  subtitle?: string;
   showBackButton?: boolean;
   onBackPress?: () => void;
   rightAction?: {
@@ -18,7 +17,6 @@ export interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({
   title,
-  subtitle,
   showBackButton = false,
   onBackPress,
   rightAction,
@@ -26,38 +24,31 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <View style={[styles.container, style]}>
-      {showBackButton && (
-        <Button
-          title=""
-          onPress={onBackPress || (() => {})}
-          variant="ghost"
-          size="small"
-          icon={<Icon name="arrow-left" size={24} color="#000" />}
-          style={styles.backButton}
-        />
-      )}
-      
-      <View style={styles.content}>
-        <Typography variant="h2" color="text" weight="bold" align="center">
-          {title}
-        </Typography>
-        {subtitle && (
-          <Typography variant="body" color="textSecondary" align="center">
-            {subtitle}
-          </Typography>
+      <View style={styles.leftSection}>
+        {showBackButton && onBackPress && (
+          <Button
+            title=""
+            onPress={onBackPress}
+            style={styles.backButton}
+            icon={<Icon materialCommunityName="arrow-left" size={24} color="#007AFF" />}
+          />
         )}
       </View>
       
-      {rightAction && (
-        <Button
-          title=""
-          onPress={rightAction.onPress}
-          variant="ghost"
-          size="small"
-          icon={<Icon name={rightAction.icon as any} size={24} color="#000" />}
-          style={styles.rightButton}
-        />
-      )}
+      <Typography variant="h2" color="text" weight="semiBold" style={styles.title}>
+        {title}
+      </Typography>
+      
+      <View style={styles.rightSection}>
+        {rightAction && (
+          <Button
+            title=""
+            onPress={rightAction.onPress}
+            style={styles.actionButton}
+            icon={<Icon materialCommunityName={rightAction.icon} size={24} color="#007AFF" />}
+          />
+        )}
+      </View>
     </View>
   );
 };
@@ -66,23 +57,32 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: 'transparent',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5E5',
   },
-  content: {
+  leftSection: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: 'flex-start',
+  },
+  rightSection: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  title: {
+    flex: 2,
+    textAlign: 'center',
   },
   backButton: {
-    position: 'absolute',
-    left: 20,
-    zIndex: 1,
+    padding: 8,
+    backgroundColor: 'transparent',
   },
-  rightButton: {
-    position: 'absolute',
-    right: 20,
-    zIndex: 1,
+  actionButton: {
+    padding: 8,
+    backgroundColor: 'transparent',
   },
 });
 

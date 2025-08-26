@@ -1,259 +1,288 @@
 import React, { useState } from 'react';
-import {
-  ScrollView,
-  Dimensions,
-} from 'react-native';
+import { ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '../contexts/ThemeContext';
 import { useProgress } from '../contexts/ProgressContext';
-import { Box, Typography, Pressable, Card } from '../ui';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Box, Typography, Pressable, Card, Icon } from '../ui';
 
-const { width } = Dimensions.get('window');
+interface GameMode {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  isUnlocked: boolean;
+  difficulty: 'easy' | 'medium' | 'hard';
+}
 
 const PracticeScreen: React.FC = () => {
   const navigation = useNavigation();
-  const { theme } = useTheme();
-  const { words, currentStreak } = useProgress();
-  
+  const { currentStreak, totalExperience, level } = useProgress();
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
 
-  const practiceModes = [
+  const gameModes: GameMode[] = [
     {
-      id: 'flashcards',
-      title: 'Flashcards',
-      description: 'Revise palavras com cartões',
+      id: '1',
+      name: 'Quiz Rápido',
+      description: 'Teste seu conhecimento com perguntas rápidas',
+      icon: 'lightning-bolt',
+      color: '#FF6B6B',
+      isUnlocked: true,
+      difficulty: 'easy',
+    },
+    {
+      id: '2',
+      name: 'Jogo da Memória',
+      description: 'Encontre pares de palavras e traduções',
       icon: 'cards',
-      color: theme.colors.primary,
-      difficulty: 'Fácil',
+      color: '#4ECDC4',
+      isUnlocked: true,
+      difficulty: 'medium',
     },
     {
-      id: 'quiz',
-      title: 'Quiz',
-      description: 'Teste seu conhecimento',
-      icon: 'help-circle',
-      color: theme.colors.secondary,
-      difficulty: 'Médio',
-    },
-    {
-      id: 'matching',
-      title: 'Associação',
-      description: 'Conecte palavras e traduções',
+      id: '3',
+      name: 'Palavras Cruzadas',
+      description: 'Complete as palavras com as letras corretas',
       icon: 'puzzle',
-      color: theme.colors.warning,
-      difficulty: 'Médio',
+      color: '#45B7D1',
+      isUnlocked: true,
+      difficulty: 'medium',
     },
     {
-      id: 'typing',
-      title: 'Digitação',
-      description: 'Digite as palavras corretas',
-      icon: 'keyboard',
-      color: theme.colors.info,
-      difficulty: 'Difícil',
+      id: '4',
+      name: 'Desafio Diário',
+      description: 'Novo desafio todos os dias',
+      icon: 'calendar-star',
+      color: '#FFD93D',
+      isUnlocked: false,
+      difficulty: 'hard',
     },
     {
-      id: 'listening',
-      title: 'Audição',
-      description: 'Ouça e identifique palavras',
-      icon: 'ear',
-      color: theme.colors.success,
-      difficulty: 'Médio',
-    },
-    {
-      id: 'speaking',
-      title: 'Pronúncia',
-      description: 'Pratique sua pronúncia',
-      icon: 'microphone',
-      color: theme.colors.error,
-      difficulty: 'Difícil',
+      id: '5',
+      name: 'Batalha de Palavras',
+      description: 'Compete com outros jogadores',
+      icon: 'sword-cross',
+      color: '#FF8E72',
+      isUnlocked: false,
+      difficulty: 'hard',
     },
   ];
 
-  const quickPracticeOptions = [
-    {
-      id: 'daily',
-      title: 'Prática Diária',
-      description: '5 palavras para hoje',
-      icon: 'calendar-today',
-      color: theme.colors.primary,
-      count: 5,
-    },
-    {
-      id: 'review',
-      title: 'Revisão',
-      description: 'Palavras que precisam de revisão',
-      icon: 'refresh',
-      color: theme.colors.secondary,
-      count: words.filter(w => !w.isLearned).length,
-    },
-    {
-      id: 'challenge',
-      title: 'Desafio',
-      description: 'Teste suas habilidades',
-      icon: 'trophy',
-      color: theme.colors.warning,
-      count: 10,
-    },
-  ];
-
-  const handlePracticeMode = (modeId: string) => {
-    setSelectedMode(modeId);
-    // Implementar navegação para o modo de prática
-    console.log('Modo selecionado:', modeId);
+  const handleGameModePress = (mode: GameMode) => {
+    if (mode.isUnlocked) {
+      setSelectedMode(mode.id);
+      // Aqui você pode navegar para o jogo selecionado
+      // navigation.navigate('Game', { gameMode: mode.id });
+    }
   };
 
-  const handleQuickPractice = (optionId: string) => {
-    // Implementar prática rápida
-    console.log('Prática rápida:', optionId);
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'easy':
+        return '#4CAF50';
+      case 'medium':
+        return '#FF9800';
+      case 'hard':
+        return '#F44336';
+      default:
+        return '#999';
+    }
   };
 
-  const renderPracticeMode = (mode: any) => (
-    <Pressable
-      key={mode.id}
-      style={{
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 12,
-        borderWidth: 2,
-        borderColor: mode.color,
-        backgroundColor: theme.colors.surface,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      }}
-      onPress={() => handlePracticeMode(mode.id)}
-    >
-      <Box style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-        <Box style={{ width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginRight: 16, backgroundColor: mode.color }}>
-          <Icon name={mode.icon} size={24} color="white" />
-        </Box>
-        <Box style={{ flex: 1 }}>
-          <Typography variant="body" color="text" weight="semiBold" style={{ marginBottom: 4 }}>
-            {mode.title}
-          </Typography>
-          <Typography variant="caption" color="textSecondary">
-            {mode.description}
-          </Typography>
-        </Box>
-      </Box>
-      
-      <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box style={{ paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, backgroundColor: mode.color }}>
-          <Typography variant="caption" color="white" weight="semiBold">
-            {mode.difficulty}
-          </Typography>
-        </Box>
-        <Icon name="chevron-right" size={20} color={theme.colors.textSecondary} />
-      </Box>
-    </Pressable>
-  );
-
-  const renderQuickPractice = (option: any) => (
-    <Pressable
-      key={option.id}
-      style={{
-        borderRadius: 12,
-        padding: 16,
-        marginBottom: 12,
-        backgroundColor: option.color,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-      }}
-      onPress={() => handleQuickPractice(option.id)}
-    >
-      <Box style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Icon name={option.icon} size={32} color="white" />
-        <Box style={{ flex: 1, marginLeft: 16 }}>
-          <Typography variant="body" color="white" weight="semiBold" style={{ marginBottom: 4 }}>
-            {option.title}
-          </Typography>
-          <Typography variant="caption" color="white" style={{ opacity: 0.9 }}>
-            {option.description}
-          </Typography>
-        </Box>
-        <Box style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 }}>
-          <Typography variant="body" color="white" weight="bold">
-            {option.count}
-          </Typography>
-        </Box>
-      </Box>
-    </Pressable>
-  );
+  const getDifficultyLabel = (difficulty: string) => {
+    switch (difficulty) {
+      case 'easy':
+        return 'Fácil';
+      case 'medium':
+        return 'Médio';
+      case 'hard':
+        return 'Difícil';
+      default:
+        return 'Desconhecido';
+    }
+  };
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
-      showsVerticalScrollIndicator={false}
-    >
-      <Box style={{ padding: 20, paddingBottom: 10 }}>
-        <Typography variant="h2" color="text" weight="bold" style={{ marginBottom: 8 }}>
-          Praticar
-        </Typography>
-        <Typography variant="body" color="textSecondary">
-          Escolha um modo de prática
-        </Typography>
-      </Box>
+    <Box flex bgGray>
+      <ScrollView>
+        {/* Header */}
+        <Box bgPrimary px py={6} style={{ paddingTop: 60 }}>
+          <Box flexRow itemsCenter>
+            <Typography variant="h1" color="white" style={{ marginRight: 16 }}>
+              🎮
+            </Typography>
+            <Box flex>
+              <Typography variant="body" color="white" weight="semiBold" style={{ marginBottom: 4 }}>
+                Praticar e Jogar
+              </Typography>
+              <Typography variant="caption" color="white" style={{ opacity: 0.9 }}>
+                Melhore suas habilidades com jogos divertidos
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
 
-      <Box style={{ paddingHorizontal: 20, marginBottom: 20 }}>
-        <Card style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 12 }} elevation={2}>
-          <Icon name="fire" size={24} color={theme.colors.error} />
-          <Typography variant="body" color="text" weight="semiBold" style={{ marginLeft: 12 }}>
-            Sequência atual: {currentStreak} dias
+        {/* Stats Cards */}
+        <Box px py={4}>
+          <Box flexRow justifyBetween>
+            <Card style={{ flex: 1, marginRight: 8 }}>
+              <Box itemsCenter py={3}>
+                <Icon materialCommunityName="fire" size={24} color="#FF6B6B" />
+                <Typography variant="body" color="text" weight="semiBold" style={{ marginTop: 8 }}>
+                  {currentStreak}
+                </Typography>
+                <Typography variant="caption" color="textSecondary" align="center">
+                  Dias seguidos
+                </Typography>
+              </Box>
+            </Card>
+            
+            <Card style={{ flex: 1, marginLeft: 8 }}>
+              <Box itemsCenter py={3}>
+                <Icon materialCommunityName="star" size={24} color="#FFD700" />
+                <Typography variant="body" color="text" weight="semiBold" style={{ marginTop: 8 }}>
+                  {level}
+                </Typography>
+                <Typography variant="caption" color="textSecondary" align="center">
+                  Nível atual
+                </Typography>
+              </Box>
+            </Card>
+          </Box>
+        </Box>
+
+        {/* Game Modes */}
+        <Box px py={4}>
+          <Typography variant="h2" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
+            Modos de Jogo
           </Typography>
-        </Card>
-      </Box>
+          
+          {gameModes.map((mode) => (
+            <Pressable
+              key={mode.id}
+              onPress={() => handleGameModePress(mode)}
+              style={{ marginBottom: 16 }}
+            >
+              <Card
+                style={{
+                  padding: 16,
+                  opacity: mode.isUnlocked ? 1 : 0.6,
+                }}
+              >
+                <Box flexRow itemsCenter>
+                  <Box
+                    style={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: 28,
+                      backgroundColor: mode.color + '20',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: 16,
+                    }}
+                  >
+                    <Icon 
+                      materialCommunityName={mode.icon} 
+                      size={28} 
+                      color={mode.color} 
+                    />
+                  </Box>
+                  
+                  <Box flex>
+                    <Box flexRow itemsCenter style={{ marginBottom: 4 }}>
+                      <Typography variant="body" color="text" weight="semiBold">
+                        {mode.name}
+                      </Typography>
+                      <Box
+                        style={{
+                          marginLeft: 8,
+                          paddingHorizontal: 8,
+                          paddingVertical: 2,
+                          backgroundColor: getDifficultyColor(mode.difficulty) + '20',
+                          borderRadius: 12,
+                        }}
+                      >
+                        <Typography variant="caption" color="text" weight="semiBold">
+                          {getDifficultyLabel(mode.difficulty)}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    
+                    <Typography variant="caption" color="textSecondary" style={{ marginBottom: 8 }}>
+                      {mode.description}
+                    </Typography>
+                    
+                    {!mode.isUnlocked && (
+                      <Box flexRow itemsCenter>
+                        <Icon materialCommunityName="lock" size={16} color="#999" />
+                        <Typography variant="caption" color="textSecondary" style={{ marginLeft: 4 }}>
+                          Desbloqueie no nível {level + 2}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                  
+                  <Box
+                    style={{
+                      padding: 8,
+                      backgroundColor: mode.isUnlocked ? mode.color : '#999',
+                      borderRadius: 20,
+                    }}
+                  >
+                    <Icon 
+                      materialCommunityName={mode.isUnlocked ? "play" : "lock"} 
+                      size={20} 
+                      color="white" 
+                    />
+                  </Box>
+                </Box>
+              </Card>
+            </Pressable>
+          ))}
+        </Box>
 
-      <Box style={{ padding: 20, paddingBottom: 10 }}>
-        <Typography variant="h3" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
-          Prática Rápida
-        </Typography>
-        {quickPracticeOptions.map(renderQuickPractice)}
-      </Box>
-
-      <Box style={{ padding: 20, paddingBottom: 10 }}>
-        <Typography variant="h3" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
-          Modos de Prática
-        </Typography>
-        {practiceModes.map(renderPracticeMode)}
-      </Box>
-
-      <Box style={{ padding: 20, paddingBottom: 40 }}>
-        <Typography variant="h3" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
-          Estatísticas
-        </Typography>
-        <Card style={{ borderRadius: 12, padding: 20 }} elevation={2}>
-          <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 }}>
-            <Typography variant="body" color="textSecondary">
-              Total de palavras:
-            </Typography>
-            <Typography variant="body" color="text" weight="semiBold">
-              {words.length}
-            </Typography>
-          </Box>
-          <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 }}>
-            <Typography variant="body" color="textSecondary">
-              Palavras aprendidas:
-            </Typography>
-            <Typography variant="body" color="success" weight="semiBold">
-              {words.filter(w => w.isLearned).length}
-            </Typography>
-          </Box>
-          <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 }}>
-            <Typography variant="body" color="textSecondary">
-              Por aprender:
-            </Typography>
-            <Typography variant="body" color="warning" weight="semiBold">
-              {words.filter(w => !w.isLearned).length}
-            </Typography>
-          </Box>
-        </Card>
-      </Box>
-    </ScrollView>
+        {/* Quick Practice */}
+        <Box px py={4} style={{ paddingBottom: 32 }}>
+          <Typography variant="h2" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
+            Prática Rápida
+          </Typography>
+          <Card style={{ padding: 16 }}>
+            <Box flexRow itemsCenter>
+              <Box
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 24,
+                  backgroundColor: '#007AFF20',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginRight: 16,
+                }}
+              >
+                <Icon materialCommunityName="target" size={24} color="#007AFF" />
+              </Box>
+              <Box flex>
+                <Typography variant="body" color="text" weight="semiBold">
+                  Prática Personalizada
+                </Typography>
+                <Typography variant="caption" color="textSecondary">
+                  Foque nas palavras que você precisa revisar
+                </Typography>
+              </Box>
+              <Pressable
+                onPress={() => {}}
+                style={{
+                  padding: 8,
+                  backgroundColor: '#007AFF',
+                  borderRadius: 20,
+                }}
+              >
+                <Icon materialCommunityName="arrow-right" size={20} color="white" />
+              </Pressable>
+            </Box>
+          </Card>
+        </Box>
+      </ScrollView>
+    </Box>
   );
 };
 

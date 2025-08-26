@@ -1,187 +1,143 @@
-import React, { useState, useRef } from 'react';
-import {
-  ScrollView,
-  Dimensions,
-  Animated,
-} from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from '../contexts/ThemeContext';
-import { Box, Typography, Pressable } from '../ui';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Box, Typography, Pressable, Icon } from '../ui';
 
-const { width } = Dimensions.get('window');
+interface OnboardingStep {
+  title: string;
+  description: string;
+  icon: string;
+}
 
 const OnboardingScreen: React.FC = () => {
   const navigation = useNavigation();
-  const { theme } = useTheme();
-  const [currentPage, setCurrentPage] = useState(0);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const [currentStep, setCurrentStep] = useState(0);
 
-  const onboardingData = [
+  const steps: OnboardingStep[] = [
     {
       title: 'Bem-vindo ao My First Words!',
-      description: 'Aprenda suas primeiras palavras de forma divertida e interativa',
-      icon: '🎯',
-      color: theme.colors.primary,
+      description: 'Aprenda inglês de forma divertida e interativa',
+      icon: 'star',
     },
     {
-      title: 'Categorias Organizadas',
-      description: 'Palavras organizadas por temas para facilitar o aprendizado',
-      icon: '📚',
-      color: theme.colors.secondary,
+      title: 'Aprenda com Jogos',
+      description: 'Jogos educativos para fixar o vocabulário',
+      icon: 'gamepad-variant',
     },
     {
-      title: 'Aprenda no Seu Ritmo',
-      description: 'Progresso personalizado com sistema de níveis e experiência',
-      icon: '⭐',
-      color: theme.colors.warning,
-    },
-    {
-      title: 'Pronto para Começar?',
-      description: 'Vamos começar sua jornada de aprendizado!',
-      icon: '🚀',
-      color: theme.colors.success,
+      title: 'Acompanhe seu Progresso',
+      description: 'Veja como você está evoluindo no aprendizado',
+      icon: 'chart-line',
     },
   ];
 
-  const handleNext = () => {
-    if (currentPage < onboardingData.length - 1) {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      scrollViewRef.current?.scrollTo({
-        x: nextPage * width,
-        animated: true,
-      });
+  const nextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
     } else {
       navigation.navigate('Login' as never);
     }
   };
 
-  const handleSkip = () => {
+  const skipOnboarding = () => {
     navigation.navigate('Login' as never);
   };
 
-  const handleScroll = (event: any) => {
-    const contentOffset = event.nativeEvent.contentOffset.x;
-    const page = Math.round(contentOffset / width);
-    setCurrentPage(page);
-  };
-
-  const renderPage = (item: any, index: number) => (
-    <Box key={index} flex justifyCenter itemsCenter style={{ width }}>
-      <Box 
-        style={{ 
-          width: 120, 
-          height: 120, 
-          borderRadius: 60,
-          backgroundColor: 'rgba(74, 144, 226, 0.1)',
-          marginBottom: 40,
-        }}
-        justifyCenter 
-        itemsCenter
-      >
-        <Typography variant="h1" style={{ fontSize: 60 }}>
-          {item.icon}
-        </Typography>
-      </Box>
-      
-      <Typography 
-        variant="h2" 
-        color="text" 
-        weight="bold" 
-        align="center"
-        style={{ marginBottom: 20, lineHeight: 36 }}
-      >
-        {item.title}
-      </Typography>
-      
-      <Typography 
-        variant="body" 
-        color="textSecondary" 
-        align="center"
-        style={{ lineHeight: 26, paddingHorizontal: 20 }}
-      >
-        {item.description}
-      </Typography>
-    </Box>
-  );
-
-  const renderDots = () => (
-    <Box flexRow justifyCenter style={{ marginBottom: 40 }}>
-      {onboardingData.map((_, index) => (
-        <Box
-          key={index}
-          style={{
-            width: 10,
-            height: 10,
-            borderRadius: 5,
-            marginHorizontal: 5,
-            backgroundColor: index === currentPage ? theme.colors.primary : theme.colors.border,
-          }}
-        />
-      ))}
-    </Box>
-  );
-
   return (
-    <Box flex style={{ backgroundColor: theme.colors.background }}>
-      <Box flexRow justifyEnd style={{ paddingTop: 60, paddingHorizontal: 20 }}>
-        <Pressable onPress={handleSkip}>
-          <Typography variant="body" color="textSecondary" weight="medium">
-            Pular
+    <Box flex bgPrimary pt={15}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Header */}
+        <Box flexRow justifyBetween itemsCenter px py>
+          <Typography variant="h2" color="white" weight="bold">
+            My First Words
           </Typography>
-        </Pressable>
-      </Box>
+          <Pressable onPress={skipOnboarding}>
+            <Box opacity80>
+              <Typography variant="body" color="white">
+                Pular
+              </Typography>
+            </Box>
+          </Pressable>
+        </Box>
 
-      <ScrollView
-        ref={scrollViewRef}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        style={{ flex: 1 }}
-      >
-        {onboardingData.map(renderPage)}
-      </ScrollView>
+        {/* Content */}
+        <Box flex justifyCenter itemsCenter px>
+          {/* Step Indicator */}
+          <Box flexRow mb={8}>
+            {steps.map((_, index) => (
+              <Box
+                key={index}
+                w={2}
+                h={2}
+                roundedFull
+                style={{
+                  backgroundColor: index === currentStep ? 'white' : 'rgba(255, 255, 255, 0.3)',
+                  marginHorizontal: 4,
+                }}
+              />
+            ))}
+          </Box>
 
-      {renderDots()}
+          {/* Step Content */}
+          <Box itemsCenter>
+            <Box
+              w={30}
+              h={30}
+              roundedFull
+              justifyCenter
+              itemsCenter
+              mb={8}
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              }}
+            >
+              <Icon 
+                materialCommunityName={steps[currentStep].icon} 
+                size={60} 
+                color="white" 
+              />
+            </Box>
 
-      <Box style={{ paddingHorizontal: 20, paddingBottom: 40 }}>
-        <Pressable
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingVertical: 16,
-            paddingHorizontal: 32,
-            borderRadius: 25,
-            backgroundColor: theme.colors.primary,
-            elevation: 3,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 4,
-          }}
-          onPress={handleNext}
-        >
-          <Typography 
-            variant="body" 
-            color="text"
-            weight="semiBold"
-            style={{ marginRight: 8 }}
+            <Box mb={4}>
+              <Typography variant="h1" color="white" align="center">
+                {steps[currentStep].title}
+              </Typography>
+            </Box>
+
+            <Box opacity90>
+              <Typography variant="body" color="white" align="center">
+                {steps[currentStep].description}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Footer */}
+        <Box px py={8}>
+          <Pressable
+            onPress={nextStep}
+            bgWhite
+            py={4}
+            px={8}
+            roundedFull
+            itemsCenter
+            shadow
+            elevation5
+            style={{
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+            }}
           >
-            {currentPage === onboardingData.length - 1 ? 'Começar' : 'Próximo'}
-          </Typography>
-          <Icon
-            name={currentPage === onboardingData.length - 1 ? 'rocket-launch' : 'arrow-right'}
-            size={20}
-            color="white"
-          />
-        </Pressable>
-      </Box>
+            <Typography variant="body" color="primary" weight="semiBold">
+              {currentStep === steps.length - 1 ? 'Começar' : 'Próximo'}
+            </Typography>
+          </Pressable>
+        </Box>
+      </ScrollView>
     </Box>
   );
 };
 
-export default OnboardingScreen;
+export default OnboardingScreen; 

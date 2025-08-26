@@ -1,199 +1,190 @@
 import React from 'react';
-import {
-  ScrollView,
-  Dimensions,
-} from 'react-native';
-import { useTheme } from '../contexts/ThemeContext';
+import { ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useProgress } from '../contexts/ProgressContext';
-import { 
-  StatCard, 
-  ProgressCard, 
-  Typography, 
-  Card, 
-  Button,
+import {
   Box,
-  Pressable
+  Typography,
+  Pressable,
+  Button,
+  Card,
+  StatCard,
+  ProgressCard,
+  Icon,
 } from '../ui';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-const { width } = Dimensions.get('window');
 
 const HomeScreen: React.FC = () => {
-  const { theme } = useTheme();
+  const navigation = useNavigation();
   const { user } = useAuth();
-  const { 
-    currentStreak, 
-    totalExperience, 
-    level, 
-    categories, 
-    words 
-  } = useProgress();
+  const { level, totalExperience, currentStreak, words } = useProgress();
 
-  const totalWords = words.length;
-  const learnedWords = words.filter(word => word.isLearned).length;
-  const progressPercentage = totalWords > 0 ? (learnedWords / totalWords) * 100 : 0;
+  const quickActions = [
+    {
+      title: 'Aprender',
+      icon: 'book-open-variant',
+      color: '#007AFF',
+      onPress: () => navigation.navigate('Learn' as never),
+    },
+    {
+      title: 'Praticar',
+      icon: 'gamepad-variant',
+      color: '#34C759',
+      onPress: () => navigation.navigate('Practice' as never),
+    },
+    {
+      title: 'Perfil',
+      icon: 'account',
+      color: '#FF9500',
+      onPress: () => navigation.navigate('Profile' as never),
+    },
+  ];
 
-  const getLevelProgress = () => {
-    const experienceInLevel = totalExperience % 100;
-    return experienceInLevel;
-  };
-
-  const renderQuickActions = () => (
-    <Box style={{ padding: 20 }}>
-      <Typography variant="h3" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
-        Ações Rápidas
-      </Typography>
-      <Box style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-        <Button
-          title="Continuar"
-          onPress={() => {}}
-          variant="primary"
-          size="large"
-          icon={<Icon name="play-circle" size={32} color="white" />}
-          style={{ width: (width - 60) / 2, height: 80, marginBottom: 12 }}
-        />
-        
-        <Button
-          title="Nova Lição"
-          onPress={() => {}}
-          variant="secondary"
-          size="large"
-          icon={<Icon name="book-open-variant" size={32} color="white" />}
-          style={{ width: (width - 60) / 2, height: 80, marginBottom: 12 }}
-        />
-        
-        <Button
-          title="Revisar"
-          onPress={() => {}}
-          variant="outline"
-          size="large"
-          icon={<Icon name="refresh" size={32} color={theme.colors.info} />}
-          style={{ width: (width - 60) / 2, height: 80, marginBottom: 12 }}
-        />
-        
-        <Button
-          title="Conquistas"
-          onPress={() => {}}
-          variant="outline"
-          size="large"
-          icon={<Icon name="trophy" size={32} color={theme.colors.success} />}
-          style={{ width: (width - 60) / 2, height: 80, marginBottom: 12 }}
-        />
-      </Box>
-    </Box>
-  );
-
-  const renderCategories = () => (
-    <Box style={{ padding: 20, paddingBottom: 40 }}>
-      <Typography variant="h3" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
-        Categorias Disponíveis
-      </Typography>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {categories.map((category) => (
-          <Pressable
-            key={category.id}
-            style={{
-              width: 120,
-              height: 120,
-              borderRadius: 12,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginRight: 16,
-              backgroundColor: category.isUnlocked ? category.color : theme.colors.border,
-              opacity: category.isUnlocked ? 1 : 0.5,
-              elevation: 2,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
-            }}
-            disabled={!category.isUnlocked}
-          >
-            <Typography variant="h1" color="white" align="center" style={{ marginBottom: 8 }}>
-              {category.icon}
-            </Typography>
-            <Typography variant="body" color="white" weight="semiBold" align="center" style={{ marginBottom: 4 }}>
-              {category.name}
-            </Typography>
-            <Typography variant="caption" color="white" align="center" style={{ opacity: 0.9 }}>
-              {category.learnedWords}/{category.totalWords}
-            </Typography>
-          </Pressable>
-        ))}
-      </ScrollView>
-    </Box>
-  );
+  const stats = [
+    {
+      icon: 'star',
+      value: level,
+      label: 'Nível',
+      color: '#FFD700',
+    },
+    {
+      icon: 'lightning-bolt',
+      value: currentStreak,
+      label: 'Sequência',
+      color: '#FF6B6B',
+    },
+    {
+      icon: 'bookmark',
+      value: words.filter((w: any) => w.isLearned).length,
+      label: 'Aprendidas',
+      color: '#4ECDC4',
+    },
+  ];
 
   return (
-    <ScrollView 
-      style={{ flex: 1, backgroundColor: theme.colors.background }}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Header com saudação */}
-      <Box style={{ padding: 20, paddingTop: 10 }}>
-        <Typography variant="h2" color="text" weight="bold">
-          Olá, {user?.name || 'Usuário'}! 👋
-        </Typography>
-        <Typography variant="body" color="textSecondary">
-          Continue sua jornada de aprendizado
-        </Typography>
-      </Box>
+    <Box flex bgGray>
+      <ScrollView>
+        {/* Header */}
+        <Box bgPrimary px py={6} style={{ paddingTop: 60 }}>
+          <Typography variant="h1" color="white" align="center" style={{ marginBottom: 8 }}>
+            Olá, {user?.name || 'Usuário'}! 👋
+          </Typography>
+          <Typography variant="body" color="white" weight="semiBold" align="center" style={{ marginBottom: 4 }}>
+            Bem-vindo de volta ao My First Words
+          </Typography>
+          <Typography variant="caption" color="white" align="center" style={{ opacity: 0.9 }}>
+            Continue sua jornada de aprendizado
+          </Typography>
+        </Box>
 
-      {/* Cards de estatísticas */}
-      <Box style={{ flexDirection: 'row', paddingHorizontal: 20, marginBottom: 20 }}>
-        <StatCard
-          icon="star"
-          value={`Nível ${level}`}
-          label="Nível"
-          color={theme.colors.warning}
-        />
-        <StatCard
-          icon="lightning-bolt"
-          value={totalExperience}
-          label="Experiência"
-          color={theme.colors.secondary}
-        />
-        <StatCard
-          icon="fire"
-          value={`${currentStreak} dias`}
-          label="Sequência"
-          color={theme.colors.error}
-        />
-      </Box>
+        {/* Quick Actions */}
+        <Box px py={4}>
+          <Typography variant="h2" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
+            Ações Rápidas
+          </Typography>
+          <Box flexRow justifyBetween>
+            {quickActions.map((action, index) => (
+              <Pressable
+                key={index}
+                onPress={action.onPress}
+                bgWhite
+                style={{
+                  flex: 1,
+                  padding: 16,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  marginHorizontal: index === 1 ? 8 : 0,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 3,
+                }}
+              >
+                <Box
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    backgroundColor: action.color + '20',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: 12,
+                  }}
+                >
+                  <Icon materialCommunityName={action.icon} size={24} color={action.color} />
+                </Box>
+                <Typography variant="body" color="text" weight="medium" align="center">
+                  {action.title}
+                </Typography>
+              </Pressable>
+            ))}
+          </Box>
+        </Box>
 
-      {/* Barra de progresso do nível */}
-      <Box style={{ margin: 20, marginBottom: 20 }}>
-        <ProgressCard
-          title={`Nível ${level}`}
-          currentValue={getLevelProgress()}
-          maxValue={100}
-          showPercentage={false}
-          color={theme.colors.primary}
-          size="small"
-        />
-        <Typography variant="caption" color="textSecondary" align="center">
-          {getLevelProgress()} / 100 XP para o próximo nível
-        </Typography>
-      </Box>
+        {/* Progress Card */}
+        <Box px py={2}>
+          <ProgressCard
+            title="Progresso Geral"
+            currentValue={totalExperience}
+            maxValue={1000}
+            color="#007AFF"
+            size="large"
+          />
+        </Box>
 
-      {/* Card de progresso geral */}
-      <Box style={{ margin: 20, marginBottom: 20 }}>
-        <ProgressCard
-          title="Progresso Geral"
-          currentValue={learnedWords}
-          maxValue={totalWords}
-          showPercentage={true}
-          color={theme.colors.primary}
-        />
-      </Box>
+        {/* Stats */}
+        <Box px py={4}>
+          <Typography variant="h2" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
+            Suas Estatísticas
+          </Typography>
+          <Box flexRow justifyBetween>
+            {stats.map((stat, index) => (
+              <StatCard
+                key={index}
+                icon={stat.icon}
+                value={stat.value}
+                label={stat.label}
+                color={stat.color}
+                style={{ flex: 1, marginHorizontal: index === 1 ? 8 : 0 }}
+              />
+            ))}
+          </Box>
+        </Box>
 
-      {/* Ações rápidas */}
-      {renderQuickActions()}
-
-      {/* Categorias disponíveis */}
-      {renderCategories()}
-    </ScrollView>
+        {/* Recent Activity */}
+        <Box px py={4} style={{ paddingBottom: 32 }}>
+          <Typography variant="h2" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
+            Atividade Recente
+          </Typography>
+          <Card style={{ padding: 16 }}>
+            <Box flexRow itemsCenter>
+              <Box
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: '#007AFF20',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginRight: 12,
+                }}
+              >
+                <Icon materialCommunityName="trophy" size={20} color="#007AFF" />
+              </Box>
+              <Box flex>
+                <Typography variant="body" color="text" weight="semiBold">
+                  Novo nível alcançado!
+                </Typography>
+                <Typography variant="caption" color="textSecondary">
+                  Parabéns! Você chegou ao nível {level}
+                </Typography>
+              </Box>
+            </Box>
+          </Card>
+        </Box>
+      </ScrollView>
+    </Box>
   );
 };
 
