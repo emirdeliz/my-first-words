@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
+import { 
+  Box, 
+  Typography, 
+  Pressable, 
+  InputField, 
+  Button,
+  Card
+} from '../ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const RegisterScreen: React.FC = () => {
@@ -24,8 +27,6 @@ const RegisterScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegister = async () => {
     if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
@@ -57,7 +58,7 @@ const RegisterScreen: React.FC = () => {
           [
             {
               text: 'OK',
-              onPress: () => navigation.replace('Main'),
+              onPress: () => navigation.navigate('Main' as never),
             },
           ]
         );
@@ -75,240 +76,97 @@ const RegisterScreen: React.FC = () => {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={handleBackToLogin}>
-            <Icon name="arrow-left" size={24} color={theme.colors.text} />
-          </TouchableOpacity>
-          
-          <View style={[styles.logoContainer, { backgroundColor: theme.colors.primary }]}>
-            <Text style={styles.logoText}>📚</Text>
-          </View>
-          <Text style={[styles.title, { color: theme.colors.text }]}>
-            Criar Conta
-          </Text>
-          <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>
-            Comece sua jornada de aprendizado
-          </Text>
-        </View>
-
-        <View style={styles.formContainer}>
-          <View style={styles.inputContainer}>
-            <Icon name="account" size={20} color={theme.colors.textSecondary} style={styles.inputIcon} />
-            <TextInput
-              style={[styles.input, { 
-                color: theme.colors.text,
-                borderColor: theme.colors.border,
-                backgroundColor: theme.colors.surface 
-              }]}
-              placeholder="Nome completo"
-              placeholderTextColor={theme.colors.textSecondary}
-              value={name}
-              onChangeText={setName}
-              autoCapitalize="words"
-              autoCorrect={false}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Icon name="email" size={20} color={theme.colors.textSecondary} style={styles.inputIcon} />
-            <TextInput
-              style={[styles.input, { 
-                color: theme.colors.text,
-                borderColor: theme.colors.border,
-                backgroundColor: theme.colors.surface 
-              }]}
-              placeholder="Email"
-              placeholderTextColor={theme.colors.textSecondary}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Icon name="lock" size={20} color={theme.colors.textSecondary} style={styles.inputIcon} />
-            <TextInput
-              style={[styles.input, { 
-                color: theme.colors.text,
-                borderColor: theme.colors.border,
-                backgroundColor: theme.colors.surface 
-              }]}
-              placeholder="Senha"
-              placeholderTextColor={theme.colors.textSecondary}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-            />
-            <TouchableOpacity
-              style={styles.passwordToggle}
-              onPress={() => setShowPassword(!showPassword)}
-            >
-              <Icon
-                name={showPassword ? 'eye-off' : 'eye'}
-                size={20}
-                color={theme.colors.textSecondary}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Icon name="lock-check" size={20} color={theme.colors.textSecondary} style={styles.inputIcon} />
-            <TextInput
-              style={[styles.input, { 
-                color: theme.colors.text,
-                borderColor: theme.colors.border,
-                backgroundColor: theme.colors.surface 
-              }]}
-              placeholder="Confirmar senha"
-              placeholderTextColor={theme.colors.textSecondary}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry={!showConfirmPassword}
-              autoCapitalize="none"
-            />
-            <TouchableOpacity
-              style={styles.passwordToggle}
-              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              <Icon
-                name={showConfirmPassword ? 'eye-off' : 'eye'}
-                size={20}
-                color={theme.colors.textSecondary}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity
-            style={[styles.registerButton, { backgroundColor: theme.colors.primary }]}
-            onPress={handleRegister}
-            disabled={isLoading}
+      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 20 }}>
+        <Box style={{ alignItems: 'center', marginBottom: 40 }}>
+          <Pressable 
+            style={{ position: 'absolute', top: 0, left: 0, padding: 10 }} 
+            onPress={handleBackToLogin}
           >
-            {isLoading ? (
-              <Text style={styles.registerButtonText}>Criando conta...</Text>
-            ) : (
-              <Text style={styles.registerButtonText}>Criar Conta</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+            <Icon name="arrow-left" size={24} color={theme.colors.text} />
+          </Pressable>
+          
+          <Card style={{ width: 80, height: 80, borderRadius: 40, justifyContent: 'center', alignItems: 'center', marginBottom: 20, backgroundColor: theme.colors.primary }} padding="large" elevation={4}>
+            <Typography variant="h1" color="white" align="center">
+              📚
+            </Typography>
+          </Card>
+          
+          <Typography variant="h2" color="text" weight="bold" align="center">
+            Criar Conta
+          </Typography>
+          <Typography variant="body" color="textSecondary" align="center">
+            Comece sua jornada de aprendizado
+          </Typography>
+        </Box>
 
-        <View style={styles.footer}>
-          <Text style={[styles.footerText, { color: theme.colors.textSecondary }]}>
+        <Box style={{ marginBottom: 30 }}>
+          <InputField
+            placeholder="Nome completo"
+            value={name}
+            onChangeText={setName}
+            autoCapitalize="words"
+            autoCorrect={false}
+            leftIcon="account"
+            style={{ marginBottom: 20 }}
+          />
+
+          <InputField
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            leftIcon="email"
+            style={{ marginBottom: 20 }}
+          />
+
+          <InputField
+            placeholder="Senha"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+            leftIcon="lock"
+            style={{ marginBottom: 20 }}
+          />
+
+          <InputField
+            placeholder="Confirmar senha"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            autoCapitalize="none"
+            leftIcon="lock-check"
+            style={{ marginBottom: 20 }}
+          />
+
+          <Button
+            title={isLoading ? "Criando conta..." : "Criar Conta"}
+            onPress={handleRegister}
+            loading={isLoading}
+            fullWidth
+            size="large"
+            style={{ marginTop: 10 }}
+          />
+        </Box>
+
+        <Box style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+          <Typography variant="body" color="textSecondary" align="center">
             Já tem uma conta?{' '}
-          </Text>
-          <TouchableOpacity onPress={handleBackToLogin}>
-            <Text style={[styles.loginText, { color: theme.colors.primary }]}>
+          </Typography>
+          <Pressable onPress={handleBackToLogin}>
+            <Typography variant="body" color="primary" weight="semiBold">
               Faça login
-            </Text>
-          </TouchableOpacity>
-        </View>
+            </Typography>
+          </Pressable>
+        </Box>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  backButton: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    padding: 10,
-  },
-  logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  logoText: {
-    fontSize: 40,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  formContainer: {
-    marginBottom: 30,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-  },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    height: 50,
-    fontSize: 16,
-  },
-  passwordToggle: {
-    padding: 8,
-  },
-  registerButton: {
-    height: 50,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  registerButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 16,
-  },
-  loginText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
 
 export default RegisterScreen;

@@ -1,124 +1,88 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import { Typography } from '../../atoms/Typography';
-import { Button } from '../../atoms/Button';
+import Typography from '../../atoms/Typography';
+import Button from '../../atoms/Button';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTheme } from '../../../contexts/ThemeContext';
 
 export interface HeaderProps {
   title: string;
   subtitle?: string;
-  leftAction?: {
-    icon: string;
-    onPress: () => void;
-  };
+  showBackButton?: boolean;
+  onBackPress?: () => void;
   rightAction?: {
     icon: string;
     onPress: () => void;
   };
-  showBackButton?: boolean;
-  onBackPress?: () => void;
   style?: ViewStyle;
 }
 
 const Header: React.FC<HeaderProps> = ({
   title,
   subtitle,
-  leftAction,
-  rightAction,
   showBackButton = false,
   onBackPress,
+  rightAction,
   style,
 }) => {
-  const { theme } = useTheme();
-
-  const renderLeftSection = () => {
-    if (showBackButton && onBackPress) {
-      return (
-        <Button
-          variant="ghost"
-          size="small"
-          onPress={onBackPress}
-          icon={<Icon name="arrow-left" size={24} color={theme.colors.text} />}
-          style={styles.actionButton}
-        />
-      );
-    }
-
-    if (leftAction) {
-      return (
-        <Button
-          variant="ghost"
-          size="small"
-          onPress={leftAction.onPress}
-          icon={<Icon name={leftAction.icon} size={24} color={theme.colors.text} />}
-          style={styles.actionButton}
-        />
-      );
-    }
-
-    return <View style={styles.actionButton} />;
-  };
-
-  const renderRightSection = () => {
-    if (rightAction) {
-      return (
-        <Button
-          variant="ghost"
-          size="small"
-          onPress={rightAction.onPress}
-          icon={<Icon name={rightAction.icon} size={24} color={theme.colors.text} />}
-          style={styles.actionButton}
-        />
-      );
-    }
-
-    return <View style={styles.actionButton} />;
-  };
-
   return (
     <View style={[styles.container, style]}>
+      {showBackButton && (
+        <Button
+          title=""
+          onPress={onBackPress || (() => {})}
+          variant="ghost"
+          size="small"
+          icon={<Icon name="arrow-left" size={24} color="#000" />}
+          style={styles.backButton}
+        />
+      )}
+      
       <View style={styles.content}>
-        {renderLeftSection()}
-        
-        <View style={styles.titleContainer}>
-          <Typography variant="h2" color="text" weight="bold" align="center">
-            {title}
+        <Typography variant="h2" color="text" weight="bold" align="center">
+          {title}
+        </Typography>
+        {subtitle && (
+          <Typography variant="body" color="textSecondary" align="center">
+            {subtitle}
           </Typography>
-          {subtitle && (
-            <Typography variant="body" color="textSecondary" align="center" style={styles.subtitle}>
-              {subtitle}
-            </Typography>
-          )}
-        </View>
-        
-        {renderRightSection()}
+        )}
       </View>
+      
+      {rightAction && (
+        <Button
+          title=""
+          onPress={rightAction.onPress}
+          variant="ghost"
+          size="small"
+          icon={<Icon name={rightAction.icon as any} size={24} color="#000" />}
+          style={styles.rightButton}
+        />
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-  },
-  content: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: 'transparent',
   },
-  actionButton: {
-    width: 48,
-    height: 48,
-  },
-  titleContainer: {
+  content: {
     flex: 1,
     alignItems: 'center',
-    paddingHorizontal: 16,
   },
-  subtitle: {
-    marginTop: 4,
+  backButton: {
+    position: 'absolute',
+    left: 20,
+    zIndex: 1,
+  },
+  rightButton: {
+    position: 'absolute',
+    right: 20,
+    zIndex: 1,
   },
 });
 

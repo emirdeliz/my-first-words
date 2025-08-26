@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useProgress } from '../contexts/ProgressContext';
+import { Box, Typography, Pressable, Card } from '../ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width } = Dimensions.get('window');
@@ -111,298 +108,153 @@ const PracticeScreen: React.FC = () => {
   };
 
   const renderPracticeMode = (mode: any) => (
-    <TouchableOpacity
+    <Pressable
       key={mode.id}
-      style={[
-        styles.practiceModeCard,
-        {
-          backgroundColor: theme.colors.surface,
-          borderColor: mode.color,
-        },
-      ]}
+      style={{
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 12,
+        borderWidth: 2,
+        borderColor: mode.color,
+        backgroundColor: theme.colors.surface,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      }}
       onPress={() => handlePracticeMode(mode.id)}
     >
-      <View style={styles.modeHeader}>
-        <View style={[styles.modeIcon, { backgroundColor: mode.color }]}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+        <Box style={{ width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginRight: 16, backgroundColor: mode.color }}>
           <Icon name={mode.icon} size={24} color="white" />
-        </View>
-        <View style={styles.modeInfo}>
-          <Text style={[styles.modeTitle, { color: theme.colors.text }]}>
+        </Box>
+        <Box style={{ flex: 1 }}>
+          <Typography variant="body" color="text" weight="semiBold" style={{ marginBottom: 4 }}>
             {mode.title}
-          </Text>
-          <Text style={[styles.modeDescription, { color: theme.colors.textSecondary }]}>
+          </Typography>
+          <Typography variant="caption" color="textSecondary">
             {mode.description}
-          </Text>
-        </View>
-      </View>
+          </Typography>
+        </Box>
+      </Box>
       
-      <View style={styles.modeFooter}>
-        <View style={[styles.difficultyBadge, { backgroundColor: mode.color }]}>
-          <Text style={styles.difficultyText}>{mode.difficulty}</Text>
-        </View>
+      <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box style={{ paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12, backgroundColor: mode.color }}>
+          <Typography variant="caption" color="white" weight="semiBold">
+            {mode.difficulty}
+          </Typography>
+        </Box>
         <Icon name="chevron-right" size={20} color={theme.colors.textSecondary} />
-      </View>
-    </TouchableOpacity>
+      </Box>
+    </Pressable>
   );
 
   const renderQuickPractice = (option: any) => (
-    <TouchableOpacity
+    <Pressable
       key={option.id}
-      style={[
-        styles.quickPracticeCard,
-        { backgroundColor: option.color },
-      ]}
+      style={{
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 12,
+        backgroundColor: option.color,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+      }}
       onPress={() => handleQuickPractice(option.id)}
     >
-      <View style={styles.quickPracticeContent}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Icon name={option.icon} size={32} color="white" />
-        <View style={styles.quickPracticeInfo}>
-          <Text style={styles.quickPracticeTitle}>{option.title}</Text>
-          <Text style={styles.quickPracticeDescription}>{option.description}</Text>
-        </View>
-        <View style={styles.wordCount}>
-          <Text style={styles.wordCountText}>{option.count}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
+        <Box style={{ flex: 1, marginLeft: 16 }}>
+          <Typography variant="body" color="white" weight="semiBold" style={{ marginBottom: 4 }}>
+            {option.title}
+          </Typography>
+          <Typography variant="caption" color="white" style={{ opacity: 0.9 }}>
+            {option.description}
+          </Typography>
+        </Box>
+        <Box style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 }}>
+          <Typography variant="body" color="white" weight="bold">
+            {option.count}
+          </Typography>
+        </Box>
+      </Box>
+    </Pressable>
   );
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
       showsVerticalScrollIndicator={false}
     >
-      <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
+      <Box style={{ padding: 20, paddingBottom: 10 }}>
+        <Typography variant="h2" color="text" weight="bold" style={{ marginBottom: 8 }}>
           Praticar
-        </Text>
-        <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>
+        </Typography>
+        <Typography variant="body" color="textSecondary">
           Escolha um modo de prática
-        </Text>
-      </View>
+        </Typography>
+      </Box>
 
-      <View style={styles.streakContainer}>
-        <View style={[styles.streakCard, { backgroundColor: theme.colors.surface }]}>
+      <Box style={{ paddingHorizontal: 20, marginBottom: 20 }}>
+        <Card style={{ flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 12 }} elevation={2}>
           <Icon name="fire" size={24} color={theme.colors.error} />
-          <Text style={[styles.streakText, { color: theme.colors.text }]}>
+          <Typography variant="body" color="text" weight="semiBold" style={{ marginLeft: 12 }}>
             Sequência atual: {currentStreak} dias
-          </Text>
-        </View>
-      </View>
+          </Typography>
+        </Card>
+      </Box>
 
-      <View style={styles.quickPracticeSection}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+      <Box style={{ padding: 20, paddingBottom: 10 }}>
+        <Typography variant="h3" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
           Prática Rápida
-        </Text>
+        </Typography>
         {quickPracticeOptions.map(renderQuickPractice)}
-      </View>
+      </Box>
 
-      <View style={styles.practiceModesSection}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+      <Box style={{ padding: 20, paddingBottom: 10 }}>
+        <Typography variant="h3" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
           Modos de Prática
-        </Text>
+        </Typography>
         {practiceModes.map(renderPracticeMode)}
-      </View>
+      </Box>
 
-      <View style={styles.statsSection}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+      <Box style={{ padding: 20, paddingBottom: 40 }}>
+        <Typography variant="h3" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
           Estatísticas
-        </Text>
-        <View style={[styles.statsCard, { backgroundColor: theme.colors.surface }]}>
-          <View style={styles.statRow}>
-            <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
+        </Typography>
+        <Card style={{ borderRadius: 12, padding: 20 }} elevation={2}>
+          <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 }}>
+            <Typography variant="body" color="textSecondary">
               Total de palavras:
-            </Text>
-            <Text style={[styles.statValue, { color: theme.colors.text }]}>
+            </Typography>
+            <Typography variant="body" color="text" weight="semiBold">
               {words.length}
-            </Text>
-          </View>
-          <View style={styles.statRow}>
-            <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
+            </Typography>
+          </Box>
+          <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 }}>
+            <Typography variant="body" color="textSecondary">
               Palavras aprendidas:
-            </Text>
-            <Text style={[styles.statValue, { color: theme.colors.success }]}>
+            </Typography>
+            <Typography variant="body" color="success" weight="semiBold">
               {words.filter(w => w.isLearned).length}
-            </Text>
-          </View>
-          <View style={styles.statRow}>
-            <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>
+            </Typography>
+          </Box>
+          <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 }}>
+            <Typography variant="body" color="textSecondary">
               Por aprender:
-            </Text>
-            <Text style={[styles.statValue, { color: theme.colors.warning }]}>
+            </Typography>
+            <Typography variant="body" color="warning" weight="semiBold">
               {words.filter(w => !w.isLearned).length}
-            </Text>
-          </View>
-        </View>
-      </View>
+            </Typography>
+          </Box>
+        </Card>
+      </Box>
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-    paddingBottom: 10,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-  },
-  streakContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
-  },
-  streakCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  streakText: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 12,
-  },
-  quickPracticeSection: {
-    padding: 20,
-    paddingBottom: 10,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 16,
-  },
-  quickPracticeCard: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  quickPracticeContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  quickPracticeInfo: {
-    flex: 1,
-    marginLeft: 16,
-  },
-  quickPracticeTitle: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  quickPracticeDescription: {
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontSize: 14,
-  },
-  wordCount: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  wordCountText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  practiceModesSection: {
-    padding: 20,
-    paddingBottom: 10,
-  },
-  practiceModeCard: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 2,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  modeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  modeIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  modeInfo: {
-    flex: 1,
-  },
-  modeTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  modeDescription: {
-    fontSize: 14,
-  },
-  modeFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  difficultyBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  difficultyText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  statsSection: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  statsCard: {
-    borderRadius: 12,
-    padding: 20,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  statRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  statLabel: {
-    fontSize: 16,
-  },
-  statValue: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
 
 export default PracticeScreen;

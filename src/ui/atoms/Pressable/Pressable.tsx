@@ -168,6 +168,7 @@ const Pressable: React.FC<PressableProps> = ({
   overflowScroll,
   activeOpacity = 0.7,
   className = '',
+  style,
   ...props
 }) => {
   const getClasses = () => {
@@ -269,6 +270,7 @@ const Pressable: React.FC<PressableProps> = ({
   return (
     <TouchableOpacity 
       className={combinedClasses} 
+      style={style}
       activeOpacity={activeOpacity}
       {...props} 
     />

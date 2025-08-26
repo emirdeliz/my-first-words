@@ -1,15 +1,13 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import { Card } from '../../atoms/Card';
-import { Typography } from '../../atoms/Typography';
-import { useTheme } from '../../../contexts/ThemeContext';
+import Card from '../../atoms/Card';
+import Typography from '../../atoms/Typography';
 
 export interface ProgressCardProps {
   title: string;
   currentValue: number;
   maxValue: number;
   showPercentage?: boolean;
-  showValues?: boolean;
   color?: string;
   size?: 'small' | 'medium' | 'large';
   style?: ViewStyle;
@@ -20,20 +18,16 @@ const ProgressCard: React.FC<ProgressCardProps> = ({
   currentValue,
   maxValue,
   showPercentage = true,
-  showValues = true,
-  color,
+  color = '#007AFF',
   size = 'medium',
   style,
 }) => {
-  const { theme } = useTheme();
-
-  const progressPercentage = maxValue > 0 ? (currentValue / maxValue) * 100 : 0;
-  const progressColor = color || theme.colors.primary;
-
-  const getBarHeight = () => {
+  const percentage = maxValue > 0 ? (currentValue / maxValue) * 100 : 0;
+  
+  const getHeight = () => {
     switch (size) {
       case 'small':
-        return 6;
+        return 8;
       case 'large':
         return 16;
       default:
@@ -41,121 +35,78 @@ const ProgressCard: React.FC<ProgressCardProps> = ({
     }
   };
 
-  const getTitleSize = () => {
-    switch (size) {
-      case 'small':
-        return 14;
-      case 'large':
-        return 20;
-      default:
-        return 18;
-    }
-  };
-
-  const getValueSize = () => {
+  const getPadding = () => {
     switch (size) {
       case 'small':
         return 12;
       case 'large':
-        return 16;
+        return 24;
       default:
-        return 14;
+        return 16;
     }
   };
 
   return (
-    <Card
-      style={[styles.container, style]}
-      padding="medium"
-      elevation={2}
-      borderRadius="medium"
-    >
-      <Typography
-        variant="body"
-        color="text"
-        weight="semiBold"
-        style={[styles.title, { fontSize: getTitleSize() }]}
-      >
-        {title}
-      </Typography>
-
-      <View style={styles.progressContainer}>
+    <Card style={[styles.container, { padding: getPadding() }, style]} elevation={2}>
+      <View style={styles.header}>
+        <Typography variant="body" color="text" weight="semiBold">
+          {title}
+        </Typography>
+        {showPercentage && (
+          <Typography variant="caption" color="textSecondary">
+            {percentage.toFixed(1)}%
+          </Typography>
+        )}
+      </View>
+      
+      <View style={[styles.progressBar, { height: getHeight() }]}>
         <View
           style={[
-            styles.progressBar,
+            styles.progressFill,
             {
-              height: getBarHeight(),
-              backgroundColor: theme.colors.border,
+              width: `${percentage}%`,
+              backgroundColor: color,
             },
           ]}
-        >
-          <View
-            style={[
-              styles.progressFill,
-              {
-                width: `${progressPercentage}%`,
-                backgroundColor: progressColor,
-                height: getBarHeight(),
-              },
-            ]}
-          />
-        </View>
+        />
       </View>
-
-      {(showValues || showPercentage) && (
-        <View style={styles.infoContainer}>
-          {showValues && (
-            <Typography
-              variant="caption"
-              color="textSecondary"
-              style={[styles.values, { fontSize: getValueSize() }]}
-            >
-              {currentValue} de {maxValue}
-            </Typography>
-          )}
-          
-          {showPercentage && (
-            <Typography
-              variant="caption"
-              color="textSecondary"
-              style={[styles.percentage, { fontSize: getValueSize() }]}
-            >
-              {progressPercentage.toFixed(1)}%
-            </Typography>
-          )}
-        </View>
-      )}
+      
+      <View style={styles.footer}>
+        <Typography variant="caption" color="textSecondary">
+          {currentValue}
+        </Typography>
+        <Typography variant="caption" color="textSecondary">
+          {maxValue}
+        </Typography>
+      </View>
     </Card>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    borderRadius: 12,
   },
-  title: {
-    marginBottom: 16,
-  },
-  progressContainer: {
-    marginBottom: 12,
-  },
-  progressBar: {
-    borderRadius: 6,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    borderRadius: 6,
-  },
-  infoContainer: {
+  header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 12,
   },
-  values: {
-    flex: 1,
+  progressBar: {
+    backgroundColor: '#E9ECEF',
+    borderRadius: 6,
+    marginBottom: 8,
+    overflow: 'hidden',
   },
-  percentage: {
-    textAlign: 'right',
+  progressFill: {
+    height: '100%',
+    borderRadius: 6,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
 

@@ -1,15 +1,12 @@
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useProgress } from '../contexts/ProgressContext';
+import { Box, Typography, Pressable, Card } from '../ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width } = Dimensions.get('window');
@@ -30,266 +27,142 @@ const LearnScreen: React.FC = () => {
   };
 
   const renderCategoryCard = (category: any) => (
-    <TouchableOpacity
+    <Pressable
       key={category.id}
-      style={[
-        styles.categoryCard,
-        {
-          backgroundColor: category.isUnlocked ? category.color : theme.colors.border,
-          opacity: category.isUnlocked ? 1 : 0.6,
-        },
-      ]}
+      style={{
+        borderRadius: 16,
+        padding: 20,
+        marginBottom: 16,
+        backgroundColor: category.isUnlocked ? category.color : theme.colors.border,
+        opacity: category.isUnlocked ? 1 : 0.6,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      }}
       onPress={() => handleCategoryPress(category.id)}
       disabled={!category.isUnlocked}
     >
-      <View style={styles.categoryHeader}>
-        <Text style={styles.categoryIcon}>{category.icon}</Text>
-        <View style={styles.categoryInfo}>
-          <Text style={styles.categoryName}>{category.name}</Text>
-          <Text style={styles.categoryDescription}>{category.description}</Text>
-        </View>
-      </View>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+        <Typography variant="h1" color="white" style={{ marginRight: 16 }}>
+          {category.icon}
+        </Typography>
+        <Box style={{ flex: 1 }}>
+          <Typography variant="body" color="white" weight="semiBold" style={{ marginBottom: 4 }}>
+            {category.name}
+          </Typography>
+          <Typography variant="caption" color="white" style={{ opacity: 0.9 }}>
+            {category.description}
+          </Typography>
+        </Box>
+      </Box>
       
-      <View style={styles.categoryProgress}>
-        <View style={styles.progressBar}>
-          <View
-            style={[
-              styles.progressFill,
-              {
-                width: `${(category.learnedWords / category.totalWords) * 100}%`,
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              },
-            ]}
+      <Box style={{ marginTop: 8 }}>
+        <Box style={{ height: 6, backgroundColor: 'rgba(255, 255, 255, 0.3)', borderRadius: 3, marginBottom: 8, overflow: 'hidden' }}>
+          <Box
+            style={{
+              width: `${(category.learnedWords / category.totalWords) * 100}%`,
+              height: '100%',
+              borderRadius: 3,
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            }}
           />
-        </View>
-        <Text style={styles.progressText}>
+        </Box>
+        <Typography variant="caption" color="white" align="center" style={{ opacity: 0.9 }}>
           {category.learnedWords}/{category.totalWords} palavras
-        </Text>
-      </View>
+        </Typography>
+      </Box>
 
       {!category.isUnlocked && (
-        <View style={styles.lockOverlay}>
+        <Box style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.3)', justifyContent: 'center', alignItems: 'center', borderRadius: 16 }}>
           <Icon name="lock" size={24} color="white" />
-        </View>
+        </Box>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 
   const renderLessonCard = (lesson: any) => (
-    <TouchableOpacity
+    <Pressable
       key={lesson.id}
-      style={[
-        styles.lessonCard,
-        {
-          backgroundColor: theme.colors.surface,
-          borderColor: lesson.isCompleted ? theme.colors.success : theme.colors.border,
-        },
-      ]}
+      style={{
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: lesson.isCompleted ? theme.colors.success : theme.colors.border,
+        backgroundColor: theme.colors.surface,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      }}
       onPress={() => handleLessonPress(lesson.id)}
     >
-      <View style={styles.lessonHeader}>
-        <View style={styles.lessonIcon}>
+      <Box style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+        <Box style={{ marginRight: 12 }}>
           <Icon
             name={lesson.isCompleted ? 'check-circle' : 'play-circle'}
             size={24}
             color={lesson.isCompleted ? theme.colors.success : theme.colors.primary}
           />
-        </View>
-        <View style={styles.lessonInfo}>
-          <Text style={[styles.lessonTitle, { color: theme.colors.text }]}>
+        </Box>
+        <Box style={{ flex: 1 }}>
+          <Typography variant="body" color="text" weight="semiBold" style={{ marginBottom: 4 }}>
             {lesson.title}
-          </Text>
-          <Text style={[styles.lessonDescription, { color: theme.colors.textSecondary }]}>
+          </Typography>
+          <Typography variant="caption" color="textSecondary">
             {lesson.description}
-          </Text>
-        </View>
-      </View>
+          </Typography>
+        </Box>
+      </Box>
 
-      <View style={styles.lessonFooter}>
-        <Text style={[styles.lessonScore, { color: theme.colors.textSecondary }]}>
+      <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="caption" color="textSecondary">
           {lesson.score}/{lesson.maxScore} pontos
-        </Text>
+        </Typography>
         {lesson.isCompleted && (
-          <View style={styles.completedBadge}>
+          <Box style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Icon name="trophy" size={16} color={theme.colors.warning} />
-            <Text style={[styles.completedText, { color: theme.colors.warning }]}>
+            <Typography variant="caption" color="warning" weight="semiBold" style={{ marginLeft: 4 }}>
               Concluída
-            </Text>
-          </View>
+            </Typography>
+          </Box>
         )}
-      </View>
-    </TouchableOpacity>
+      </Box>
+    </Pressable>
   );
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
       showsVerticalScrollIndicator={false}
     >
-      <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
+      <Box style={{ padding: 20, paddingBottom: 10 }}>
+        <Typography variant="h2" color="text" weight="bold" style={{ marginBottom: 8 }}>
           Categorias de Aprendizado
-        </Text>
-        <Text style={[styles.headerSubtitle, { color: theme.colors.textSecondary }]}>
+        </Typography>
+        <Typography variant="body" color="textSecondary">
           Escolha uma categoria para começar
-        </Text>
-      </View>
+        </Typography>
+      </Box>
 
-      <View style={styles.categoriesSection}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+      <Box style={{ padding: 20, paddingBottom: 10 }}>
+        <Typography variant="h3" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
           Categorias Disponíveis
-        </Text>
+        </Typography>
         {categories.map(renderCategoryCard)}
-      </View>
+      </Box>
 
-      <View style={styles.lessonsSection}>
-        <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+      <Box style={{ padding: 20, paddingBottom: 40 }}>
+        <Typography variant="h3" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
           Lições Recentes
-        </Text>
+        </Typography>
         {lessons.map(renderLessonCard)}
-      </View>
+      </Box>
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-    paddingBottom: 10,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  headerSubtitle: {
-    fontSize: 16,
-  },
-  categoriesSection: {
-    padding: 20,
-    paddingBottom: 10,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 16,
-  },
-  categoryCard: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  categoryHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  categoryIcon: {
-    fontSize: 32,
-    marginRight: 16,
-  },
-  categoryInfo: {
-    flex: 1,
-  },
-  categoryName: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  categoryDescription: {
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontSize: 14,
-  },
-  categoryProgress: {
-    marginTop: 8,
-  },
-  progressBar: {
-    height: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 3,
-    marginBottom: 8,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 3,
-  },
-  progressText: {
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  lockOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 16,
-  },
-  lessonsSection: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  lessonCard: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  lessonHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  lessonIcon: {
-    marginRight: 12,
-  },
-  lessonInfo: {
-    flex: 1,
-  },
-  lessonTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  lessonDescription: {
-    fontSize: 14,
-  },
-  lessonFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  lessonScore: {
-    fontSize: 14,
-  },
-  completedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  completedText: {
-    fontSize: 12,
-    fontWeight: '600',
-    marginLeft: 4,
-  },
-});
 
 export default LearnScreen;

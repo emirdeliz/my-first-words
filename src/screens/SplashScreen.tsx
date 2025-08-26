@@ -1,8 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   Animated,
   Dimensions,
   StatusBar,
@@ -10,6 +7,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { Box, Typography, Card } from '../ui';
 
 const { width, height } = Dimensions.get('window');
 
@@ -71,127 +69,96 @@ const SplashScreen: React.FC = () => {
 
   const navigateToNextScreen = () => {
     if (isAuthenticated) {
-      navigation.replace('Main');
+      navigation.navigate('Main' as never);
     } else {
-      navigation.replace('Onboarding');
+      navigation.navigate('Onboarding' as never);
     }
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <Box flex justifyCenter itemsCenter style={{ backgroundColor: theme.colors.background }}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
         translucent
       />
       
-      <View style={styles.content}>
+      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 40 }}>
         {/* Logo animado */}
         <Animated.View
-          style={[
-            styles.logoContainer,
-            {
-              opacity: logoOpacity,
-              transform: [{ scale: logoScale }],
-            },
-          ]}
+          style={{
+            marginBottom: 40,
+            opacity: logoOpacity,
+            transform: [{ scale: logoScale }],
+          }}
         >
-          <View style={[styles.logo, { backgroundColor: theme.colors.primary }]}>
-            <Text style={styles.logoText}>📚</Text>
-          </View>
+          <Card style={{ width: 120, height: 120, borderRadius: 60, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.primary }} padding="large" elevation={8}>
+            <Typography variant="h1" color="white" align="center">
+              📚
+            </Typography>
+          </Card>
         </Animated.View>
 
         {/* Título animado */}
         <Animated.Text
-          style={[
-            styles.title,
-            {
-              color: theme.colors.text,
-              opacity: titleOpacity,
-            },
-          ]}
+          style={{
+            fontSize: 32,
+            fontWeight: 'bold',
+            textAlign: 'center',
+            marginBottom: 16,
+            color: theme.colors.text,
+            opacity: titleOpacity,
+          }}
         >
           My First Words
         </Animated.Text>
 
         {/* Subtítulo animado */}
         <Animated.Text
-          style={[
-            styles.subtitle,
-            {
-              color: theme.colors.textSecondary,
-              opacity: subtitleOpacity,
-            },
-          ]}
+          style={{
+            fontSize: 16,
+            textAlign: 'center',
+            lineHeight: 24,
+            color: theme.colors.textSecondary,
+            opacity: subtitleOpacity,
+          }}
         >
           Aprenda suas primeiras palavras de forma divertida
         </Animated.Text>
-      </View>
+      </Box>
 
       {/* Indicador de carregamento */}
-      <View style={styles.loadingContainer}>
-        <View style={[styles.loadingDot, { backgroundColor: theme.colors.primary }]} />
-        <View style={[styles.loadingDot, { backgroundColor: theme.colors.secondary }]} />
-        <View style={[styles.loadingDot, { backgroundColor: theme.colors.primary }]} />
-      </View>
-    </View>
+      <Box flexRow style={{ marginBottom: 60 }}>
+        <Box
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: 4,
+            marginHorizontal: 4,
+            backgroundColor: theme.colors.primary,
+          }}
+        />
+        <Box
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: 4,
+            marginHorizontal: 4,
+            backgroundColor: theme.colors.secondary,
+          }}
+        />
+        <Box
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: 4,
+            marginHorizontal: 4,
+            backgroundColor: theme.colors.primary,
+          }}
+        />
+      </Box>
+    </Box>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  logoContainer: {
-    marginBottom: 40,
-  },
-  logo: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  logoText: {
-    fontSize: 60,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  loadingContainer: {
-    flexDirection: 'row',
-    marginBottom: 60,
-  },
-  loadingDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 4,
-  },
-});
 
 export default SplashScreen;

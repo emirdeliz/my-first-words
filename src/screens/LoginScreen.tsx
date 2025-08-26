@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import {
-  View,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -14,7 +12,8 @@ import {
   FormField, 
   Button, 
   Typography, 
-  Card 
+  Card,
+  Box
 } from '../ui';
 
 const LoginScreen: React.FC = () => {
@@ -39,7 +38,7 @@ const LoginScreen: React.FC = () => {
     try {
       const success = await login(email, password);
       if (success) {
-        navigation.replace('Main');
+        navigation.navigate('Main' as never);
       } else {
         Alert.alert('Erro', 'Email ou senha incorretos');
       }
@@ -49,17 +48,17 @@ const LoginScreen: React.FC = () => {
   };
 
   const handleRegister = () => {
-    navigation.navigate('Register');
+    navigation.navigate('Register' as never);
   };
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <Card style={styles.logoCard} padding="large" elevation={4}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 20 }}>
+        <Box style={{ alignItems: 'center', marginBottom: 40 }}>
+          <Card style={{ width: 80, height: 80, borderRadius: 40, justifyContent: 'center', alignItems: 'center', marginBottom: 20 }} padding="large" elevation={4}>
             <Typography variant="h1" color="primary" align="center">
               📚
             </Typography>
@@ -71,9 +70,9 @@ const LoginScreen: React.FC = () => {
           <Typography variant="body" color="textSecondary" align="center">
             Faça login para continuar aprendendo
           </Typography>
-        </View>
+        </Box>
 
-        <View style={styles.formContainer}>
+        <Box style={{ marginBottom: 30 }}>
           <FormField
             label="Email"
             placeholder="Digite seu email"
@@ -102,7 +101,7 @@ const LoginScreen: React.FC = () => {
             loading={isLoading}
             fullWidth
             size="large"
-            style={styles.loginButton}
+            style={{ marginTop: 10 }}
           />
 
           <Button
@@ -110,11 +109,11 @@ const LoginScreen: React.FC = () => {
             onPress={() => {}}
             variant="ghost"
             size="medium"
-            style={styles.forgotPasswordButton}
+            style={{ marginTop: 20 }}
           />
-        </View>
+        </Box>
 
-        <View style={styles.footer}>
+        <Box style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
           <Typography variant="body" color="textSecondary" align="center">
             Não tem uma conta?{' '}
           </Typography>
@@ -124,47 +123,10 @@ const LoginScreen: React.FC = () => {
             variant="ghost"
             size="medium"
           />
-        </View>
+        </Box>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logoCard: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  formContainer: {
-    marginBottom: 30,
-  },
-  loginButton: {
-    marginTop: 10,
-  },
-  forgotPasswordButton: {
-    marginTop: 20,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 
 export default LoginScreen;

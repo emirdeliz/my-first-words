@@ -4,7 +4,7 @@ import { useTheme } from '../../../contexts/ThemeContext';
 
 export interface TypographyProps extends TextProps {
   variant?: 'h1' | 'h2' | 'h3' | 'body' | 'caption' | 'label';
-  color?: 'primary' | 'secondary' | 'text' | 'textSecondary' | 'error' | 'success' | 'warning';
+  color?: 'primary' | 'secondary' | 'text' | 'textSecondary' | 'error' | 'success' | 'warning' | 'white';
   weight?: 'normal' | 'medium' | 'semiBold' | 'bold';
   align?: 'left' | 'center' | 'right';
   style?: TextStyle;
@@ -31,23 +31,23 @@ const Typography: React.FC<TypographyProps> = ({
     switch (variant) {
       case 'h1':
         baseStyle.fontSize = theme.typography.h1.fontSize;
-        baseStyle.fontWeight = theme.typography.h1.fontWeight;
+        baseStyle.fontWeight = theme.typography.h1.fontWeight as any;
         break;
       case 'h2':
         baseStyle.fontSize = theme.typography.h2.fontSize;
-        baseStyle.fontWeight = theme.typography.h2.fontWeight;
+        baseStyle.fontWeight = theme.typography.h2.fontWeight as any;
         break;
       case 'h3':
         baseStyle.fontSize = theme.typography.h3.fontSize;
-        baseStyle.fontWeight = theme.typography.h3.fontWeight;
+        baseStyle.fontWeight = theme.typography.h3.fontWeight as any;
         break;
       case 'body':
         baseStyle.fontSize = theme.typography.body.fontSize;
-        baseStyle.fontWeight = theme.typography.body.fontWeight;
+        baseStyle.fontWeight = theme.typography.body.fontWeight as any;
         break;
       case 'caption':
         baseStyle.fontSize = theme.typography.caption.fontSize;
-        baseStyle.fontWeight = theme.typography.caption.fontWeight;
+        baseStyle.fontWeight = theme.typography.caption.fontWeight as any;
         break;
       case 'label':
         baseStyle.fontSize = 14;
@@ -82,6 +82,9 @@ const Typography: React.FC<TypographyProps> = ({
         break;
       case 'warning':
         baseStyle.color = theme.colors.warning;
+        break;
+      case 'white':
+        baseStyle.color = 'white';
         break;
     }
 

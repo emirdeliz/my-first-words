@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import { Input, InputProps } from '../../atoms/Input';
-import { Typography } from '../../atoms/Typography';
+import Input from '../../atoms/Input';
+import Typography from '../../atoms/Typography';
 
-export interface FormFieldProps extends InputProps {
+export interface FormFieldProps extends React.ComponentProps<typeof Input> {
   label?: string;
   error?: string;
   required?: boolean;

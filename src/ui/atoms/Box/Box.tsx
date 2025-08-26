@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ViewProps } from 'react-native';
+import { View, ViewProps, StyleSheet, ViewStyle } from 'react-native';
 
 export interface BoxProps extends ViewProps {
   // Layout
@@ -148,6 +148,7 @@ const Box: React.FC<BoxProps> = ({
   overflowHidden,
   overflowScroll,
   className = '',
+  style,
   ...props
 }) => {
   const getClasses = () => {
@@ -239,7 +240,7 @@ const Box: React.FC<BoxProps> = ({
   const combinedClasses = `${getClasses()} ${className}`.trim();
 
   return (
-    <View className={combinedClasses} {...props} />
+    <View className={combinedClasses} style={style} {...props} />
   );
 };
 
