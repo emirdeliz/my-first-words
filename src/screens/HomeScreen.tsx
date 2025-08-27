@@ -66,50 +66,55 @@ const HomeScreen: React.FC = () => {
       <ScrollView>
         {/* Header */}
         <Box bgPrimary px py={6} style={{ paddingTop: 60 }}>
-          <Typography variant="h1" color="white" align="center" style={{ marginBottom: 8 }}>
-            Olá, {user?.name || 'Usuário'}! 👋
-          </Typography>
-          <Typography variant="body" color="white" weight="semiBold" align="center" style={{ marginBottom: 4 }}>
-            Bem-vindo de volta ao My First Words
-          </Typography>
-          <Typography variant="caption" color="white" align="center" style={{ opacity: 0.9 }}>
-            Continue sua jornada de aprendizado
-          </Typography>
+          <Box mb={2}>
+            <Typography variant="h1" color="white" align="center">
+              Olá, {user?.name || 'Usuário'}! 👋
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography variant="body" color="white" weight="semiBold" align="center">
+              Bem-vindo de volta ao My First Words
+            </Typography>
+          </Box>
+          <Box opacity90>
+            <Typography variant="caption" color="white" align="center">
+              Continue sua jornada de aprendizado
+            </Typography>
+          </Box>
         </Box>
 
         {/* Quick Actions */}
         <Box px py={4}>
-          <Typography variant="h2" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
-            Ações Rápidas
-          </Typography>
+          <Box mb={4}>
+            <Typography variant="h2" color="text" weight="semiBold">
+              Ações Rápidas
+            </Typography>
+          </Box>
           <Box flexRow justifyBetween>
             {quickActions.map((action, index) => (
               <Pressable
                 key={index}
                 onPress={action.onPress}
                 bgWhite
+                p={4}
+                roundedLg
+                itemsCenter
+                shadow
+                elevation3
                 style={{
                   flex: 1,
-                  padding: 16,
-                  borderRadius: 12,
-                  alignItems: 'center',
                   marginHorizontal: index === 1 ? 8 : 0,
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 4,
-                  elevation: 3,
                 }}
               >
                 <Box
+                  w={12}
+                  h={12}
+                  roundedFull
+                  justifyCenter
+                  itemsCenter
+                  mb={3}
                   style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 24,
                     backgroundColor: action.color + '20',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginBottom: 12,
                   }}
                 >
                   <Icon materialCommunityName={action.icon} size={24} color={action.color} />
@@ -135,9 +140,11 @@ const HomeScreen: React.FC = () => {
 
         {/* Stats */}
         <Box px py={4}>
-          <Typography variant="h2" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
-            Suas Estatísticas
-          </Typography>
+          <Box mb={4}>
+            <Typography variant="h2" color="text" weight="semiBold">
+              Suas Estatísticas
+            </Typography>
+          </Box>
           <Box flexRow justifyBetween>
             {stats.map((stat, index) => (
               <StatCard
@@ -154,20 +161,22 @@ const HomeScreen: React.FC = () => {
 
         {/* Recent Activity */}
         <Box px py={4} style={{ paddingBottom: 32 }}>
-          <Typography variant="h2" color="text" weight="semiBold" style={{ marginBottom: 16 }}>
-            Atividade Recente
-          </Typography>
+          <Box mb={4}>
+            <Typography variant="h2" color="text" weight="semiBold">
+              Atividade Recente
+            </Typography>
+          </Box>
           <Card style={{ padding: 16 }}>
             <Box flexRow itemsCenter>
               <Box
+                w={10}
+                h={10}
+                roundedFull
+                justifyCenter
+                itemsCenter
+                mr={3}
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
                   backgroundColor: '#007AFF20',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginRight: 12,
                 }}
               >
                 <Icon materialCommunityName="trophy" size={20} color="#007AFF" />
