@@ -138,6 +138,7 @@ const CommunicationGrid = ({
       <ScrollView 
         showsVerticalScrollIndicator={false} 
         style={{ backgroundColor: colors.background }}
+        contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
       >
         <LayoutView 
           isFlexRow

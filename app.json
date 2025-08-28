@@ -12,7 +12,15 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSMicrophoneUsageDescription": "O app precisa de acesso ao microfone para reproduzir áudio.",
-        "NSSpeechRecognitionUsageDescription": "O app usa reconhecimento de fala para melhorar a experiência do usuário."
+        "NSSpeechRecognitionUsageDescription": "O app usa reconhecimento de fala para melhorar a experiência do usuário.",
+        "UIBackgroundModes": ["audio"],
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      },
+      "entitlements": {
+        "com.apple.developer.associated-domains": [],
+        "com.apple.developer.ubiquity-kvstore-identifier": []
       }
     },
     "android": {

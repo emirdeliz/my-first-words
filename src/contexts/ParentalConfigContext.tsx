@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLanguage } from '../hooks/useLanguage';
 
 export interface AudioItem {
   id: string;
@@ -46,47 +47,73 @@ interface ParentalConfigProviderProps {
   children: React.ReactNode;
 }
 
-// Default audio items configuration
-const DEFAULT_AUDIO_ITEMS: AudioItem[] = [
+// Default audio items configuration (without hardcoded text)
+const DEFAULT_AUDIO_ITEMS_CONFIG = [
   // Basic Needs
-  { id: 'basic-hungry', categoryId: 'basic', textKey: 'hungry', text: 'Hungry', icon: 'restaurant', type: 'basic', isEnabled: true },
-  { id: 'basic-thirsty', categoryId: 'basic', textKey: 'thirsty', text: 'Thirsty', icon: 'local-drink', type: 'basic', isEnabled: true },
-  { id: 'basic-tired', categoryId: 'basic', textKey: 'tired', text: 'Tired', icon: 'bedtime', type: 'basic', isEnabled: true },
-  { id: 'basic-bathroom', categoryId: 'basic', textKey: 'bathroom', text: 'Bathroom', icon: 'wc', type: 'basic', isEnabled: true },
-  { id: 'basic-help', categoryId: 'basic', textKey: 'help', text: 'Help', icon: 'help', type: 'basic', isEnabled: true },
-  { id: 'basic-break', categoryId: 'basic', textKey: 'break', text: 'Break', icon: 'pause', type: 'basic', isEnabled: true },
+  { id: 'basic-hungry', categoryId: 'basic', textKey: 'hungry', icon: 'restaurant', type: 'basic' as const },
+  { id: 'basic-thirsty', categoryId: 'basic', textKey: 'thirsty', icon: 'local-drink', type: 'basic' as const },
+  { id: 'basic-tired', categoryId: 'basic', textKey: 'tired', icon: 'bedtime', type: 'basic' as const },
+  { id: 'basic-bathroom', categoryId: 'basic', textKey: 'bathroom', icon: 'wc', type: 'basic' as const },
+  { id: 'basic-help', categoryId: 'basic', textKey: 'help', icon: 'help', type: 'basic' as const },
+  { id: 'basic-break', categoryId: 'basic', textKey: 'break', icon: 'pause', type: 'basic' as const },
   
   // Emotions
-  { id: 'emotions-happy', categoryId: 'emotions', textKey: 'happy', text: 'Happy', icon: 'sentiment-satisfied', type: 'emotions', isEnabled: true },
-  { id: 'emotions-sad', categoryId: 'emotions', textKey: 'sad', text: 'Sad', icon: 'sentiment-dissatisfied', type: 'emotions', isEnabled: true },
-  { id: 'emotions-angry', categoryId: 'emotions', textKey: 'angry', text: 'Angry', icon: 'mood-bad', type: 'emotions', isEnabled: true },
-  { id: 'emotions-scared', categoryId: 'emotions', textKey: 'scared', text: 'Scared', icon: 'sentiment-very-dissatisfied', type: 'emotions', isEnabled: true },
-  { id: 'emotions-excited', categoryId: 'emotions', textKey: 'excited', text: 'Excited', icon: 'sentiment-very-satisfied', type: 'emotions', isEnabled: true },
-  { id: 'emotions-calm', categoryId: 'emotions', textKey: 'calm', text: 'Calm', icon: 'sentiment-neutral', type: 'emotions', isEnabled: true },
+  { id: 'emotions-happy', categoryId: 'emotions', textKey: 'happy', icon: 'sentiment-satisfied', type: 'emotions' as const },
+  { id: 'emotions-sad', categoryId: 'emotions', textKey: 'sad', icon: 'sentiment-dissatisfied', type: 'emotions' as const },
+  { id: 'emotions-angry', categoryId: 'emotions', textKey: 'angry', icon: 'mood-bad', type: 'emotions' as const },
+  { id: 'emotions-scared', categoryId: 'emotions', textKey: 'scared', icon: 'sentiment-very-dissatisfied', type: 'emotions' as const },
+  { id: 'emotions-excited', categoryId: 'emotions', textKey: 'excited', icon: 'sentiment-very-satisfied', type: 'emotions' as const },
+  { id: 'emotions-calm', categoryId: 'emotions', textKey: 'calm', icon: 'sentiment-neutral', type: 'emotions' as const },
   
   // Activities
-  { id: 'activities-play', categoryId: 'activities', textKey: 'play', text: 'Play', icon: 'sports-esports', type: 'activities', isEnabled: true },
-  { id: 'activities-read', categoryId: 'activities', textKey: 'read', text: 'Read', icon: 'book', type: 'activities', isEnabled: true },
-  { id: 'activities-music', categoryId: 'activities', textKey: 'music', text: 'Music', icon: 'music-note', type: 'activities', isEnabled: true },
-  { id: 'activities-outside', categoryId: 'activities', textKey: 'outside', text: 'Outside', icon: 'park', type: 'activities', isEnabled: true },
-  { id: 'activities-tv', categoryId: 'activities', textKey: 'tv', text: 'TV', icon: 'tv', type: 'activities', isEnabled: true },
-  { id: 'activities-draw', categoryId: 'activities', textKey: 'draw', text: 'Draw', icon: 'brush', type: 'activities', isEnabled: true },
+  { id: 'activities-play', categoryId: 'activities', textKey: 'play', icon: 'sports-esports', type: 'activities' as const },
+  { id: 'activities-read', categoryId: 'activities', textKey: 'read', icon: 'book', type: 'activities' as const },
+  { id: 'activities-music', categoryId: 'activities', textKey: 'music', icon: 'music-note', type: 'activities' as const },
+  { id: 'activities-outside', categoryId: 'activities', textKey: 'outside', icon: 'park', type: 'activities' as const },
+  { id: 'activities-tv', categoryId: 'activities', textKey: 'tv', icon: 'tv', type: 'activities' as const },
+  { id: 'activities-draw', categoryId: 'activities', textKey: 'draw', icon: 'brush', type: 'activities' as const },
   
   // Social
-  { id: 'social-hello', categoryId: 'social', textKey: 'hello', text: 'Hello', icon: 'handshake', type: 'social', isEnabled: true },
-  { id: 'social-goodbye', categoryId: 'social', textKey: 'goodbye', text: 'Goodbye', icon: 'exit-to-app', type: 'social', isEnabled: true },
-  { id: 'social-please', categoryId: 'social', textKey: 'please', text: 'Please', icon: 'favorite', type: 'social', isEnabled: true },
-  { id: 'social-thankyou', categoryId: 'social', textKey: 'thankyou', text: 'Thanks', icon: 'thumb-up', type: 'social', isEnabled: true },
-  { id: 'social-sorry', categoryId: 'social', textKey: 'sorry', text: 'Sorry', icon: 'sentiment-dissatisfied', type: 'social', isEnabled: true },
-  { id: 'social-yes', categoryId: 'social', textKey: 'yes', text: 'Yes', icon: 'check-circle', type: 'social', isEnabled: true },
-  { id: 'social-no', categoryId: 'social', textKey: 'no', text: 'No', icon: 'cancel', type: 'social', isEnabled: true },
+  { id: 'social-hello', categoryId: 'social', textKey: 'hello', icon: 'handshake', type: 'social' as const },
+  { id: 'social-goodbye', categoryId: 'social', textKey: 'goodbye', icon: 'exit-to-app', type: 'social' as const },
+  { id: 'social-please', categoryId: 'social', textKey: 'please', icon: 'favorite', type: 'social' as const },
+  { id: 'social-thankyou', categoryId: 'social', textKey: 'thankyou', icon: 'thumb-up', type: 'social' as const },
+  { id: 'social-sorry', categoryId: 'social', textKey: 'sorry', icon: 'sentiment-dissatisfied', type: 'social' as const },
+  { id: 'social-yes', categoryId: 'social', textKey: 'yes', icon: 'check-circle', type: 'social' as const },
+  { id: 'social-no', categoryId: 'social', textKey: 'no', icon: 'cancel', type: 'social' as const },
 ];
 
 const STORAGE_KEY = 'parental_config';
 
 export const ParentalConfigProvider: React.FC<ParentalConfigProviderProps> = ({ children }) => {
+  const { translation } = useLanguage();
+  
+  // Function to create audio items with translated text
+  const createTranslatedAudioItems = (): AudioItem[] => {
+    return DEFAULT_AUDIO_ITEMS_CONFIG.map(item => {
+      let translatedText = '';
+      
+      // Get translated text based on category and textKey
+      if (item.categoryId === 'basic') {
+        translatedText = (translation.basicNeeds as any)[item.textKey] || item.textKey;
+      } else if (item.categoryId === 'emotions') {
+        translatedText = (translation.emotions as any)[item.textKey] || item.textKey;
+      } else if (item.categoryId === 'activities') {
+        translatedText = (translation.activities as any)[item.textKey] || item.textKey;
+      } else if (item.categoryId === 'social') {
+        translatedText = (translation.social as any)[item.textKey] || item.textKey;
+      }
+      
+      return {
+        ...item,
+        text: translatedText,
+        isEnabled: true,
+      };
+    });
+  };
+
   const [config, setConfig] = useState<ParentalConfig>({
-    enabledAudioItems: DEFAULT_AUDIO_ITEMS,
+    enabledAudioItems: createTranslatedAudioItems(),
     isParentMode: false,
     lastUpdated: new Date(),
   });
@@ -98,7 +125,7 @@ export const ParentalConfigProvider: React.FC<ParentalConfigProviderProps> = ({ 
       if (stored) {
         const parsedConfig = JSON.parse(stored);
         // Ensure all items exist (in case new items were added)
-        const mergedItems = DEFAULT_AUDIO_ITEMS.map(defaultItem => {
+        const mergedItems = createTranslatedAudioItems().map(defaultItem => {
           const storedItem = parsedConfig.enabledAudioItems.find(
             (item: AudioItem) => item.id === defaultItem.id
           );
@@ -201,6 +228,18 @@ export const ParentalConfigProvider: React.FC<ParentalConfigProviderProps> = ({ 
   useEffect(() => {
     loadConfig();
   }, []);
+
+  // Update translations when language changes
+  useEffect(() => {
+    setConfig(prev => ({
+      ...prev,
+      enabledAudioItems: prev.enabledAudioItems.map(item => {
+        const updatedConfig = createTranslatedAudioItems();
+        const updatedItem = updatedConfig.find(updated => updated.id === item.id);
+        return updatedItem ? { ...updatedItem, isEnabled: item.isEnabled } : item;
+      }),
+    }));
+  }, [translation]);
 
   // Save config whenever it changes
   useEffect(() => {

@@ -10,12 +10,14 @@ import LearningLevelSelector from "../components/molecules/LearningLevelSelector
 import LanguageSelector from "../components/molecules/LanguageSelector";
 import VoiceSelector from '../components/molecules/VoiceSelector';
 import ThemeSelector from '../components/molecules/ThemeSelector';
+import AudioTestButton from '../components/molecules/AudioTestButton';
 import { useTheme } from "../contexts/ThemeContext";
 
 const SettingsScreen = () => {
   const { currentLevel } = useLearningLevel();
   const { currentLanguage, translation } = useLanguage();
   const { colors, isDark } = useTheme();
+
 
   const handleBack = () => {
     router.back();
@@ -406,6 +408,52 @@ const SettingsScreen = () => {
             </LayoutView>
           </LayoutView>
 
+          {/* Seção de Teste de Áudio */}
+          <LayoutView
+            style={{
+              backgroundColor: isDark ? colors.surface : colors.background,
+              borderRadius: 12,
+              shadowColor: colors.shadow,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
+            customClasses="mb-6"
+            p5
+          >
+            <LayoutView
+              isFlexRow
+              isItemsCenter
+              hasMarginBottom
+            >
+              <MaterialIcons
+                name="volume-up"
+                size={28}
+                color={colors.primary}
+              />
+              <LayoutText
+                isTextLg
+                isFontBold
+                style={{ color: isDark ? colors.text : colors.text }}
+                customClasses="ml-3"
+              >
+                Teste de Áudio
+              </LayoutText>
+            </LayoutView>
+
+            <LayoutText
+              isTextBase
+              style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
+              hasMarginBottom
+              customClasses="mb-4"
+            >
+              Teste se o áudio está funcionando corretamente no seu dispositivo.
+            </LayoutText>
+
+            <AudioTestButton />
+          </LayoutView>
+
           {/* Seção de Configuração Parental */}
           <LayoutView
             style={{
@@ -539,6 +587,8 @@ const SettingsScreen = () => {
           </LayoutView>
         </LayoutView>
       </ScrollView>
+
+
     </>
   );
 };

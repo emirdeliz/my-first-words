@@ -33,20 +33,20 @@ const ParentalConfigScreen = () => {
   };
 
   const categories = [
-    { id: "basic", name: "Basic Needs", icon: "restaurant", color: "#2563eb" },
+    { id: "basic", name: translation.categories.basic, icon: "restaurant", color: "#2563eb" },
     {
       id: "emotions",
-      name: "Emotions",
+      name: translation.categories.emotions,
       icon: "sentiment-satisfied",
       color: "#db2777",
     },
     {
       id: "activities",
-      name: "Activities",
+      name: translation.categories.activities,
       icon: "sports-esports",
       color: "#16a34a",
     },
-    { id: "social", name: "Social", icon: "people", color: "#9333ea" },
+    { id: "social", name: translation.categories.social, icon: "people", color: "#9333ea" },
   ];
 
   const getCategoryStats = (categoryId: string) => {
@@ -74,7 +74,7 @@ const ParentalConfigScreen = () => {
 
   const getCategoryIcon = (categoryId: string) => {
     const category = categories.find((cat) => cat.id === categoryId);
-    return category?.icon || "category";
+    return category?.icon || "help";
   };
 
   const getCategoryColor = (categoryId: string) => {
@@ -303,7 +303,7 @@ const ParentalConfigScreen = () => {
                     name={
                       selectedCategory
                         ? (getCategoryIcon(selectedCategory) as any)
-                        : "category"
+                        : "help"
                     }
                     size={20}
                     color="white"
@@ -312,7 +312,7 @@ const ParentalConfigScreen = () => {
                 <LayoutText isTextXl isFontBold style={{ color: colors.text }}>
                   {selectedCategory
                     ? getCategoryName(selectedCategory)
-                    : translation.parentalConfig.items.category}
+                    : translation.categories.basic}
                 </LayoutText>
               </LayoutView>
 
@@ -425,7 +425,7 @@ const ParentalConfigScreen = () => {
                             marginTop: 4,
                           }}
                         >
-                          {item.type} • {item.textKey}
+                          {translation.categories[item.categoryId as keyof typeof translation.categories]} • {item.textKey}
                         </LayoutText>
                       </LayoutView>
 

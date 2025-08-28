@@ -18,6 +18,7 @@ export class AudioService {
   private currentLanguage: string = 'pt-BR';
   private isPlaying: boolean = false;
   private audioQueue: Array<{ text: string; type: 'word' | 'phrase' | 'sentence' }> = [];
+  private isInitialized: boolean = false;
 
   private constructor() {}
 
@@ -34,6 +35,41 @@ export class AudioService {
 
   setLanguage(language: string) {
     this.currentLanguage = language;
+  }
+
+  // Initialize audio system for iOS
+  async initializeForIOS(): Promise<boolean> {
+    try {
+      if (Platform.OS !== 'ios') return true;
+      
+      console.log('🔧 Initializing audio system for iOS...');
+      
+      // Test with a simple speech to initialize the system
+      Speech.speak('test', {
+        language: 'en-US',
+        rate: 1.0,
+        pitch: 1.0,
+        onDone: () => {
+          console.log('✅ iOS audio system initialized successfully');
+          this.isInitialized = true;
+        },
+        onError: (error) => {
+          console.error('❌ iOS audio system initialization failed:', error);
+          this.isInitialized = false;
+        },
+        onStopped: () => {
+          console.log('⏹️ iOS audio system initialization stopped');
+        },
+      });
+      
+      // Wait a bit for initialization
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      return this.isInitialized;
+    } catch (error) {
+      console.error('❌ Error initializing iOS audio system:', error);
+      return false;
+    }
   }
 
   // Check and request audio permissions
@@ -287,11 +323,25 @@ export class AudioService {
         return;
       }
 
+      // Initialize iOS audio system if needed
+      if (Platform.OS === 'ios' && !this.isInitialized) {
+        console.log('🔧 iOS audio not initialized, initializing now...');
+        const initialized = await this.initializeForIOS();
+        if (!initialized) {
+          console.error('❌ Failed to initialize iOS audio system');
+          this.isPlaying = false;
+          setTimeout(() => {
+            this.playNextInQueue();
+          }, 500);
+          return;
+        }
+      }
+
       // iOS-specific optimizations
       const iosOptions = Platform.OS === 'ios' ? {
         language: this.currentLanguage,
-        pitch: options.pitch || 1.0,
-        rate: options.rate || 0.9,
+        pitch: 1.0, // Use natural pitch for iOS
+        rate: 0.8,  // Slightly slower for better clarity on iOS
         // iOS works better with these settings
         voice: undefined, // Let iOS choose the best voice
       } : {
@@ -382,7 +432,7 @@ export class AudioService {
       await Speech.speak(audioItem.text, {
         language: 'en-US', // Fallback to English
         pitch: 1.0,
-        rate: 0.9,
+        rate: 0.8,
         onDone: () => {
           console.log(`✅ iOS fallback succeeded: "${audioItem.text}"`);
           this.isPlaying = false;
@@ -393,7 +443,39 @@ export class AudioService {
         onError: (error) => {
           console.error(`❌ iOS fallback failed: ${error}`);
           this.isPlaying = false;
-          // Continue with next item even if fallback fails
+          // Try second fallback
+          this.tryIOSFallback2(audioItem);
+        },
+        onStopped: () => {
+          this.isPlaying = false;
+        },
+      });
+    } catch (error) {
+      console.error(`❌ iOS fallback error: ${error}`);
+      this.isPlaying = false;
+      // Try second fallback
+      this.tryIOSFallback2(audioItem);
+    }
+  }
+
+  // iOS second fallback method
+  private async tryIOSFallback2(audioItem: { text: string; type: string }): Promise<void> {
+    try {
+      console.log(`🔄 iOS fallback 2: Trying with no options`);
+      
+      // iOS fallback 2: Try with absolutely no options
+      await Speech.speak(audioItem.text, {
+        onDone: () => {
+          console.log(`✅ iOS fallback 2 succeeded: "${audioItem.text}"`);
+          this.isPlaying = false;
+          setTimeout(() => {
+            this.playNextInQueue();
+          }, 500);
+        },
+        onError: (error) => {
+          console.error(`❌ iOS fallback 2 failed: ${error}`);
+          this.isPlaying = false;
+          // Continue with next item even if all fallbacks fail
           setTimeout(() => {
             this.playNextInQueue();
           }, 500);
@@ -403,7 +485,7 @@ export class AudioService {
         },
       });
     } catch (error) {
-      console.error(`❌ iOS fallback error: ${error}`);
+      console.error(`❌ iOS fallback 2 error: ${error}`);
       this.isPlaying = false;
       setTimeout(() => {
         this.playNextInQueue();
@@ -549,6 +631,39 @@ export class AudioService {
   // Check if currently speaking
   async isSpeaking(): Promise<boolean> {
     return this.isPlaying || await Speech.isSpeakingAsync();
+  }
+
+  // Test audio on iOS
+  async testAudioOnIOS(): Promise<boolean> {
+    try {
+      if (Platform.OS !== 'ios') return true;
+      
+      console.log('🧪 Testing audio on iOS...');
+      
+      // Test with a simple word
+      await Speech.speak('test', {
+        language: 'en-US',
+        rate: 1.0,
+        pitch: 1.0,
+        onDone: () => {
+          console.log('✅ iOS audio test successful');
+        },
+        onError: (error) => {
+          console.error('❌ iOS audio test failed:', error);
+        },
+        onStopped: () => {
+          console.log('⏹️ iOS audio test stopped');
+        },
+      });
+      
+      // Wait a bit for the test to complete
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      return true;
+    } catch (error) {
+      console.error('❌ Error testing iOS audio:', error);
+      return false;
+    }
   }
 
   // Check if currently speaking (synchronous)
