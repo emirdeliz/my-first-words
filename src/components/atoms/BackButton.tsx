@@ -22,9 +22,9 @@ const BackButton = ({
   return (
     <TouchableOpacity onPress={onPress}>
       <LayoutView 
-        isFlexRow={true}
-        isItemsCenter={true}
-        hasMarginRight={true}
+        isFlexRow
+        isItemsCenter
+        hasMarginRight
         customClasses="mr-4"
       >
         <Icon 
@@ -32,14 +32,14 @@ const BackButton = ({
           isMedium={!isLarge && !isSmall}
           isLarge={isLarge}
           isSmall={isSmall}
-          isWhite={true}
+          isWhite
           hasMargin={hasMargin}
         />
         <LayoutText 
-          isTextWhite={true}
-          isTextBase={true}
-          hasMarginLeft={true}
-          isFontMedium={true}
+          isTextWhite
+          isTextBase
+          hasMarginLeft
+          isFontMedium
           customClasses="ml-2"
         >
           {text}

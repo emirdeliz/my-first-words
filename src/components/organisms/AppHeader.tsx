@@ -10,22 +10,22 @@ const AppHeader = () => {
 
   return (
     <LayoutView 
-      isBgPrimary600={true}
-      isFlexRow={true}
-      isItemsEnd={true}
-      isJustifyBetween={true}
-      hasPaddingX={true}
-      hasPaddingY={true}
-      hasShadow={true}
+      isBgPrimary600
+      isFlexRow
+      isItemsEnd
+      isJustifyBetween
+      hasPaddingX
+      hasPaddingY
+      hasShadow
       style={{
         height: 100
       }}
     >
       <MaterialIcons name="record-voice-over" size={28} color="white" />
       <LayoutText 
-        isTextXl={true}
-        isFontBold={true}
-        isTextWhite={true}
+        isTextXl
+        isFontBold
+        isTextWhite
       >
         {translation.appTitle}
       </LayoutText>

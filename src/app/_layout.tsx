@@ -9,7 +9,7 @@ const RootLayout = () => {
     <SafeAreaProvider>
       <LanguageProvider>
         <SafeAreaView style={{ backgroundColor: '#f8fafc', flex: 1 }} edges={['bottom']}>
-          {/* <StatusBar style="light" backgroundColor="#2563eb" hidden={true} /> */}
+          <StatusBar style="light" backgroundColor="#2563eb" hidden />
           <Stack screenOptions={{ headerShown: false, headerStyle: { backgroundColor: '#2563eb' } }}>
             <Stack.Screen name="index" />
           </Stack>
@@ -18,5 +18,7 @@ const RootLayout = () => {
     </SafeAreaProvider>
   );
 }
+
+// https://www.onspace.ai/ai-app-builder/9b1j3r
 
 export default RootLayout;

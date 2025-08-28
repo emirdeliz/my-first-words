@@ -1,6 +1,8 @@
 import { Platform } from 'react-native';
 import * as Speech from 'expo-speech';
 
+const VOICE_NAME_IGNORE = ['Trinoids', 'Albert', 'Jester'];
+
 export class SpeechService {
   static async speak(text: string, languageCode: string): Promise<void> {
     try {
@@ -101,28 +103,31 @@ export class SpeechService {
       let selectedVoice = null;
       
       // Strategy 1: Exact language match
-      selectedVoice = voices.find(voice => voice.language === languageCode);
+      selectedVoice = voices.find(voice => voice.language === languageCode && !VOICE_NAME_IGNORE.includes(voice.name));
       
       // Strategy 2: Language family match
       if (!selectedVoice) {
         const langCode = languageCode.split('-')[0];
-        selectedVoice = voices.find(voice => voice.language.startsWith(langCode));
+        selectedVoice = voices.find(voice => voice.language.startsWith(langCode) && !VOICE_NAME_IGNORE.includes(voice.name));
       }
       
       // Strategy 3: Alternative codes for mobile
       if (!selectedVoice) {
         const alternatives = this.getAlternativeLanguageCodes(languageCode);
         for (const altCode of alternatives) {
-          selectedVoice = voices.find(voice => voice.language === altCode);
+
+          console.log('altCode', altCode);
+
+          selectedVoice = voices.find(voice => voice.language === altCode && !VOICE_NAME_IGNORE.includes(voice.name));
           if (selectedVoice) break;
         }
       }
       
-      const speechOptions: any = {
+      const speechOptions = {
         language: languageCode,
         pitch: 1.0,
         rate: 0.7,
-      };
+      } as any;
       
       if (selectedVoice) {
         speechOptions.voice = selectedVoice.identifier;
@@ -131,12 +136,12 @@ export class SpeechService {
         console.log(`⚠️ No specific voice found for ${languageCode}, using system default`);
       }
       
-      await Speech.speak(text, speechOptions);
+      Speech.speak(text, speechOptions);
       
     } catch (voiceError) {
       console.warn('⚠️ Voice selection error, using basic speech:', voiceError);
       // Fallback to basic speech
-      await Speech.speak(text, {
+      Speech.speak(text, {
         language: languageCode,
         pitch: 1.0,
         rate: 0.7,
@@ -147,10 +152,10 @@ export class SpeechService {
   private static getAlternativeLanguageCodes(languageCode: string): string[] {
     const alternatives: Record<string, string[]> = {
       'es-ES': ['es-MX', 'es-US', 'es-AR'],
-      'pt-PT': ['pt-BR'],
-      'pt-BR': ['pt-PT'],
+      'pt-PT': ['pt-PT'],
+      'pt-BR': ['pt-BR'],
       'de-DE': ['de-AT', 'de-CH'],
-      'en-US': ['en-GB', 'en-AU'],
+      'en-US': ['en-US'],
     };
     
     return alternatives[languageCode] || [];

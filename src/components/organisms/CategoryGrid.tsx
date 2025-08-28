@@ -46,11 +46,11 @@ const CategoryGrid = ({ categories, onSelectCategory }: CategoryGridProps) => {
 
   return (
     <LayoutView 
-      isFlex={true}
-      isFlexRow={true}
-      isFlexWrap={true}
-      hasPadding={true}
-      isJustifyBetween={true}
+      isFlex
+      isFlexRow
+      isFlexWrap
+      hasPadding
+      isJustifyBetween
       customClasses="p-5 justify-between"
     >
       {categories.map((category) => {

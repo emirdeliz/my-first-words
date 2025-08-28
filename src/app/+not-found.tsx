@@ -15,8 +15,8 @@ const NotFoundScreen = () => {
   return (
     <SafeAreaView>
       <LayoutView 
-        isFlex={true}
-        isBgBlack={true}
+        isFlex
+        isBgBlack
       >
         <LinearGradient
           colors={['#0a0a0a', '#1a1a1a']}
@@ -24,28 +24,28 @@ const NotFoundScreen = () => {
         />
         
         <LayoutView 
-          isFlex={true}
-          isJustifyCenter={true}
-          isItemsCenter={true}
-          hasPadding={true}
+          isFlex
+          isJustifyCenter
+          isItemsCenter
+          hasPadding
           customClasses="p-5"
         >
           <MaterialIcons name="photo-camera" size={80} color="#FFD700" />
           <LayoutText 
-            isText3xl={true}
-            isFontBold={true}
-            isTextWhite={true}
-            hasMarginTop={true}
-            hasMarginBottom={true}
+            isText3xl
+            isFontBold
+            isTextWhite
+            hasMarginTop
+            hasMarginBottom
             customClasses="mt-5 mb-2.5"
           >
             Page Not Found
           </LayoutText>
           <LayoutText 
-            isTextBase={true}
-            isTextGray300={true}
-            isTextCenter={true}
-            hasMarginBottom={true}
+            isTextBase
+            isTextGray300
+            isTextCenter
+            hasMarginBottom
             customClasses="mb-10 leading-[22px]"
           >
             Sorry, the page you are looking for does not exist.
@@ -61,9 +61,9 @@ const NotFoundScreen = () => {
             }}
           >
             <LayoutText 
-              isTextBlack={true}
-              isFontBold={true}
-              isTextBase={true}
+              isTextBlack
+              isFontBold
+              isTextBase
             >
               Return Home
             </LayoutText>

@@ -22,15 +22,15 @@ const LanguageSelector = () => {
     <>
       <Pressable onPress={() => setModalVisible(true)}>
         <LayoutView 
-          isFlexRow={true}
-          isItemsCenter={true}
+          isFlexRow
+          isItemsCenter
         >
           <MaterialIcons name="language" size={24} color="white" />
           <LayoutText 
-            isTextWhite={true}
-            isTextSm={true}
-            isFontBold={true}
-            hasMarginLeft={true}
+            isTextWhite
+            isTextSm
+            isFontBold
+            hasMarginLeft
             customClasses="ml-1"
           >
             {currentLanguage.code.toUpperCase()}
@@ -40,28 +40,29 @@ const LanguageSelector = () => {
 
       <Modal
         animationType="fade"
-        transparent={true}
         visible={modalVisible}
+        transparent
         onRequestClose={() => setModalVisible(false)}
       >
         <LayoutView 
-          isFlex={true}
-          isBgBlack50={true}
-          isJustifyCenter={true}
-          isItemsCenter={true}
+          isFlex
+          isBgBlack50
+          isHFull
+          isJustifyCenter
+          isItemsCenter
         >
           <LayoutView 
-            isBgWhite={true}
-            isRounded2xl={true}
-            hasPadding={true}
+            isBgWhite
+            isRounded2xl
+            hasPadding
             customClasses="p-5 w-4/5 max-h-[70%]"
           >
             <LayoutText 
-              isTextXl={true}
-              isFontBold={true}
-              isTextCenter={true}
-              hasMarginBottom={true}
-              isTextGray800={true}
+              isTextXl
+              isFontBold
+              isTextCenter
+              hasMarginBottom
+              isTextGray800
               customClasses="mb-5"
             >
               Select Language / Selecionar Idioma
@@ -84,7 +85,7 @@ const LanguageSelector = () => {
                   }}
                 >
                   <LayoutText 
-                    isTextBase={true}
+                    isTextBase
                     customClasses={`${
                       currentLanguage.code === language.code ? 'text-gray-800' : 'text-gray-600'
                     }`}
@@ -108,10 +109,10 @@ const LanguageSelector = () => {
               }}
             >
               <LayoutText 
-                isTextWhite={true}
-                isTextBase={true}
-                isFontSemibold={true}
-                isTextCenter={true}
+                isTextWhite
+                isTextBase
+                isFontSemibold
+                isTextCenter
               >
                 Cancel
               </LayoutText>

@@ -64,20 +64,20 @@ const CommunicationGrid = ({
   };
 
   return (
-    <LayoutView isFlex={true}>
+    <LayoutView isFlex isHFull>
       <LayoutView 
-        isBgPrimary600={true}
-        isFlexRow={true}
-        isItemsCenter={true}
-        hasPaddingX={true}
-        hasPaddingY={true}
+        isBgPrimary600
+        isFlexRow
+        isItemsCenter
+        hasPaddingX
+        hasPaddingY
         customClasses="px-5 py-3"
       >
         <BackButton onPress={handleBack} text={translation.back} />
         <LayoutText 
-          isTextLg={true}
-          isFontBold={true}
-          isTextWhite={true}
+          isTextLg
+          isFontBold
+          isTextWhite
         >
           {(translation.categories as any)[category.nameKey]}
         </LayoutText>
@@ -85,11 +85,11 @@ const CommunicationGrid = ({
       
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <LayoutView 
-          isFlex={true}
-          isFlexRow={true}
-          isFlexWrap={true}
-          hasPadding={true}
-          isJustifyBetween={true}
+          isFlex
+          isFlexRow
+          isFlexWrap
+          hasPadding
+          isJustifyBetween
           customClasses="p-4 justify-between"
         >
           {category.items.map((item) => {

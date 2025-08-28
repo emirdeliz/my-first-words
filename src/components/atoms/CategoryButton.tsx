@@ -79,10 +79,10 @@ const CategoryButton = ({
         <MaterialIcons name={icon} size={isLarge ? 48 : 36} color="white" />
         <LayoutText 
           customClasses={`${getTextSize()} font-bold text-white mt-2 text-center`}
-          isTextWhite={true}
-          isFontBold={true}
-          hasMarginTop={true}
-          isTextCenter={true}
+          isTextWhite
+          isFontBold
+          hasMarginTop
+          isTextCenter
         >
           {title}
         </LayoutText>

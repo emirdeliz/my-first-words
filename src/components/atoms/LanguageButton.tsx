@@ -59,7 +59,7 @@ const LanguageButton = ({
           />
         )}
         <LayoutText 
-          isTextWhite={true}
+          isTextWhite
           customClasses={`${getTextSize()} font-bold ${hasIcon ? 'ml-1' : ''}`}
         >
           {languageCode.toUpperCase()}

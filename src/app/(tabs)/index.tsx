@@ -8,8 +8,8 @@ const NotFoundScreen = () => {
   return (
     <SafeAreaView>
       <LayoutView 
-        isFlex={true}
-        isBgBlack={true}
+        isFlex
+        isBgBlack
       >
         <LinearGradient
           colors={['#0a0a0a', '#1a1a1a']}
@@ -17,19 +17,19 @@ const NotFoundScreen = () => {
         />
         
         <LayoutView 
-          isFlex={true}
-          isJustifyCenter={true}
-          isItemsCenter={true}
-          hasPadding={true}
+          isFlex
+          isJustifyCenter
+          isItemsCenter
+          hasPadding
           customClasses="p-5"
         >
           <MaterialIcons name="photo-camera" size={80} color="#FFD700" />
           <LayoutText 
-            isText3xl={true}
-            isFontBold={true}
-            isTextWhite={true}
-            hasMarginTop={true}
-            hasMarginBottom={true}
+            isText3xl
+            isFontBold
+            isTextWhite
+            hasMarginTop
+            hasMarginBottom
             customClasses="mt-5 mb-2.5"
           >
             Home

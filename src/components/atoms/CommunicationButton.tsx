@@ -74,22 +74,21 @@ const CommunicationButton = ({
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={0.7}
+      className='w-[48%] aspect-square'
     >
       <LayoutView 
-        customClasses={`${getSizeClasses()} ${getBorderRadius()} justify-center items-center mb-4 ${getShadow()} ${getPadding()}`}
+        customClasses={`${getSizeClasses()} ${getBorderRadius()} justify-center items-center mb-4 w-full ${getShadow()} ${getPadding()}`}
         style={{ 
-          borderWidth: 2, 
-          borderColor: 'blue',
           backgroundColor: isPrimary ? '#2563eb' : isSecondary ? '#16a34a' : isAccent ? '#9333ea' : isWarning ? '#ca8a04' : '#4b5563'
         }}
       >
         <MaterialIcons name={icon} size={getIconSize()} color="white" />
         <LayoutText 
           customClasses={`${getTextSize()} font-semibold text-white mt-2 text-center leading-[18px]`}
-          isTextWhite={true}
-          isFontSemibold={true}
-          hasMarginTop={true}
-          isTextCenter={true}
+          isTextWhite
+          isFontSemibold
+          hasMarginTop
+          isTextCenter
         >
           {text}
         </LayoutText>
