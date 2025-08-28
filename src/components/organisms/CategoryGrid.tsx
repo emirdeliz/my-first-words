@@ -1,6 +1,7 @@
 import React from 'react';
 import CategoryButton from '../atoms/CategoryButton';
 import { useLanguage } from '../../hooks/useLanguage';
+import { useTheme } from '../../contexts/ThemeContext';
 import LayoutView from '../atoms/LayoutView';
 
 interface Category {
@@ -17,6 +18,7 @@ interface CategoryGridProps {
 
 const CategoryGrid = ({ categories, onSelectCategory }: CategoryGridProps) => {
   const { translation } = useLanguage();
+  const { colors } = useTheme();
 
   const getCategoryProps = (category: Category) => {
     // Use category ID for specific colors
@@ -47,11 +49,13 @@ const CategoryGrid = ({ categories, onSelectCategory }: CategoryGridProps) => {
   return (
     <LayoutView 
       isFlex
+      isFlex1
       isFlexRow
       isFlexWrap
       isJustifyBetween
-      customClasses="justify-between"
+
       p5
+      style={{ backgroundColor: colors.background }}
     >
       {categories.map((category) => {
         const categoryProps = getCategoryProps(category);

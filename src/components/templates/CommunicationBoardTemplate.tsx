@@ -111,7 +111,6 @@ const CommunicationBoardTemplate = () => {
   return (
     <>
       <AppHeader />
-      
       {selectedCategoryData ? (
         <CommunicationGrid
           category={selectedCategoryData}

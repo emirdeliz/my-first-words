@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '../../contexts/ThemeContext';
 import LayoutView from './LayoutView';
 import LayoutText from './LayoutText';
 
@@ -33,31 +34,32 @@ const CommunicationButton = ({
   hasPadding = true,
   onPress 
 }: CommunicationButtonProps) => {
+  const { colors } = useTheme();
   const getSizeClasses = () => {
-    if (isLarge) return 'w-[48%] aspect-[5/6]';
-    if (isSmall) return 'w-[30%] aspect-[4/5]';
-    return 'w-[48%] aspect-[5/6]'; // default
+    if (isLarge) return { isW48: true, isAspect56: true };
+    if (isSmall) return { isW30: true, isAspect65: true };
+    return { isW48: true, isAspect56: true }; // default
   };
 
   const getBorderRadius = () => {
-    if (isRounded) return 'rounded-xl';
-    return 'rounded-lg';
+    if (isRounded) return { isRoundedXl: true };
+    return { isRoundedLg: true };
   };
 
   const getShadow = () => {
-    if (hasShadow) return 'shadow-lg';
-    return '';
+    if (hasShadow) return { hasShadowLg: true };
+    return {};
   };
 
   const getPadding = () => {
-    if (hasPadding) return 'p-3';
-    return '';
+    if (hasPadding) return { p4: true };
+    return {};
   };
 
   const getTextSize = () => {
-    if (isLarge) return 'text-sm';
-    if (isSmall) return 'text-xs';
-    return 'text-sm'; // default
+    if (isLarge) return { isTextSm: true };
+    if (isSmall) return { isTextXs: true };
+    return { isTextSm: true }; // default
   };
 
   const getIconSize = () => {
@@ -74,21 +76,34 @@ const CommunicationButton = ({
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={0.7}
-      className='w-[48%] aspect-square'
+      className='w-[48%]'
     >
       <LayoutView 
-        customClasses={`${getSizeClasses()} ${getBorderRadius()} justify-center items-center mb-4 w-full ${getShadow()} ${getPadding()}`}
+        {...getSizeClasses()}
+        {...getBorderRadius()}
+        {...getShadow()}
+        {...getPadding()}
+        isJustifyCenter
+        isItemsCenter
+        hasMarginBottom
+        isWFull
+        customClasses="mb-4"
         style={{ 
-          backgroundColor: isPrimary ? '#2563eb' : isSecondary ? '#16a34a' : isAccent ? '#9333ea' : isWarning ? '#ca8a04' : '#4b5563'
+          backgroundColor: isPrimary ? colors.primary : 
+                         isSecondary ? colors.success : 
+                         isAccent ? colors.info : 
+                         isWarning ? colors.warning : 
+                         colors.textSecondary
         }}
       >
         <MaterialIcons name={icon} size={getIconSize()} color="white" />
         <LayoutText 
-          customClasses={`${getTextSize()} font-semibold text-white mt-2 text-center leading-[18px]`}
-          isTextWhite
+          {...getTextSize()}
           isFontSemibold
+          isTextWhite
           hasMarginTop
           isTextCenter
+          customClasses="mt-2 leading-[18px]"
         >
           {text}
         </LayoutText>

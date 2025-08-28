@@ -54,7 +54,7 @@ export interface Translation {
     yes: string;
     no: string;
   };
-  // Traduções por nível de aprendizado
+  // Learning level translations
   basicNeedsLevel1: {
     hungry: string;
     thirsty: string;
@@ -88,7 +88,7 @@ export interface Translation {
     yes: string;
     no: string;
   };
-  // Novas traduções para configurações
+  // New translations for settings
   settings: {
     title: string;
     language: {
@@ -181,7 +181,7 @@ export const TRANSLATIONS: Record<string, Translation> = {
       yes: 'Yes',
       no: 'No',
     },
-    // Traduções do nível 1 (palavras simples)
+    // Level 1 translations (simple words)
     basicNeedsLevel1: {
       hungry: 'Hungry',
       thirsty: 'Thirsty',
@@ -320,7 +320,7 @@ export const TRANSLATIONS: Record<string, Translation> = {
       yes: 'Sí',
       no: 'No',
     },
-    // Traduções do nível 1 (palavras simples)
+    // Level 1 translations (simple words)
     basicNeedsLevel1: {
       hungry: 'Hambre',
       thirsty: 'Sed',
@@ -459,7 +459,7 @@ export const TRANSLATIONS: Record<string, Translation> = {
       yes: 'Sim',
       no: 'Não',
     },
-    // Traduções do nível 1 (palavras simples)
+    // Level 1 translations (simple words)
     basicNeedsLevel1: {
       hungry: 'Fome',
       thirsty: 'Sede',
@@ -598,7 +598,7 @@ export const TRANSLATIONS: Record<string, Translation> = {
       yes: 'Sim',
       no: 'Não',
     },
-    // Traduções do nível 1 (palavras simples)
+    // Level 1 translations (simple words)
     basicNeedsLevel1: {
       hungry: 'Fome',
       thirsty: 'Sede',
@@ -737,7 +737,7 @@ export const TRANSLATIONS: Record<string, Translation> = {
       yes: 'Ja',
       no: 'Nein',
     },
-    // Traduções do nível 1 (palavras simples)
+    // Level 1 translations (simple words)
     basicNeedsLevel1: {
       hungry: 'Hunger',
       thirsty: 'Durst',

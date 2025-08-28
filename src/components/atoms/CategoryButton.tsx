@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '../../contexts/ThemeContext';
 import LayoutView from './LayoutView';
 import LayoutText from './LayoutText';
 
@@ -33,26 +34,27 @@ const CategoryButton = ({
   hasShadow = true,
   onPress 
 }: CategoryButtonProps) => {
+  const { colors } = useTheme();
   const getSizeClasses = () => {
-    if (isLarge) return 'w-[48%] aspect-square';
-    if (isSmall) return 'w-[30%] aspect-square';
-    return 'w-[48%] aspect-square'; // default
+    if (isLarge) return { isW48: true, isAspectSquare: true };
+    if (isSmall) return { isW30: true, isAspectSquare: true };
+    return { isW48: true, isAspectSquare: true }; // default
   };
 
   const getBorderRadius = () => {
-    if (isRounded) return 'rounded-2xl';
-    return 'rounded-lg';
+    if (isRounded) return { isRounded2xl: true };
+    return { isRoundedLg: true };
   };
 
   const getShadow = () => {
-    if (hasShadow) return 'shadow-lg';
-    return '';
+    if (hasShadow) return { hasShadowLg: true };
+    return {};
   };
 
   const getTextSize = () => {
-    if (isLarge) return 'text-base';
-    if (isSmall) return 'text-sm';
-    return 'text-base'; // default
+    if (isLarge) return { isTextBase: true };
+    if (isSmall) return { isTextSm: true };
+    return { isTextBase: true }; // default
   };
 
   const handlePress = () => {
@@ -66,23 +68,31 @@ const CategoryButton = ({
       className='w-[48%] aspect-square'
     >
       <LayoutView 
-        customClasses={`${getSizeClasses()} ${getBorderRadius()} justify-center items-center mb-4 w-full ${getShadow()}`}
+        {...getSizeClasses()}
+        {...getBorderRadius()}
+        {...getShadow()}
+        isJustifyCenter
+        isItemsCenter
+        hasMarginBottom
+        isWFull
+        customClasses="mb-4"
         style={{ 
-          backgroundColor: isPrimary ? '#2563eb' : 
-                         isSecondary ? '#16a34a' : 
-                         isAccent ? '#9333ea' : 
+          backgroundColor: isPrimary ? colors.primary : 
+                         isSecondary ? colors.success : 
+                         isAccent ? colors.info : 
                          isFeelings ? '#db2777' : 
                          isSocial ? '#ea580c' : 
-                         '#4b5563'
+                         colors.textSecondary
         }}
       >
         <MaterialIcons name={icon} size={isLarge ? 48 : 36} color="white" />
         <LayoutText 
-          customClasses={`${getTextSize()} font-bold text-white mt-2 text-center`}
-          isTextWhite
+          {...getTextSize()}
           isFontBold
+          isTextWhite
           hasMarginTop
           isTextCenter
+          customClasses="mt-2"
         >
           {title}
         </LayoutText>

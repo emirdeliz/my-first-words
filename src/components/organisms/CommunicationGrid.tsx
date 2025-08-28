@@ -7,6 +7,7 @@ import { useLearningLevel } from '../../contexts/LearningLevelContext';
 import AudioService from '../../services/AudioService';
 import LayoutView from '../atoms/LayoutView';
 import LayoutText from '../atoms/LayoutText';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface CommunicationItem {
   id: string;
@@ -32,11 +33,17 @@ const CommunicationGrid = ({
   onBack, 
   onItemPress 
 }: CommunicationGridProps) => {
-  const { translation } = useLanguage();
+  const { translation, currentLanguage } = useLanguage();
   const { currentLevel } = useLearningLevel();
+  const { colors, isDark } = useTheme();
+
+  // Sincronizar idioma com o AudioService
+  React.useEffect(() => {
+    AudioService.setLanguage(currentLanguage.code);
+  }, [currentLanguage.code]);
 
   const getTranslatedText = (categoryId: string, itemTextKey: string): string => {
-    // Nível 1: Palavras simples
+    // Level 1: Simple words
     if (currentLevel === 1) {
       if (categoryId === 'basic') return (translation.basicNeedsLevel1 as any)[itemTextKey];
       if (categoryId === 'emotions') return (translation.emotionsLevel1 as any)[itemTextKey];
@@ -44,7 +51,7 @@ const CommunicationGrid = ({
       if (categoryId === 'social') return (translation.socialLevel1 as any)[itemTextKey];
     }
     
-    // Níveis 2 e 3: Frases completas
+    // Levels 2 and 3: Complete phrases
     if (categoryId === 'basic') return (translation.basicNeeds as any)[itemTextKey];
     if (categoryId === 'emotions') return (translation.emotions as any)[itemTextKey];
     if (categoryId === 'activities') return (translation.activities as any)[itemTextKey];
@@ -70,38 +77,17 @@ const CommunicationGrid = ({
 
   const handleItemPress = async (text: string) => {
     try {
-      // Atualizar o nível no serviço de áudio
+      // Update level in audio service
       AudioService.setLevel(currentLevel);
       
-      // Reproduzir áudio baseado no nível
-      if (currentLevel === 1) {
-        // Nível 1: Apenas palavras
-        await AudioService.playWord(text);
-      } else if (currentLevel === 2) {
-        // Nível 2: Palavras e frases simples
-        await AudioService.playWord(text);
-        if (AudioService.isPhraseEnabled()) {
-          const simplePhrase = `Esta é a palavra: ${text}`;
-          await AudioService.playPhrase(simplePhrase);
-        }
-      } else if (currentLevel === 3) {
-        // Nível 3: Palavras, frases e sentenças complexas
-        await AudioService.playWord(text);
-        if (AudioService.isPhraseEnabled()) {
-          const simplePhrase = `Esta é a palavra: ${text}`;
-          await AudioService.playPhrase(simplePhrase);
-        }
-        if (AudioService.isComplexSentenceEnabled()) {
-          const complexSentence = `A palavra "${text}" é muito importante para comunicação. Vamos praticar juntos!`;
-          await AudioService.playComplexSentence(complexSentence);
-        }
-      }
+      // Play audio sequence based on level
+      await AudioService.playAudioSequence(text);
       
-      // Chamar callback original
+      // Call original callback
       onItemPress(text);
     } catch (error) {
-      console.error('Erro ao reproduzir áudio:', error);
-      // Fallback: apenas chamar callback original
+      console.error('Error playing audio:', error);
+      // Fallback: just call original callback
       onItemPress(text);
     }
   };
@@ -111,16 +97,23 @@ const CommunicationGrid = ({
   };
 
   return (
-    <LayoutView isFlex isHFull>
+    <LayoutView isFlex isFlex1 isHFull>
       <LayoutView 
-        isBgPrimary600
-        isFlexRow
-        isItemsCenter
-        px5
-        py3
+        style={{
+          backgroundColor: isDark ? colors.surface : colors.primary,
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 20,
+          paddingVertical: 12,
+          shadowColor: colors.shadow,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+          elevation: 5,
+        }}
       >
         <BackButton onPress={handleBack} text={translation.back} />
-        <LayoutView customClasses="flex-1 items-center">
+        <LayoutView isFlex1 isItemsCenter>
           <LayoutText 
             isTextLg
             isFontBold
@@ -138,18 +131,19 @@ const CommunicationGrid = ({
             {translation.settings.learningLevel.levels[`level${currentLevel}` as keyof typeof translation.settings.learningLevel.levels]} - {translation.settings.learningLevel.levels[`level${currentLevel}Desc` as keyof typeof translation.settings.learningLevel.levels]}
           </LayoutText>
         </LayoutView>
-        {/* Espaçador para manter o título centralizado */}
-        <LayoutView customClasses="w-20" />
+        {/* Spacer to keep title centered */}
+        <LayoutView style={{ width: 80 }} />
       </LayoutView>
     
-      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        style={{ backgroundColor: colors.background }}
+      >
         <LayoutView 
-          isFlex
           isFlexRow
           isFlexWrap
           p4
           isJustifyBetween
-          customClasses="justify-between"
         >
           {category.items.map((item) => {
             const translatedText = getTranslatedText(category.id, item.textKey);

@@ -1,6 +1,5 @@
 import React from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useLearningLevel } from "../contexts/LearningLevelContext";
@@ -9,10 +8,14 @@ import LayoutView from "../components/atoms/LayoutView";
 import LayoutText from "../components/atoms/LayoutText";
 import LearningLevelSelector from "../components/molecules/LearningLevelSelector";
 import LanguageSelector from "../components/molecules/LanguageSelector";
+import VoiceSelector from '../components/molecules/VoiceSelector';
+import ThemeSelector from '../components/molecules/ThemeSelector';
+import { useTheme } from "../contexts/ThemeContext";
 
 const SettingsScreen = () => {
   const { currentLevel } = useLearningLevel();
   const { currentLanguage, translation } = useLanguage();
+  const { colors, isDark } = useTheme();
 
   const handleBack = () => {
     router.back();
@@ -60,14 +63,18 @@ const SettingsScreen = () => {
   return (
     <>
       <LayoutView
-        isBgPrimary600
-        isFlexRow
-        isItemsEnd
-        hasPaddingX
-        hasPaddingY
-        hasShadow
         style={{
+          backgroundColor: isDark ? colors.surface : colors.primary,
           height: 100,
+          flexDirection: 'row',
+          alignItems: 'flex-end',
+          paddingHorizontal: 20,
+          paddingVertical: 12,
+          shadowColor: colors.shadow,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+          elevation: 5,
         }}
       >
         <TouchableOpacity onPress={handleBack}>
@@ -83,22 +90,29 @@ const SettingsScreen = () => {
         contentContainerStyle={{
           paddingBottom: 20,
         }}
+        style={{ backgroundColor: colors.background }}
       >
         <LayoutView p5>
           {/* Seção de Idioma */}
           <LayoutView
-            isBgWhite
-            isRoundedXl
-            hasShadow
+            style={{
+              backgroundColor: isDark ? colors.surface : colors.background,
+              borderRadius: 12,
+              shadowColor: colors.shadow,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
             customClasses="mb-6"
             p5
           >
             <LayoutView isFlexRow isItemsCenter hasMarginBottom>
-              <MaterialIcons name="language" size={28} color="#2563eb" />
+              <MaterialIcons name="language" size={28} color={colors.primary} />
               <LayoutText
                 isTextLg
                 isFontBold
-                isTextGray800
+                style={{ color: isDark ? colors.text : colors.text }}
                 customClasses="ml-3"
               >
                 {translation.settings.language.title}
@@ -107,7 +121,7 @@ const SettingsScreen = () => {
 
             <LayoutText
               isTextBase
-              isTextGray
+              style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
               hasMarginBottom
               customClasses="mb-4"
             >
@@ -116,18 +130,28 @@ const SettingsScreen = () => {
 
             {/* Idioma Atual */}
             <LayoutView
-              isBgGray100
-              isRoundedLg
+              style={{
+                backgroundColor: isDark ? colors.surfaceSecondary : colors.cardSecondary,
+                borderRadius: 8,
+              }}
               customClasses="mb-4"
               p4
             >
               <LayoutView isFlexRow isItemsCenter hasMarginBottom>
-                <MaterialIcons name="language" size={32} color="#2563eb" />
-                <LayoutView customClasses="ml-3 flex-1">
-                  <LayoutText isTextLg isFontBold isTextGray800>
-                    {currentLanguage.name}
-                  </LayoutText>
-                  <LayoutText isTextSm isTextGray customClasses="mt-1">
+                <MaterialIcons name="language" size={32} color={colors.primary} />
+                                              <LayoutView hasMarginLeft isFlex1>
+                                <LayoutText
+                                  isTextLg
+                                  isFontBold
+                                  style={{ color: isDark ? colors.text : colors.text }}
+                                >
+                                  {currentLanguage.name}
+                                </LayoutText>
+                  <LayoutText 
+                    isTextSm 
+                    style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
+                    customClasses="mt-1"
+                  >
                     {translation.settings.language.code}: {currentLanguage.code}
                   </LayoutText>
                 </LayoutView>
@@ -140,18 +164,24 @@ const SettingsScreen = () => {
 
           {/* Seção de Nível de Aprendizado */}
           <LayoutView
-            isBgWhite
-            isRoundedXl
-            hasShadow
+            style={{
+              backgroundColor: isDark ? colors.surface : colors.background,
+              borderRadius: 12,
+              shadowColor: colors.shadow,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
             customClasses="mb-6"
             p5
           >
             <LayoutView isFlexRow isItemsCenter hasMarginBottom>
-              <MaterialIcons name="school" size={28} color="#2563eb" />
+              <MaterialIcons name="school" size={28} color={colors.primary} />
               <LayoutText
                 isTextLg
                 isFontBold
-                isTextGray800
+                style={{ color: isDark ? colors.text : colors.text }}
                 customClasses="ml-3"
               >
                 {translation.settings.learningLevel.title}
@@ -160,7 +190,7 @@ const SettingsScreen = () => {
 
             <LayoutText
               isTextBase
-              isTextGray
+              style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
               hasMarginBottom
               customClasses="mb-4"
             >
@@ -169,8 +199,10 @@ const SettingsScreen = () => {
 
             {/* Nível Atual */}
             <LayoutView
-              isBgGray100
-              isRoundedLg
+              style={{
+                backgroundColor: isDark ? colors.surfaceSecondary : colors.cardSecondary,
+                borderRadius: 8,
+              }}
               customClasses="mb-4"
               p4
             >
@@ -180,16 +212,24 @@ const SettingsScreen = () => {
                   size={32}
                   color={getLevelColor(currentLevel)}
                 />
-                <LayoutView customClasses="ml-3 flex-1">
-                  <LayoutText isTextLg isFontBold isTextGray800>
-                    {
-                      translation.settings.learningLevel.levels[
-                        `level${currentLevel}` as keyof typeof translation.settings.learningLevel.levels
-                      ]
-                    }{" "}
-                    - {translation.settings.learningLevel.active}
-                  </LayoutText>
-                  <LayoutText isTextSm isTextGray customClasses="mt-1">
+                                                <LayoutView hasMarginLeft isFlex1>
+                                  <LayoutText
+                                    isTextLg
+                                    isFontBold
+                                    style={{ color: isDark ? colors.text : colors.text }}
+                                  >
+                                    {
+                                      translation.settings.learningLevel.levels[
+                                        `level${currentLevel}` as keyof typeof translation.settings.learningLevel.levels
+                                      ]
+                                    }{" "}
+                                    - {translation.settings.learningLevel.active}
+                                  </LayoutText>
+                  <LayoutText 
+                    isTextSm 
+                    style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
+                    customClasses="mt-1"
+                  >
                     {
                       translation.settings.learningLevel.levels[
                         `level${currentLevel}Desc` as keyof typeof translation.settings.learningLevel.levels
@@ -204,7 +244,7 @@ const SettingsScreen = () => {
                 <LayoutText
                   isTextSm
                   isFontSemibold
-                  isTextGray800
+                  style={{ color: isDark ? colors.text : colors.text }}
                   hasMarginBottom
                   customClasses="mb-2"
                 >
@@ -222,7 +262,11 @@ const SettingsScreen = () => {
                       size={16}
                       color={getLevelColor(currentLevel)}
                     />
-                    <LayoutText isTextSm isTextGray customClasses="ml-2">
+                    <LayoutText 
+                      isTextSm 
+                      style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
+                      customClasses="ml-2"
+                    >
                       {feature}
                     </LayoutText>
                   </LayoutView>
@@ -234,19 +278,153 @@ const SettingsScreen = () => {
             <LearningLevelSelector />
           </LayoutView>
 
-          {/* Sobre o App */}
+          {/* Seção de Áudio */}
           <LayoutView
-            isBgWhite
-            isRoundedXl
-            hasShadow
+            style={{
+              backgroundColor: isDark ? colors.surface : colors.background,
+              borderRadius: 12,
+              shadowColor: colors.shadow,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
+            customClasses="mb-6"
             p5
           >
-            <LayoutView isFlexRow isItemsCenter hasMarginBottom>
-              <MaterialIcons name="info" size={28} color="#2563eb" />
+            <LayoutView
+              isFlexRow
+              isItemsCenter
+              hasMarginBottom
+            >
+              <MaterialIcons
+                name="volume-up"
+                size={28}
+                color={colors.primary}
+              />
               <LayoutText
                 isTextLg
                 isFontBold
-                isTextGray800
+                style={{ color: isDark ? colors.text : colors.text }}
+                customClasses="ml-3"
+              >
+                {translation.settings.audio.title}
+              </LayoutText>
+            </LayoutView>
+
+            <LayoutText
+              isTextBase
+              style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
+              hasMarginBottom
+              customClasses="mb-4"
+            >
+              {translation.settings.audio.subtitle}
+            </LayoutText>
+
+            <LayoutView customClasses="mb-4">
+              <LayoutText
+                isTextSm
+                isFontSemibold
+                style={{ color: isDark ? colors.text : colors.text }}
+                hasMarginBottom
+                customClasses="mb-2"
+              >
+                Qualidade da Voz
+              </LayoutText>
+              <LayoutText
+                isTextSm
+                style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
+                customClasses="mb-3"
+              >
+                Selecione a melhor voz disponível para o idioma {currentLanguage.name}. Vozes de alta qualidade soam mais naturais e são melhores para o aprendizado.
+              </LayoutText>
+                          <VoiceSelector />
+          </LayoutView>
+        </LayoutView>
+
+        {/* Seção de Aparência */}
+        <LayoutView
+          style={{
+            backgroundColor: isDark ? colors.surface : colors.background,
+            borderRadius: 12,
+            shadowColor: colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5,
+          }}
+          customClasses="mb-6"
+          p5
+        >
+          <LayoutView
+            isFlexRow
+            isItemsCenter
+            hasMarginBottom
+          >
+            <MaterialIcons
+              name="palette"
+              size={28}
+              color={colors.primary}
+            />
+            <LayoutText
+              isTextLg
+              isFontBold
+              style={{ color: isDark ? colors.text : colors.text }}
+              customClasses="ml-3"
+            >
+              Aparência
+            </LayoutText>
+          </LayoutView>
+
+                      <LayoutText
+              isTextBase
+              style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
+              hasMarginBottom
+              customClasses="mb-4"
+            >
+              Personalize a aparência do app escolhendo entre tema claro, escuro ou automático.
+            </LayoutText>
+
+            <LayoutView customClasses="mb-4">
+              <LayoutText
+                isTextSm
+                isFontSemibold
+                style={{ color: isDark ? colors.text : colors.text }}
+                hasMarginBottom
+                customClasses="mb-2"
+              >
+                Tema do App
+              </LayoutText>
+              <LayoutText
+                isTextSm
+                style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
+                customClasses="mb-3"
+              >
+                Escolha o tema que melhor se adapta ao seu ambiente e preferência visual.
+              </LayoutText>
+            <ThemeSelector />
+          </LayoutView>
+        </LayoutView>
+
+        {/* Sobre o App */}
+          <LayoutView
+            style={{
+              backgroundColor: isDark ? colors.surface : colors.background,
+              borderRadius: 12,
+              shadowColor: colors.shadow,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
+            p5
+          >
+            <LayoutView isFlexRow isItemsCenter hasMarginBottom>
+              <MaterialIcons name="info" size={28} color={colors.primary} />
+              <LayoutText
+                isTextLg
+                isFontBold
+                style={{ color: isDark ? colors.text : colors.text }}
                 customClasses="ml-3"
               >
                 {translation.settings.about.title}
@@ -255,27 +433,44 @@ const SettingsScreen = () => {
 
             <LayoutText
               isTextBase
-              isTextGray
+              style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
               hasMarginBottom
               customClasses="mb-4"
             >
               {translation.settings.about.subtitle}
             </LayoutText>
 
-            <LayoutView isBgGray100 isRoundedLg p4>
-              <LayoutText isTextSm isTextGray customClasses="mb-2">
+            <LayoutView 
+              style={{
+                backgroundColor: isDark ? colors.surfaceSecondary : colors.cardSecondary,
+                borderRadius: 8,
+              }}
+              p4
+            >
+              <LayoutText 
+                isTextSm 
+                style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
+                customClasses="mb-2"
+              >
                 <LayoutText isFontSemibold>
                   {translation.settings.about.version}:
                 </LayoutText>{" "}
                 1.0.0
               </LayoutText>
-              <LayoutText isTextSm isTextGray customClasses="mb-2">
+              <LayoutText 
+                isTextSm 
+                style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
+                customClasses="mb-2"
+              >
                 <LayoutText isFontSemibold>
                   {translation.settings.about.developer}:
                 </LayoutText>{" "}
                 Emir Marques de Liz para seu filho Miguel ❤️
               </LayoutText>
-              <LayoutText isTextSm isTextGray>
+              <LayoutText 
+                isTextSm 
+                style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
+              >
                 <LayoutText isFontSemibold>
                   {translation.settings.about.description}:
                 </LayoutText>{" "}

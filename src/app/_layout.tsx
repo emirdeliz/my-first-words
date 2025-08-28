@@ -4,6 +4,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import { LearningLevelProvider } from '../contexts/LearningLevelContext';
+import { ThemeProvider } from '../contexts/ThemeContext';
 
 const RootLayout = () => {
   return (
@@ -11,10 +12,12 @@ const RootLayout = () => {
       <StatusBar style="light" backgroundColor="#2563eb" />
       <LanguageProvider>
         <LearningLevelProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="settings" />
-          </Stack>
+          <ThemeProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="settings" />
+            </Stack>
+          </ThemeProvider>
         </LearningLevelProvider>
       </LanguageProvider>
     </SafeAreaProvider>

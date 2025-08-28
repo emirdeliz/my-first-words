@@ -130,14 +130,14 @@ const LearningLevelSelector = () => {
                   <LayoutView 
                     isFlexRow
                     isItemsCenter
-                    customClasses="flex-1"
+                    isFlex1
                   >
                     <MaterialIcons 
                       name={getLevelIcon(level)} 
                       size={32} 
                       color={getLevelColor(level)} 
                     />
-                    <LayoutView customClasses="ml-3 flex-1">
+                                          <LayoutView hasMarginLeft isFlex1>
                       <LayoutText 
                         isTextLg
                         isFontBold

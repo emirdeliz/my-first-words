@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import Icon from './Icon';
+import { useTheme } from '../../contexts/ThemeContext';
 import LayoutView from './LayoutView';
 import LayoutText from './LayoutText';
 
@@ -19,17 +20,19 @@ const BackButton = ({
   isSmall = false,
   hasMargin = false
 }: BackButtonProps) => {
+  const { colors } = useTheme();
+
   return (
     <TouchableOpacity 
       onPress={onPress}
       activeOpacity={0.8}
       style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: colors.backgroundSecondary,
         paddingHorizontal: 12,
         paddingVertical: 8,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.2)',
+        borderColor: colors.borderSecondary,
       }}
     >
       <LayoutView 
@@ -41,11 +44,11 @@ const BackButton = ({
           isMedium={!isLarge && !isSmall}
           isLarge={isLarge}
           isSmall={isSmall}
-          isWhite
+          style={{ color: colors.textInverse }}
           hasMargin={hasMargin}
         />
         <LayoutText 
-          isTextWhite
+          style={{ color: colors.textInverse }}
           isTextBase
           hasMarginLeft
           isFontMedium
