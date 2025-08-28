@@ -76,7 +76,7 @@ const CommunicationButton = ({
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={0.7}
-      className='w-[48%]'
+              style={{ width: '48%' }}
     >
       <LayoutView 
         {...getSizeClasses()}

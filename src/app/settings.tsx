@@ -402,9 +402,68 @@ const SettingsScreen = () => {
               >
                 Escolha o tema que melhor se adapta ao seu ambiente e preferência visual.
               </LayoutText>
-            <ThemeSelector />
+              <ThemeSelector />
+            </LayoutView>
           </LayoutView>
-        </LayoutView>
+
+          {/* Seção de Configuração Parental */}
+          <LayoutView
+            style={{
+              backgroundColor: isDark ? colors.surface : colors.background,
+              borderRadius: 12,
+              shadowColor: colors.shadow,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
+            customClasses="mb-6"
+            p5
+          >
+            <LayoutView
+              isFlexRow
+              isItemsCenter
+              hasMarginBottom
+            >
+              <MaterialIcons
+                name="family-restroom"
+                size={28}
+                color={colors.primary}
+              />
+              <LayoutText
+                isTextLg
+                isFontBold
+                style={{ color: isDark ? colors.text : colors.text }}
+                customClasses="ml-3"
+              >
+                Configuração Parental
+              </LayoutText>
+            </LayoutView>
+
+            <LayoutText
+              isTextBase
+              style={{ color: isDark ? colors.textSecondary : colors.textSecondary }}
+              hasMarginBottom
+              customClasses="mb-4"
+            >
+              Configure quais áudios estarão disponíveis para a criança no app principal.
+            </LayoutText>
+
+            <TouchableOpacity
+              onPress={() => router.push('/parental-config')}
+              style={{
+                backgroundColor: colors.primary,
+                paddingVertical: 12,
+                paddingHorizontal: 20,
+                borderRadius: 8,
+                alignItems: 'center',
+              }}
+            >
+              <LayoutText isTextWhite isTextBase isFontSemibold>
+                Configurar Áudios Disponíveis
+              </LayoutText>
+            </TouchableOpacity>
+          </LayoutView>
 
         {/* Sobre o App */}
           <LayoutView

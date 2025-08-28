@@ -1,5 +1,6 @@
 import { LearningLevel } from '../contexts/LearningLevelContext';
 import * as Speech from 'expo-speech';
+import { Platform, PermissionsAndroid } from 'react-native';
 
 export interface AudioOptions {
   level: LearningLevel;
@@ -33,6 +34,30 @@ export class AudioService {
 
   setLanguage(language: string) {
     this.currentLanguage = language;
+  }
+
+  // Check and request audio permissions
+  async checkAudioPermissions(): Promise<boolean> {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          {
+            title: 'Permissão de Áudio',
+            message: 'O app precisa de permissão para reproduzir áudio.',
+            buttonNeutral: 'Perguntar depois',
+            buttonNegative: 'Cancelar',
+            buttonPositive: 'OK',
+          }
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      }
+      // iOS doesn't require explicit audio permissions for speech synthesis
+      return true;
+    } catch (error) {
+      console.error('Error checking audio permissions:', error);
+      return false;
+    }
   }
 
   // Get available voices with better quality
@@ -229,39 +254,220 @@ export class AudioService {
     const options = this.getLanguageOptimizedSettings(this.currentLanguage);
     
     try {
-      console.log(`🎵 Playing ${audioItem.type}: "${audioItem.text}"`);
+      console.log(`🎵 Playing ${audioItem.type}: "${audioItem.text}" on ${Platform.OS}`);
       
+      // Android-specific fallback for tablets
+      if (Platform.OS === 'android') {
+        await this.playAudioAndroid(audioItem, options);
+      } else {
+        await this.playAudioStandard(audioItem, options);
+      }
+      
+    } catch (error) {
+      console.error(`❌ Error playing ${audioItem.type}:`, error);
+      this.isPlaying = false;
+      // Continue with next item even if there's an error
+      setTimeout(() => {
+        this.playNextInQueue();
+      }, 500);
+    }
+  }
+
+  // Standard audio playback for iOS and web
+  private async playAudioStandard(audioItem: { text: string; type: string }, options: any): Promise<void> {
+    try {
+      // Check permissions first
+      const hasPermission = await this.checkAudioPermissions();
+      if (!hasPermission) {
+        console.error('❌ Audio permission denied');
+        this.isPlaying = false;
+        setTimeout(() => {
+          this.playNextInQueue();
+        }, 500);
+        return;
+      }
+
+      // iOS-specific optimizations
+      const iosOptions = Platform.OS === 'ios' ? {
+        language: this.currentLanguage,
+        pitch: options.pitch || 1.0,
+        rate: options.rate || 0.9,
+        // iOS works better with these settings
+        voice: undefined, // Let iOS choose the best voice
+      } : {
+        language: this.currentLanguage,
+        voice: options.voice,
+        pitch: options.pitch,
+        rate: options.rate,
+      };
+
+      await Speech.speak(audioItem.text, {
+        ...iosOptions,
+        onDone: () => {
+          console.log(`✅ ${audioItem.type} played: "${audioItem.text}" on ${Platform.OS}`);
+          this.isPlaying = false;
+          // Play next item after a short delay
+          setTimeout(() => {
+            this.playNextInQueue();
+          }, 500);
+        },
+        onError: (error) => {
+          console.error(`❌ Error playing ${audioItem.type} on ${Platform.OS}:`, error);
+          this.isPlaying = false;
+          // Try iOS fallback if on iOS
+          if (Platform.OS === 'ios') {
+            this.tryIOSFallback(audioItem);
+          } else {
+            // Continue with next item even if there's an error
+            setTimeout(() => {
+              this.playNextInQueue();
+            }, 500);
+          }
+        },
+        onStopped: () => {
+          console.log(`⏹️ ${audioItem.type} stopped: "${audioItem.text}" on ${Platform.OS}`);
+          this.isPlaying = false;
+        },
+      });
+    } catch (error) {
+      console.error(`❌ Error in playAudioStandard on ${Platform.OS}:`, error);
+      this.isPlaying = false;
+      if (Platform.OS === 'ios') {
+        this.tryIOSFallback(audioItem);
+      } else {
+        setTimeout(() => {
+          this.playNextInQueue();
+        }, 500);
+      }
+    }
+  }
+
+  // Android-specific audio playback with fallbacks
+  private async playAudioAndroid(audioItem: { text: string; type: string }, options: any): Promise<void> {
+    try {
+      // First attempt: Standard speech
       await Speech.speak(audioItem.text, {
         language: this.currentLanguage,
         voice: options.voice,
         pitch: options.pitch,
         rate: options.rate,
         onDone: () => {
-          console.log(`✅ ${audioItem.type} played: "${audioItem.text}"`);
+          console.log(`✅ Android: ${audioItem.type} played: "${audioItem.text}"`);
           this.isPlaying = false;
-          // Play next item after a short delay
           setTimeout(() => {
             this.playNextInQueue();
-          }, 500); // 500ms delay between audio items
+          }, 500);
         },
         onError: (error) => {
-          console.error(`❌ Error playing ${audioItem.type}:`, error);
+          console.log(`⚠️ Android speech failed, trying fallback: ${error}`);
+          this.tryAndroidFallback(audioItem, options);
+        },
+        onStopped: () => {
+          console.log(`⏹️ Android: ${audioItem.type} stopped: "${audioItem.text}"`);
           this.isPlaying = false;
-          // Continue with next item even if there's an error
+        },
+      });
+    } catch (error) {
+      console.log(`⚠️ Android speech error, trying fallback: ${error}`);
+      this.tryAndroidFallback(audioItem, options);
+    }
+  }
+
+  // iOS fallback method
+  private async tryIOSFallback(audioItem: { text: string; type: string }): Promise<void> {
+    try {
+      console.log(`🔄 iOS fallback: Trying minimal options`);
+      
+      // iOS fallback: Try with minimal options and English
+      await Speech.speak(audioItem.text, {
+        language: 'en-US', // Fallback to English
+        pitch: 1.0,
+        rate: 0.9,
+        onDone: () => {
+          console.log(`✅ iOS fallback succeeded: "${audioItem.text}"`);
+          this.isPlaying = false;
+          setTimeout(() => {
+            this.playNextInQueue();
+          }, 500);
+        },
+        onError: (error) => {
+          console.error(`❌ iOS fallback failed: ${error}`);
+          this.isPlaying = false;
+          // Continue with next item even if fallback fails
           setTimeout(() => {
             this.playNextInQueue();
           }, 500);
         },
         onStopped: () => {
-          console.log(`⏹️ ${audioItem.type} stopped: "${audioItem.text}"`);
           this.isPlaying = false;
         },
       });
-      
     } catch (error) {
-      console.error(`❌ Error playing ${audioItem.type}:`, error);
+      console.error(`❌ iOS fallback error: ${error}`);
       this.isPlaying = false;
-      // Continue with next item even if there's an error
+      setTimeout(() => {
+        this.playNextInQueue();
+      }, 500);
+    }
+  }
+
+  // Android fallback methods
+  private async tryAndroidFallback(audioItem: { text: string; type: string }, options: any): Promise<void> {
+    try {
+      // Fallback 1: Try with default language
+      console.log(`🔄 Android fallback 1: Trying default language`);
+      await Speech.speak(audioItem.text, {
+        language: 'en-US', // Fallback to English
+        pitch: 1.0,
+        rate: 0.9,
+        onDone: () => {
+          console.log(`✅ Android fallback 1 succeeded: "${audioItem.text}"`);
+          this.isPlaying = false;
+          setTimeout(() => {
+            this.playNextInQueue();
+          }, 500);
+        },
+        onError: (error) => {
+          console.log(`⚠️ Android fallback 1 failed: ${error}`);
+          this.tryAndroidFallback2(audioItem);
+        },
+        onStopped: () => {
+          this.isPlaying = false;
+        },
+      });
+    } catch (error) {
+      console.log(`⚠️ Android fallback 1 error: ${error}`);
+      this.tryAndroidFallback2(audioItem);
+    }
+  }
+
+  private async tryAndroidFallback2(audioItem: { text: string; type: string }): Promise<void> {
+    try {
+      // Fallback 2: Try with minimal options
+      console.log(`🔄 Android fallback 2: Trying minimal options`);
+      await Speech.speak(audioItem.text, {
+        onDone: () => {
+          console.log(`✅ Android fallback 2 succeeded: "${audioItem.text}"`);
+          this.isPlaying = false;
+          setTimeout(() => {
+            this.playNextInQueue();
+          }, 500);
+        },
+        onError: (error) => {
+          console.error(`❌ All Android fallbacks failed: ${error}`);
+          this.isPlaying = false;
+          // Continue with next item even if all fallbacks fail
+          setTimeout(() => {
+            this.playNextInQueue();
+          }, 500);
+        },
+        onStopped: () => {
+          this.isPlaying = false;
+        },
+      });
+    } catch (error) {
+      console.error(`❌ Android fallback 2 error: ${error}`);
+      this.isPlaying = false;
       setTimeout(() => {
         this.playNextInQueue();
       }, 500);

@@ -1,129 +1,196 @@
-import React, { useState } from 'react';
-import AppHeader from '../organisms/AppHeader';
-import CategoryGrid from '../organisms/CategoryGrid';
-import CommunicationGrid from '../organisms/CommunicationGrid';
-import { SpeechService } from '../../services/speechService';
+import React from 'react';
+import { ScrollView, TouchableOpacity } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useLanguage } from '../../hooks/useLanguage';
-
-interface CommunicationItem {
-  id: string;
-  textKey: string;
-  icon: keyof typeof import('@expo/vector-icons/MaterialIcons').default.glyphMap;
-  type: 'primary' | 'secondary' | 'accent' | 'warning';
-}
-
-interface Category {
-  id: string;
-  nameKey: string;
-  icon: keyof typeof import('@expo/vector-icons/MaterialIcons').default.glyphMap;
-  type: 'primary' | 'secondary' | 'accent';
-  items: CommunicationItem[];
-}
-
-const getCategoriesData = (): Category[] => [
-  {
-    id: 'basic',
-    nameKey: 'basic',
-    icon: 'home',
-    type: 'primary',
-    items: [
-      { id: 'hungry', textKey: 'hungry', icon: 'restaurant', type: 'warning' },
-      { id: 'thirsty', textKey: 'thirsty', icon: 'local-drink', type: 'accent' },
-      { id: 'tired', textKey: 'tired', icon: 'bed', type: 'accent' },
-      { id: 'bathroom', textKey: 'bathroom', icon: 'wc', type: 'secondary' },
-      { id: 'help', textKey: 'help', icon: 'help', type: 'warning' },
-      { id: 'break', textKey: 'break', icon: 'pause', type: 'secondary' },
-    ]
-  },
-  {
-    id: 'emotions',
-    nameKey: 'emotions',
-    icon: 'mood',
-    type: 'accent',
-    items: [
-      { id: 'happy', textKey: 'happy', icon: 'mood', type: 'secondary' },
-      { id: 'sad', textKey: 'sad', icon: 'mood-bad', type: 'primary' },
-      { id: 'angry', textKey: 'angry', icon: 'sentiment-very-dissatisfied', type: 'warning' },
-      { id: 'scared', textKey: 'scared', icon: 'warning', type: 'warning' },
-      { id: 'excited', textKey: 'excited', icon: 'celebration', type: 'accent' },
-      { id: 'calm', textKey: 'calm', icon: 'spa', type: 'accent' },
-    ]
-  },
-  {
-    id: 'activities',
-    nameKey: 'activities',
-    icon: 'sports-esports',
-    type: 'secondary',
-    items: [
-      { id: 'play', textKey: 'play', icon: 'sports-esports', type: 'primary' },
-      { id: 'read', textKey: 'read', icon: 'book', type: 'accent' },
-      { id: 'music', textKey: 'music', icon: 'music-note', type: 'accent' },
-      { id: 'outside', textKey: 'outside', icon: 'nature', type: 'secondary' },
-      { id: 'tv', textKey: 'tv', icon: 'tv', type: 'secondary' },
-      { id: 'draw', textKey: 'draw', icon: 'brush', type: 'warning' },
-    ]
-  },
-  {
-    id: 'social',
-    nameKey: 'social',
-    icon: 'people',
-    type: 'accent',
-    items: [
-      { id: 'hello', textKey: 'hello', icon: 'waving-hand', type: 'secondary' },
-      { id: 'goodbye', textKey: 'goodbye', icon: 'back-hand', type: 'primary' },
-      { id: 'please', textKey: 'please', icon: 'volunteer-activism', type: 'accent' },
-      { id: 'thankyou', textKey: 'thankyou', icon: 'favorite', type: 'warning' },
-      { id: 'sorry', textKey: 'sorry', icon: 'sentiment-dissatisfied', type: 'accent' },  
-      { id: 'yes', textKey: 'yes', icon: 'check', type: 'secondary' },
-      { id: 'no', textKey: 'no', icon: 'close', type: 'warning' },
-    ]
-  }
-];
+import { useTheme } from '../../contexts/ThemeContext';
+import { useParentalConfig } from '../../contexts/ParentalConfigContext';
+import { useLearningLevel } from '../../contexts/LearningLevelContext';
+import LayoutView from '../atoms/LayoutView';
+import LayoutText from '../atoms/LayoutText';
+import AudioService from '../../services/AudioService';
+import { router } from 'expo-router';
 
 const CommunicationBoardTemplate = () => {
-  const { currentLanguage, loading } = useLanguage();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { translation, currentLanguage } = useLanguage();
+  const { colors, isDark } = useTheme();
+  const { getEnabledItems } = useParentalConfig();
+  const { currentLevel } = useLearningLevel();
 
-  const categories = getCategoriesData();
+  const enabledItems = getEnabledItems();
 
-  const handleItemPress = async (text: string) => {
-    await SpeechService.speak(text, currentLanguage.speechCode);
+  // Function to get translated text based on level and language
+  const getTranslatedText = (categoryId: string, textKey: string): string => {
+    // Level 1: Simple words
+    if (currentLevel === 1) {
+      if (categoryId === 'basic') return (translation.basicNeedsLevel1 as any)[textKey];
+      if (categoryId === 'emotions') return (translation.emotionsLevel1 as any)[textKey];
+      if (categoryId === 'activities') return (translation.activitiesLevel1 as any)[textKey];
+      if (categoryId === 'social') return (translation.socialLevel1 as any)[textKey];
+    }
+    
+    // Levels 2 and 3: Complete phrases
+    if (categoryId === 'basic') return (translation.basicNeeds as any)[textKey];
+    if (categoryId === 'emotions') return (translation.emotions as any)[textKey];
+    if (categoryId === 'activities') return (translation.activities as any)[textKey];
+    if (categoryId === 'social') return (translation.social as any)[textKey];
+    
+    return textKey;
   };
 
-  const handleCategorySelect = (categoryId: string) => {
-    setSelectedCategory(categoryId);
+  const handleItemPress = async (text: string, categoryId: string, textKey: string) => {
+    try {
+      // Update level in audio service
+      AudioService.setLevel(currentLevel);
+      
+      // Get translated text for audio
+      const translatedText = getTranslatedText(categoryId, textKey);
+      
+      // Play audio sequence
+      await AudioService.playAudioSequence(translatedText);
+    } catch (error) {
+      console.error('Error playing audio:', error);
+    }
   };
 
-  const handleBackToCategories = () => {
-    setSelectedCategory(null);
+  const getItemColor = (type: string) => {
+    switch (type) {
+      case 'basic':
+        return colors.primary;
+      case 'emotions':
+        return '#db2777';
+      case 'activities':
+        return colors.success;
+      case 'social':
+        return '#9333ea';
+      default:
+        return colors.textSecondary;
+    }
   };
 
-  if (loading) {
+  const getItemIcon = (iconName: string) => {
+    return iconName as keyof typeof MaterialIcons.glyphMap;
+  };
+
+  if (enabledItems.length === 0) {
     return (
-      <>
-        <AppHeader />
-      </>
+      <LayoutView 
+        isFlex 
+        isJustifyCenter 
+        isItemsCenter 
+        p5
+        style={{ backgroundColor: colors.background }}
+      >
+        <MaterialIcons name="volume-off" size={64} color={colors.textSecondary} />
+        <LayoutText
+          isTextLg
+          isFontBold
+          style={{ color: colors.text }}
+          customClasses="mt-4 mb-2"
+        >
+          {translation.parentalConfig.noAudioConfigured}
+        </LayoutText>
+        <LayoutText
+          isTextBase
+          style={{ color: colors.textSecondary }}
+          isTextCenter
+        >
+          {translation.parentalConfig.goToSettings}
+        </LayoutText>
+      </LayoutView>
     );
   }
 
-  const selectedCategoryData = categories.find(cat => cat.id === selectedCategory);
-
   return (
-    <>
-      <AppHeader />
-      {selectedCategoryData ? (
-        <CommunicationGrid
-          category={selectedCategoryData}
-          onBack={handleBackToCategories}
-          onItemPress={handleItemPress}
+    <LayoutView isFlex style={{ backgroundColor: colors.background }}>
+      {/* Header */}
+      <LayoutView
+        style={{
+          backgroundColor: isDark ? colors.surface : colors.primary,
+          height: 100,
+          flexDirection: 'row',
+          alignItems: 'flex-end',
+          justifyContent: 'space-between',
+          paddingHorizontal: 20,
+          paddingVertical: 12,
+          shadowColor: colors.shadow,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+          elevation: 5,
+        }}
+      >
+        <MaterialIcons 
+          name="record-voice-over" 
+          size={28} 
+          color={colors.textInverse} 
         />
-      ) : (
-        <CategoryGrid
-          categories={categories}
-          onSelectCategory={handleCategorySelect}
-        />
-      )}
-    </>
+        <LayoutText 
+          isTextXl
+          isFontBold
+          style={{ color: colors.textInverse }}
+        >
+          {translation.appTitle}
+        </LayoutText>
+        <TouchableOpacity onPress={() => router.push('/settings')}>
+          <MaterialIcons name="settings" size={24} color={colors.textInverse} />
+        </TouchableOpacity>
+      </LayoutView>
+
+      {/* Audio Items Grid */}
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      >
+        <LayoutView 
+          isFlex
+          isFlexRow
+          isFlexWrap
+          p4
+          isJustifyBetween
+        >
+          {enabledItems.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              onPress={() => handleItemPress(item.text, item.categoryId, item.textKey)}
+              activeOpacity={0.7}
+              style={{ width: '48%', marginBottom: 16 }}
+            >
+              <LayoutView 
+                style={{
+                  backgroundColor: getItemColor(item.type),
+                  aspectRatio: 5/6,
+                  borderRadius: 12,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  shadowColor: colors.shadow,
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3.84,
+                  elevation: 5,
+                  padding: 12,
+                }}
+              >
+                <MaterialIcons 
+                  name={getItemIcon(item.icon)} 
+                  size={36} 
+                  color="white" 
+                />
+                <LayoutText 
+                  isTextSm
+                  isFontSemibold
+                  isTextWhite
+                  hasMarginTop
+                  isTextCenter
+                  customClasses="mt-2 leading-[18px]"
+                >
+                  {getTranslatedText(item.categoryId, item.textKey)}
+                </LayoutText>
+              </LayoutView>
+            </TouchableOpacity>
+          ))}
+        </LayoutView>
+      </ScrollView>
+    </LayoutView>
   );
 };
 

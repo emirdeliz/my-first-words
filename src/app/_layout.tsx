@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import { LearningLevelProvider } from '../contexts/LearningLevelContext';
 import { ThemeProvider } from '../contexts/ThemeContext';
+import { ParentalConfigProvider } from '../contexts/ParentalConfigContext';
 
 const RootLayout = () => {
   return (
@@ -13,10 +14,14 @@ const RootLayout = () => {
       <LanguageProvider>
         <LearningLevelProvider>
           <ThemeProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="settings" />
-            </Stack>
+            <ParentalConfigProvider>
+              <StatusBar style="light" backgroundColor="#2563eb" hidden />
+              <Stack screenOptions={{ headerShown: false, headerStyle: { backgroundColor: '#2563eb' } }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="settings" />
+                <Stack.Screen name="parental-config" />
+              </Stack>
+            </ParentalConfigProvider>
           </ThemeProvider>
         </LearningLevelProvider>
       </LanguageProvider>

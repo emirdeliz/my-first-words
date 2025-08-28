@@ -44,7 +44,7 @@ const BackButton = ({
           isMedium={!isLarge && !isSmall}
           isLarge={isLarge}
           isSmall={isSmall}
-          style={{ color: colors.textInverse }}
+          isWhite
           hasMargin={hasMargin}
         />
         <LayoutText 
