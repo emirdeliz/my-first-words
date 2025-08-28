@@ -6,7 +6,7 @@ import LayoutView from '../atoms/LayoutView';
 import LayoutText from '../atoms/LayoutText';
 
 const LanguageSelector = () => {
-  const { currentLanguage, availableLanguages, changeLanguage } = useLanguage();
+  const { currentLanguage, availableLanguages, changeLanguage, translation } = useLanguage();
   const [modalVisible, setModalVisible] = useState(false);
 
   const selectLanguage = async (languageCode: string) => {
@@ -20,28 +20,29 @@ const LanguageSelector = () => {
 
   return (
     <>
-      <Pressable onPress={() => setModalVisible(true)}>
-        <LayoutView 
-          isFlexRow
-          isItemsCenter
+      <TouchableOpacity
+        onPress={() => setModalVisible(true)}
+        style={{
+          backgroundColor: '#2563eb',
+          paddingVertical: 12,
+          paddingHorizontal: 16,
+          borderRadius: 8,
+          alignItems: 'center',
+        }}
+      >
+        <LayoutText 
+          isTextWhite
+          isTextBase
+          isFontSemibold
         >
-          <MaterialIcons name="language" size={24} color="white" />
-          <LayoutText 
-            isTextWhite
-            isTextSm
-            isFontBold
-            hasMarginLeft
-            customClasses="ml-1"
-          >
-            {currentLanguage.code.toUpperCase()}
-          </LayoutText>
-        </LayoutView>
-      </Pressable>
+          {translation.settings.language.changeButton}
+        </LayoutText>
+      </TouchableOpacity>
 
       <Modal
         animationType="fade"
-        visible={modalVisible}
         transparent
+        visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
         <LayoutView 
@@ -55,7 +56,7 @@ const LanguageSelector = () => {
             isBgWhite
             isRounded2xl
             hasPadding
-            customClasses="p-5 w-4/5 max-h-[70%]"
+            customClasses="p-5 w-4/5 max-h-[80%]"
           >
             <LayoutText 
               isTextXl
@@ -65,10 +66,10 @@ const LanguageSelector = () => {
               isTextGray800
               customClasses="mb-5"
             >
-              Select Language / Selecionar Idioma
+              {translation.settings.modal.selectLanguage}
             </LayoutText>
 
-            <ScrollView style={{ maxHeight: 320 }}>
+            <ScrollView style={{ maxHeight: 400 }}>
               {availableLanguages.map((language) => (
                 <TouchableOpacity
                   key={language.code}
@@ -114,7 +115,7 @@ const LanguageSelector = () => {
                 isFontSemibold
                 isTextCenter
               >
-                Cancel
+                {translation.settings.modal.close}
               </LayoutText>
             </TouchableOpacity>
           </LayoutView>

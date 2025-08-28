@@ -20,12 +20,21 @@ const BackButton = ({
   hasMargin = false
 }: BackButtonProps) => {
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity 
+      onPress={onPress}
+      activeOpacity={0.8}
+      style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+      }}
+    >
       <LayoutView 
         isFlexRow
         isItemsCenter
-        hasMarginRight
-        customClasses="mr-4"
       >
         <Icon 
           name="arrow-back"

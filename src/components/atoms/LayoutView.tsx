@@ -45,6 +45,12 @@ interface LayoutViewProps extends ViewProps {
   hasPaddingLeft?: boolean;
   hasPaddingRight?: boolean;
   
+  // Specific padding values
+  px5?: boolean;
+  py3?: boolean;
+  p4?: boolean;
+  p5?: boolean;
+  
   // Position
   isAbsolute?: boolean;
   isRelative?: boolean;
@@ -195,6 +201,12 @@ const LayoutView = ({
   hasPaddingBottom = false,
   hasPaddingLeft = false,
   hasPaddingRight = false,
+  
+  // Specific padding values
+  px5 = false,
+  py3 = false,
+  p4 = false,
+  p5 = false,
   
   // Position
   isAbsolute = false,
@@ -350,6 +362,12 @@ const LayoutView = ({
     if (hasPaddingBottom) classes.push('pb-2');
     if (hasPaddingLeft) classes.push('pl-2');
     if (hasPaddingRight) classes.push('pr-2');
+    
+    // Specific padding values
+    if (px5) classes.push('px-5');
+    if (py3) classes.push('py-3');
+    if (p4) classes.push('p-4');
+    if (p5) classes.push('p-5');
     
     // Position
     if (isAbsolute) classes.push('absolute');

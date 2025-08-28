@@ -3,17 +3,19 @@ import { Stack } from 'expo-router';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { LanguageProvider } from '../contexts/LanguageContext';
+import { LearningLevelProvider } from '../contexts/LearningLevelContext';
 
 const RootLayout = () => {
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider style={{ flex: 1 }}>
+      <StatusBar style="light" backgroundColor="#2563eb" />
       <LanguageProvider>
-        <SafeAreaView style={{ backgroundColor: '#f8fafc', flex: 1 }} edges={['bottom']}>
-          <StatusBar style="light" backgroundColor="#2563eb" hidden />
-          <Stack screenOptions={{ headerShown: false, headerStyle: { backgroundColor: '#2563eb' } }}>
+        <LearningLevelProvider>
+          <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
+            <Stack.Screen name="settings" />
           </Stack>
-        </SafeAreaView>
+        </LearningLevelProvider>
       </LanguageProvider>
     </SafeAreaProvider>
   );

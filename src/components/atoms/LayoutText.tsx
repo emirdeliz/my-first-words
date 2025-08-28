@@ -7,6 +7,8 @@ interface LayoutTextProps extends TextProps {
   isTextBlack?: boolean;
   isTextGray?: boolean;
   isTextGray300?: boolean;
+  isTextGray400?: boolean;
+  isTextGray500?: boolean;
   isTextGray800?: boolean;
   
   // Text Sizes
@@ -76,6 +78,8 @@ const LayoutText = ({
   isTextBlack = false,
   isTextGray = false,
   isTextGray300 = false,
+  isTextGray400 = false,
+  isTextGray500 = false,
   isTextGray800 = false,
   
   // Text Sizes
@@ -149,6 +153,8 @@ const LayoutText = ({
     if (isTextBlack) classes.push('text-black');
     if (isTextGray) classes.push('text-gray');
     if (isTextGray300) classes.push('text-gray-300');
+    if (isTextGray400) classes.push('text-gray-400');
+    if (isTextGray500) classes.push('text-gray-500');
     if (isTextGray800) classes.push('text-gray-800');
     
     // Text Sizes

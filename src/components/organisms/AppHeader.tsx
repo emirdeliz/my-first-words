@@ -1,12 +1,17 @@
 import React from 'react';
+import { TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import LanguageSelector from '../molecules/LanguageSelector';
+import { router } from 'expo-router';
 import { useLanguage } from '../../hooks/useLanguage';
 import LayoutView from '../atoms/LayoutView';
 import LayoutText from '../atoms/LayoutText';
 
 const AppHeader = () => {
   const { translation } = useLanguage();
+
+  const handleSettingsPress = () => {
+    router.push('/settings');
+  };
 
   return (
     <LayoutView 
@@ -29,7 +34,9 @@ const AppHeader = () => {
       >
         {translation.appTitle}
       </LayoutText>
-      <LanguageSelector />
+      <TouchableOpacity onPress={handleSettingsPress}>
+        <MaterialIcons name="settings" size={24} color="white" />
+      </TouchableOpacity>
     </LayoutView>
   );
 };

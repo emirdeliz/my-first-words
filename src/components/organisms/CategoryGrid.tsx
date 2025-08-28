@@ -49,9 +49,9 @@ const CategoryGrid = ({ categories, onSelectCategory }: CategoryGridProps) => {
       isFlex
       isFlexRow
       isFlexWrap
-      hasPadding
       isJustifyBetween
-      customClasses="p-5 justify-between"
+      customClasses="justify-between"
+      p5
     >
       {categories.map((category) => {
         const categoryProps = getCategoryProps(category);
