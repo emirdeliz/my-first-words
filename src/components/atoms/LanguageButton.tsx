@@ -22,15 +22,15 @@ const LanguageButton = ({
   onPress 
 }: LanguageButtonProps) => {
   const getSizeClasses = () => {
-    if (isLarge) return 'px-4 py-3';
-    if (isSmall) return 'px-2 py-1';
-    return 'px-3 py-2'; // default
+    if (isLarge) return { px4: true, py3: true };
+    if (isSmall) return { px2: true, py1: true };
+    return { px3: true, py2: true }; // default
   };
 
   const getTextSize = () => {
-    if (isLarge) return 'text-lg';
-    if (isSmall) return 'text-xs';
-    return 'text-sm'; // default
+    if (isLarge) return { isTextLg: true };
+    if (isSmall) return { isTextXs: true };
+    return { isTextSm: true }; // default
   };
 
   const getIconSize = () => {
@@ -40,8 +40,8 @@ const LanguageButton = ({
   };
 
   const getAlignment = () => {
-    if (isCentered) return 'justify-center';
-    return 'flex-row items-center';
+    if (isCentered) return { isJustifyCenter: true };
+    return { isFlexRow: true, isItemsCenter: true };
   };
 
   return (
@@ -49,7 +49,8 @@ const LanguageButton = ({
       onPress={onPress}
     >
       <LayoutView 
-        customClasses={`${getAlignment()} ${getSizeClasses()}`}
+        {...getAlignment()}
+        {...getSizeClasses()}
       >
         {hasIcon && (
           <MaterialIcons 
@@ -60,7 +61,9 @@ const LanguageButton = ({
         )}
         <LayoutText 
           isTextWhite
-          customClasses={`${getTextSize()} font-bold ${hasIcon ? 'ml-1' : ''}`}
+          isFontBold
+          {...getTextSize()}
+          customClasses={hasIcon ? 'ml-1' : ''}
         >
           {languageCode.toUpperCase()}
         </LayoutText>

@@ -104,19 +104,16 @@ const CommunicationBoardTemplate = () => {
     <LayoutView isFlex style={{ backgroundColor: colors.background }}>
       {/* Header */}
       <LayoutView
+        isFlexRow
+        isItemsEnd
+        isJustifyBetween
+        hasPaddingX
+        hasPaddingY
+        hasShadow
+        customClasses="px-5 py-3"
         style={{
           backgroundColor: isDark ? colors.surface : colors.primary,
           height: 100,
-          flexDirection: 'row',
-          alignItems: 'flex-end',
-          justifyContent: 'space-between',
-          paddingHorizontal: 20,
-          paddingVertical: 12,
-          shadowColor: colors.shadow,
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-          elevation: 5,
         }}
       >
         <MaterialIcons 
@@ -156,18 +153,15 @@ const CommunicationBoardTemplate = () => {
               style={{ width: '48%', marginBottom: 16 }}
             >
               <LayoutView 
+                isJustifyCenter
+                isItemsCenter
+                hasPadding
+                hasShadow
+                customClasses="p-3"
                 style={{
                   backgroundColor: getItemColor(item.type),
                   aspectRatio: 5/6,
                   borderRadius: 12,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  shadowColor: colors.shadow,
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 3.84,
-                  elevation: 5,
-                  padding: 12,
                 }}
               >
                 <MaterialIcons 

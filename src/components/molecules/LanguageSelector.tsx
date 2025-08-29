@@ -22,21 +22,23 @@ const LanguageSelector = () => {
     <>
       <TouchableOpacity
         onPress={() => setModalVisible(true)}
-        style={{
-          backgroundColor: '#2563eb',
-          paddingVertical: 12,
-          paddingHorizontal: 16,
-          borderRadius: 8,
-          alignItems: 'center',
-        }}
       >
-        <LayoutText 
-          isTextWhite
-          isTextBase
-          isFontSemibold
+        <LayoutView 
+          isBgPrimary600
+          hasPaddingY
+          hasPaddingX
+          isRounded
+          isItemsCenter
+          customClasses="py-3 px-4"
         >
-          {translation.settings.language.changeButton}
-        </LayoutText>
+          <LayoutText 
+            isTextWhite
+            isTextBase
+            isFontSemibold
+          >
+            {translation.settings.language.changeButton}
+          </LayoutText>
+        </LayoutView>
       </TouchableOpacity>
 
       <Modal
@@ -74,28 +76,32 @@ const LanguageSelector = () => {
                 <TouchableOpacity
                   key={language.code}
                   onPress={() => selectLanguage(language.code)}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingVertical: 16,
-                    paddingHorizontal: 12,
-                    borderRadius: 8,
-                    marginBottom: 8,
-                    backgroundColor: currentLanguage.code === language.code ? '#e5e7eb' : '#f3f4f6',
-                  }}
                 >
-                  <LayoutText 
-                    isTextBase
-                    customClasses={`${
-                      currentLanguage.code === language.code ? 'text-gray-800' : 'text-gray-600'
-                    }`}
+                  <LayoutView 
+                    isFlexRow
+                    isItemsCenter
+                    isJustifyBetween
+                    hasPaddingY
+                    hasPaddingX
+                    isRounded
+                    hasMarginBottom
+                    customClasses="py-4 px-3 mb-2"
+                    style={{
+                      backgroundColor: currentLanguage.code === language.code ? '#e5e7eb' : '#f3f4f6',
+                    }}
                   >
-                    {language.name}
-                  </LayoutText>
-                  {currentLanguage.code === language.code && (
-                    <MaterialIcons name="check" size={20} color="#10b981" />
-                  )}
+                    <LayoutText 
+                      isTextBase
+                      customClasses={`${
+                        currentLanguage.code === language.code ? 'text-gray-800' : 'text-gray-600'
+                      }`}
+                    >
+                      {language.name}
+                    </LayoutText>
+                    {currentLanguage.code === language.code && (
+                      <MaterialIcons name="check" size={20} color="#10b981" />
+                    )}
+                  </LayoutView>
                 </TouchableOpacity>
               ))}
             </ScrollView>

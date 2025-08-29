@@ -99,17 +99,15 @@ const CommunicationGrid = ({
   return (
     <LayoutView isFlex isFlex1 isHFull>
       <LayoutView 
+        isFlexRow
+        isItemsCenter
+        hasPaddingX
+        hasPaddingY
+        hasShadow
+        customClasses="px-5 py-3"
         style={{
           backgroundColor: isDark ? colors.surface : colors.primary,
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 20,
-          paddingVertical: 12,
-          shadowColor: colors.shadow,
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-          elevation: 5,
+          height: 100,
         }}
       >
         <BackButton onPress={handleBack} text={translation.back} />
@@ -138,7 +136,7 @@ const CommunicationGrid = ({
       <ScrollView 
         showsVerticalScrollIndicator={false} 
         style={{ backgroundColor: colors.background }}
-        contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
+        contentContainerStyle={{ paddingBottom: 400, flexGrow: 1 }}
       >
         <LayoutView 
           isFlexRow

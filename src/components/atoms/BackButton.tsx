@@ -26,18 +26,19 @@ const BackButton = ({
     <TouchableOpacity 
       onPress={onPress}
       activeOpacity={0.8}
-      style={{
-        backgroundColor: colors.backgroundSecondary,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: colors.borderSecondary,
-      }}
     >
       <LayoutView 
         isFlexRow
         isItemsCenter
+        hasPaddingX
+        hasPaddingY
+        isRounded
+        customClasses="px-3 py-2"
+        style={{
+          backgroundColor: colors.backgroundSecondary,
+          borderColor: colors.borderSecondary,
+          borderWidth: 1,
+        }}
       >
         <Icon 
           name="arrow-back"

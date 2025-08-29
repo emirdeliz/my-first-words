@@ -53,20 +53,22 @@ const NotFoundScreen = () => {
           
           <TouchableOpacity
             onPress={() => router.push('/')}
-            style={{
-              backgroundColor: '#fbbf24',
-              paddingHorizontal: 32,
-              paddingVertical: 16,
-              borderRadius: 9999,
-            }}
           >
-            <LayoutText 
-              isTextBlack
-              isFontBold
-              isTextBase
+            <LayoutView 
+              isBgYellow400
+              hasPaddingX
+              hasPaddingY
+              isRoundedFull
+              customClasses="px-8 py-4"
             >
-              Return Home
-            </LayoutText>
+              <LayoutText 
+                isTextBlack
+                isFontBold
+                isTextBase
+              >
+                Return Home
+              </LayoutText>
+            </LayoutView>
           </TouchableOpacity>
         </LayoutView>
       </LayoutView>

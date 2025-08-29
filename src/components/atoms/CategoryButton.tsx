@@ -65,7 +65,6 @@ const CategoryButton = ({
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={0.8}
-              style={{ width: '48%', aspectRatio: 1 }}
     >
       <LayoutView 
         {...getSizeClasses()}

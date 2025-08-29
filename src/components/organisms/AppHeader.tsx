@@ -17,19 +17,16 @@ const AppHeader = () => {
 
   return (
     <LayoutView 
+      isFlexRow
+      isItemsEnd
+      isJustifyBetween
+      hasPaddingX
+      hasPaddingY
+      hasShadow
+      customClasses="px-5 py-3"
       style={{
         backgroundColor: isDark ? colors.surface : colors.primary,
         height: 100,
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingVertical: 12,
-        shadowColor: colors.shadow,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
       }}
     >
       <MaterialIcons 
