@@ -78,3 +78,5 @@ ios/
 # Codemagic
 codemagic.yaml
 .codemagic/
+
+.history
