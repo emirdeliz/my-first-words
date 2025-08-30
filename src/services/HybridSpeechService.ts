@@ -1,7 +1,6 @@
 import { Platform } from 'react-native';
 import * as ExpoSpeech from 'expo-speech';
-import Tts from 'react-native-tts';
-import Voice from '@react-native-voice/voice';
+import Voice from '@react-native-community/voice';
 
 export interface SpeechOptions {
   language?: string;
@@ -14,7 +13,7 @@ export interface SpeechOptions {
   onStopped?: () => void;
 }
 
-export type SpeechEngine = 'expo-speech' | 'react-native-tts' | 'react-native-voice';
+export type SpeechEngine = 'expo-speech' | 'react-native-voice';
 
 export class HybridSpeechService {
   private static instance: HybridSpeechService;
@@ -22,7 +21,7 @@ export class HybridSpeechService {
   private isInitialized: boolean = false;
   private isSpeaking: boolean = false;
   private currentLanguage: string = 'pt-BR';
-  private enginePriority: SpeechEngine[] = ['react-native-tts', 'expo-speech', 'react-native-voice'];
+  private enginePriority: SpeechEngine[] = ['expo-speech', 'react-native-voice'];
 
   private constructor() {
     this.initializeService();
@@ -72,8 +71,6 @@ export class HybridSpeechService {
   private async testEngine(engine: SpeechEngine): Promise<boolean> {
     try {
       switch (engine) {
-        case 'react-native-tts':
-          return await this.testTTSEngine();
         case 'expo-speech':
           return await this.testExpoSpeechEngine();
         case 'react-native-voice':
@@ -83,23 +80,6 @@ export class HybridSpeechService {
       }
     } catch (error) {
       console.error(`❌ Error testing ${engine}:`, error);
-      return false;
-    }
-  }
-
-  private async testTTSEngine(): Promise<boolean> {
-    try {
-      // Test TTS initialization
-      await Tts.setDefaultLanguage('en-US');
-      await Tts.setDefaultRate(0.8);
-      await Tts.setDefaultPitch(1.0);
-      
-      // Wait a bit for the test to complete
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      return true;
-    } catch (error) {
-      console.log('❌ TTS engine test failed:', error);
       return false;
     }
   }
@@ -139,9 +119,6 @@ export class HybridSpeechService {
   private async updateEngineLanguage(language: string): Promise<void> {
     try {
       switch (this.currentEngine) {
-        case 'react-native-tts':
-          await Tts.setDefaultLanguage(language);
-          break;
         case 'expo-speech':
           // expo-speech doesn't have a setDefaultLanguage method
           break;
@@ -171,9 +148,6 @@ export class HybridSpeechService {
       console.log(`🗣️ Speaking with ${this.currentEngine}: "${text}" in ${options.language || this.currentLanguage}`);
       
       switch (this.currentEngine) {
-        case 'react-native-tts':
-          await this.speakWithTTS(text, options);
-          break;
         case 'expo-speech':
           await this.speakWithExpoSpeech(text, options);
           break;
@@ -181,98 +155,72 @@ export class HybridSpeechService {
           await this.speakWithVoice(text, options);
           break;
         default:
-          throw new Error(`Unknown engine: ${this.currentEngine}`);
+          throw new Error(`Unsupported engine: ${this.currentEngine}`);
       }
-      
+
     } catch (error) {
-      console.error(`❌ Error with ${this.currentEngine}:`, error);
-      
-      // Try to fallback to another engine
-      await this.fallbackToAnotherEngine(text, options);
+      console.error('❌ Error speaking:', error);
+      throw error;
     }
-  }
-
-  private async speakWithTTS(text: string, options: SpeechOptions): Promise<void> {
-    const ttsOptions: any = {
-      language: options.language || this.currentLanguage,
-      rate: options.rate || 0.8,
-      pitch: options.pitch || 1.0,
-    };
-
-    if (options.voice) {
-      ttsOptions.voice = options.voice;
-    }
-
-    await Tts.speak(text, ttsOptions);
   }
 
   private async speakWithExpoSpeech(text: string, options: SpeechOptions): Promise<void> {
-    const expoOptions: any = {
-      language: options.language || this.currentLanguage,
-      rate: options.rate || 0.8,
-      pitch: options.pitch || 1.0,
-      onDone: options.onEnd,
-      onError: options.onError,
-      onStopped: options.onStopped,
-    };
+    try {
+      const expoOptions = {
+        language: options.language || this.currentLanguage,
+        pitch: options.pitch || 1.0,
+        rate: options.rate || 0.8,
+        voice: options.voice,
+        onStart: options.onStart,
+        onDone: options.onEnd,
+        onError: options.onError,
+        onStopped: options.onStopped,
+      };
 
-    if (options.voice) {
-      expoOptions.voice = options.voice;
+      console.log('🔊 Using Expo Speech with options:', expoOptions);
+      
+      await ExpoSpeech.speak(text, expoOptions);
+      
+      this.isSpeaking = true;
+      
+      // Set up a timeout to mark as not speaking
+      setTimeout(() => {
+        this.isSpeaking = false;
+        if (options.onEnd) options.onEnd();
+      }, Math.max(text.length * 100, 1000));
+
+    } catch (error) {
+      console.error('❌ Expo Speech error:', error);
+      throw error;
     }
-
-    await ExpoSpeech.speak(text, expoOptions);
   }
 
   private async speakWithVoice(text: string, options: SpeechOptions): Promise<void> {
-    // Voice is primarily for speech recognition, but we can try to use it for TTS
-    await Voice.start(options.language || this.currentLanguage);
-    
-    // Simulate speech duration
-    const speechDuration = Math.max(text.length * 100, 1000);
-    setTimeout(() => {
-      this.isSpeaking = false;
-      if (options.onEnd) options.onEnd();
-    }, speechDuration);
-  }
+    try {
+      console.log('🔊 Using Voice with options:', options);
+      
+      // Voice is primarily for speech recognition, not TTS
+      // We'll use it as a fallback for basic functionality
+      if (options.onStart) options.onStart();
+      
+      // Simulate speech for now
+      this.isSpeaking = true;
+      
+      setTimeout(() => {
+        this.isSpeaking = false;
+        if (options.onEnd) options.onEnd();
+      }, Math.max(text.length * 100, 1000));
 
-  private async fallbackToAnotherEngine(text: string, options: SpeechOptions): Promise<void> {
-    console.log('🔄 Attempting fallback to another engine...');
-    
-    // Try other engines
-    for (const engine of this.enginePriority) {
-      if (engine !== this.currentEngine) {
-        try {
-          console.log(`🔄 Trying fallback engine: ${engine}`);
-          
-          // Temporarily switch engine
-          const originalEngine = this.currentEngine;
-          this.currentEngine = engine;
-          
-          await this.speak(text, options);
-          
-          // If successful, keep the new engine
-          console.log(`✅ Fallback to ${engine} successful`);
-          return;
-          
-        } catch (error) {
-          console.log(`❌ Fallback to ${engine} failed:`, error);
-          // Revert to original engine
-          this.currentEngine = this.currentEngine;
-        }
-      }
+    } catch (error) {
+      console.error('❌ Voice error:', error);
+      throw error;
     }
-    
-    // If all engines fail, throw error
-    throw new Error('All speech engines failed');
   }
 
   async stop(): Promise<void> {
     try {
       if (this.isSpeaking) {
         switch (this.currentEngine) {
-          case 'react-native-tts':
-            await Tts.stop();
-            break;
           case 'expo-speech':
             await ExpoSpeech.stop();
             break;
@@ -291,94 +239,34 @@ export class HybridSpeechService {
 
   async getAvailableVoices(): Promise<any[]> {
     try {
-      switch (this.currentEngine) {
-        case 'react-native-tts':
-          return await Tts.voices();
-        case 'expo-speech':
-          return await ExpoSpeech.getAvailableVoicesAsync();
-        case 'react-native-voice':
-          // Voice doesn't provide voices for TTS
-          return [];
-        default:
-          return [];
-      }
+      // Return basic voice options
+      return [
+        { identifier: 'pt-BR-female', name: 'Portuguese (Brazil) - Female', language: 'pt-BR' },
+        { identifier: 'pt-BR-male', name: 'Portuguese (Brazil) - Male', language: 'pt-BR' },
+        { identifier: 'en-US-female', name: 'English (US) - Female', language: 'en-US' },
+        { identifier: 'en-US-male', name: 'English (US) - Male', language: 'en-US' },
+        { identifier: 'es-ES-female', name: 'Spanish (Spain) - Female', language: 'es-ES' },
+        { identifier: 'es-ES-male', name: 'Spanish (Spain) - Male', language: 'es-ES' },
+      ];
     } catch (error) {
       console.error('❌ Error getting available voices:', error);
       return [];
     }
   }
 
-  getCurrentEngine(): SpeechEngine {
-    return this.currentEngine;
-  }
-
   isCurrentlySpeaking(): boolean {
     return this.isSpeaking;
   }
 
-  // Platform-specific initialization
-  async initializeForPlatform(): Promise<boolean> {
-    try {
-      if (Platform.OS === 'android') {
-        return await this.initializeForAndroid();
-      } else if (Platform.OS === 'ios') {
-        return await this.initializeForIOS();
-      }
-      return true;
-    } catch (error) {
-      console.error('❌ Error initializing for platform:', error);
-      return false;
-    }
-  }
-
-  private async initializeForAndroid(): Promise<boolean> {
-    try {
-      console.log('🤖 Initializing for Android...');
-      
-      // Android-specific initialization
-      if (this.currentEngine === 'react-native-tts') {
-        await Tts.setDefaultLanguage('pt-BR');
-        await Tts.setDefaultRate(0.8);
-        await Tts.setDefaultPitch(1.0);
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('❌ Error initializing for Android:', error);
-      return false;
-    }
-  }
-
-  private async initializeForIOS(): Promise<boolean> {
-    try {
-      console.log('🍎 Initializing for iOS...');
-      
-      // iOS-specific initialization
-      if (this.currentEngine === 'react-native-tts') {
-        await Tts.setDefaultLanguage('pt-BR');
-        await Tts.setDefaultRate(0.8);
-        await Tts.setDefaultPitch(1.0);
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('❌ Error initializing for iOS:', error);
-      return false;
-    }
+  getCurrentEngine(): SpeechEngine {
+    return this.currentEngine;
   }
 
   // Cleanup
   destroy(): void {
     try {
-      // Cleanup all engines
-      Tts.removeAllListeners('tts-start');
-      Tts.removeAllListeners('tts-finish');
-      Tts.removeAllListeners('tts-cancel');
-      Tts.removeAllListeners('tts-error');
-      
-      Voice.removeAllListeners();
-      
       this.isInitialized = false;
+      this.isSpeaking = false;
       console.log('🧹 Hybrid Speech Service destroyed');
     } catch (error) {
       console.error('❌ Error destroying Hybrid Speech Service:', error);

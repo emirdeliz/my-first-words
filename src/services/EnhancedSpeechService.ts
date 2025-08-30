@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import Voice from '@react-native-voice/voice';
+import Voice from '@react-native-community/voice';
 
 export interface SpeechOptions {
   language?: string;
@@ -71,7 +71,7 @@ export class EnhancedSpeechService {
       if (options.onStart) Voice.onSpeechStart = options.onStart;
       if (options.onEnd) Voice.onSpeechEnd = options.onEnd;
       if (options.onError) Voice.onSpeechError = options.onError;
-      if (options.onStopped) Voice.onSpeechStopped = options.onStopped;
+      if (options.onStopped) Voice.onSpeechEnd = options.onStopped; // Use onSpeechEnd instead
 
       // Start speaking
       await Voice.start(options.language || this.currentLanguage);
