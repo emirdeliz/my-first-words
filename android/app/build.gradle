@@ -220,6 +220,7 @@ dependencies {
             force 'com.facebook.react:react-android:0.79.5'
             force 'com.facebook.react:hermes-android:0.79.5'
             force 'com.facebook.fbjni:fbjni:0.7.0'
+            force 'com.swmansion.rnscreens:react-native-screens:3.29.0'
         }
     }
 }
