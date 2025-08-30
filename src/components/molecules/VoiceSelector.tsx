@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TouchableOpacity, ScrollView, Modal, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import PlatformAwareSpeechService from '../../services/PlatformAwareSpeechService';
+import HybridSpeechService from '../../services/HybridSpeechService';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useAudioConfig } from '../../contexts/AudioConfigContext';
 import LayoutView from '../atoms/LayoutView';
@@ -24,7 +24,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
 
   const loadAvailableVoices = async () => {
     try {
-      const voices = await PlatformAwareSpeechService.getAvailableVoices();
+      const voices = await HybridSpeechService.getAvailableVoices();
       
       // Filter voices for the current language and offline availability
       const filteredVoices = voices.filter(voice => {
@@ -193,7 +193,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
   const testVoice = async (voiceId: string) => {
     try {
       setTestingVoice(voiceId); // Set loading state
-      PlatformAwareSpeechService.stop(); // Stop any previous speech
+              HybridSpeechService.stop(); // Stop any previous speech
       
       let testText = 'Hello'; // Default in English
       switch (currentLanguage.code) {
@@ -214,7 +214,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         onStopped: () => { console.log(`⏹️ Test stopped: ${voiceId}`); setTestingVoice(null); },
       };
       if (voiceId !== 'offline-default-voice') { speechOptions.voice = voiceId; }
-      await PlatformAwareSpeechService.speak(testText, speechOptions);
+              await HybridSpeechService.speak(testText, speechOptions);
       
     } catch (error) {
       console.error('❌ Error testing voice:', error);
