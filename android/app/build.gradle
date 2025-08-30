@@ -196,5 +196,21 @@ dependencies {
         implementation('androidx.window:window:1.2.0') {
             because 'Resolve react-native-screens compatibility'
         }
+        implementation('androidx.activity:activity:1.8.2') {
+            because 'Resolve react-native-screens compatibility'
+        }
+        implementation('androidx.fragment:fragment:1.6.2') {
+            because 'Resolve react-native-screens compatibility'
+        }
+    }
+    
+    // Force specific versions for problematic libraries
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.core:core:1.13.1'
+            force 'androidx.window:window:1.2.0'
+            force 'androidx.activity:activity:1.8.2'
+            force 'androidx.fragment:fragment:1.6.2'
+        }
     }
 }
