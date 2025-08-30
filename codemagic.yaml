@@ -10,6 +10,7 @@ workflows:
         NEW_ARCH_ENABLED: "false"
         ANDROID_ENABLE_JETIFIER: "true"
         ANDROID_USE_ANDROIDX: "true"
+        ANDROID_ENABLE_RESOURCE_MERGING: "false"
     scripts:
       - name: Set up environment
         script: |
@@ -28,6 +29,9 @@ workflows:
       - name: Build APK
         script: |
           cd android
+          # Add resource conflict resolution
+          echo "android.packagingOptions.pickFirsts += ['**/values/values.xml', '**/values-*/values.xml']" >> app/build.gradle
+          echo "android.packagingOptions.excludes += ['**/values/values.xml', '**/values-*/values.xml']" >> app/build.gradle
           ./gradlew assembleRelease --no-daemon --stacktrace
     artifacts:
       - android/app/build/outputs/apk/release/*.apk
