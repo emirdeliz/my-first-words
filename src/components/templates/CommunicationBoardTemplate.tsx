@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useParentalConfig } from '../../contexts/ParentalConfigContext';
 import { useLearningLevel } from '../../contexts/LearningLevelContext';
+import { useAudioConfig } from '../../contexts/AudioConfigContext';
 import LayoutView from '../atoms/LayoutView';
 import LayoutText from '../atoms/LayoutText';
 import AudioService from '../../services/AudioService';
@@ -15,38 +17,110 @@ const CommunicationBoardTemplate = () => {
   const { colors, isDark } = useTheme();
   const { getEnabledItems } = useParentalConfig();
   const { currentLevel } = useLearningLevel();
+  const { audioConfig, loadAudioConfig } = useAudioConfig();
+
+  // Monitor changes in audio config (only log once on mount)
+  useEffect(() => {
+    console.log('🎤 CommunicationBoardTemplate - Audio config loaded:', audioConfig);
+  }, []); // Empty dependency array to run only once
+
+  // Monitor when screen comes into focus (only once per focus)
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('🎤 CommunicationBoardTemplate - Screen focused, current audio config:', audioConfig);
+      
+      // Force refresh of audio config when screen comes into focus (only once)
+      const refreshAudioConfig = async () => {
+        try {
+          await loadAudioConfig();
+          console.log('🔄 Audio config refreshed on focus');
+        } catch (error) {
+          console.error('❌ Error refreshing audio config:', error);
+        }
+      };
+      
+      refreshAudioConfig();
+    }, []) // No dependencies to prevent infinite loop
+  );
 
   const enabledItems = getEnabledItems();
+  
+  // // Debug: Log enabled items to check structure
+  // useEffect(() => {
+  //   console.log('🔍 CommunicationBoardTemplate - Enabled items:', enabledItems);
+  //   console.log('🔍 CommunicationBoardTemplate - Items structure check:');
+  //   enabledItems.forEach((item, index) => {
+  //     console.log(`  Item ${index}:`, {
+  //       id: item.id,
+  //       categoryId: item.categoryId,
+  //       textKey: item.textKey,
+  //       text: item.text,
+  //       icon: item.icon,
+  //       type: item.type
+  //     });
+  //   });
+  // }, [enabledItems]);
 
   // Function to get translated text based on level and language
   const getTranslatedText = (categoryId: string, textKey: string): string => {
-    // Level 1: Simple words
-    if (currentLevel === 1) {
-      if (categoryId === 'basic') return (translation.basicNeedsLevel1 as any)[textKey];
-      if (categoryId === 'emotions') return (translation.emotionsLevel1 as any)[textKey];
-      if (categoryId === 'activities') return (translation.activitiesLevel1 as any)[textKey];
-      if (categoryId === 'social') return (translation.socialLevel1 as any)[textKey];
+    console.log('🌐 getTranslatedText - categoryId:', categoryId, 'textKey:', textKey, 'level:', currentLevel);
+    console.log('🌐 getTranslatedText - current language:', currentLanguage);
+    
+    let translatedText = '';
+    
+    try {
+      // Level 1: Simple words
+      if (currentLevel === 1) {
+        if (categoryId === 'basic' && translation.basicNeedsLevel1) {
+          translatedText = (translation.basicNeedsLevel1 as any)[textKey];
+        } else if (categoryId === 'emotions' && translation.emotionsLevel1) {
+          translatedText = (translation.emotionsLevel1 as any)[textKey];
+        } else if (categoryId === 'activities' && translation.activitiesLevel1) {
+          translatedText = (translation.activitiesLevel1 as any)[textKey];
+        } else if (categoryId === 'social' && translation.socialLevel1) {
+          translatedText = (translation.socialLevel1 as any)[textKey];
+        }
+      } else {
+        // Levels 2 and 3: Complete phrases
+        if (categoryId === 'basic' && translation.basicNeeds) {
+          translatedText = (translation.basicNeeds as any)[textKey];
+        } else if (categoryId === 'emotions' && translation.emotions) {
+          translatedText = (translation.emotions as any)[textKey];
+        } else if (categoryId === 'activities' && translation.activities) {
+          translatedText = (translation.activities as any)[textKey];
+        } else if (categoryId === 'social' && translation.social) {
+          translatedText = (translation.social as any)[textKey];
+        }
+      }
+      
+      console.log('🌐 getTranslatedText - result:', translatedText);
+      
+      // Fallback to textKey if no translation found
+      if (!translatedText) {
+        console.warn('⚠️ No translation found for:', categoryId, textKey, 'level:', currentLevel);
+        translatedText = textKey;
+      }
+      
+      return translatedText;
+    } catch (error) {
+      console.error('❌ Error in getTranslatedText:', error);
+      return textKey; // Fallback to original text
     }
-    
-    // Levels 2 and 3: Complete phrases
-    if (categoryId === 'basic') return (translation.basicNeeds as any)[textKey];
-    if (categoryId === 'emotions') return (translation.emotions as any)[textKey];
-    if (categoryId === 'activities') return (translation.activities as any)[textKey];
-    if (categoryId === 'social') return (translation.social as any)[textKey];
-    
-    return textKey;
   };
 
   const handleItemPress = async (text: string, categoryId: string, textKey: string) => {
     try {
+      console.log('🎤 CommunicationBoardTemplate - Selected voice:', audioConfig.selectedVoice);
+      console.log('🎤 CommunicationBoardTemplate - Audio config:', audioConfig);
+      
       // Update level in audio service
       AudioService.setLevel(currentLevel);
       
       // Get translated text for audio
       const translatedText = getTranslatedText(categoryId, textKey);
       
-      // Play audio sequence
-      await AudioService.playAudioSequence(translatedText);
+      // Play audio sequence with selected voice
+      await AudioService.playAudioSequence(translatedText, audioConfig.selectedVoice);
     } catch (error) {
       console.error('Error playing audio:', error);
     }
@@ -70,6 +144,8 @@ const CommunicationBoardTemplate = () => {
   const getItemIcon = (iconName: string) => {
     return iconName as keyof typeof MaterialIcons.glyphMap;
   };
+
+
 
   if (enabledItems.length === 0) {
     return (
@@ -121,13 +197,16 @@ const CommunicationBoardTemplate = () => {
           size={28} 
           color={colors.textInverse} 
         />
-        <LayoutText 
-          isTextXl
-          isFontBold
-          style={{ color: colors.textInverse }}
-        >
-          {translation.appTitle}
-        </LayoutText>
+        <LayoutView style={{ flex: 1, marginLeft: 16 }}>
+          <LayoutText 
+            isTextXl
+            isFontBold
+            style={{ color: colors.textInverse }}
+          >
+            {translation.appTitle}
+          </LayoutText>
+        </LayoutView>
+
         <TouchableOpacity onPress={() => router.push('/settings')}>
           <MaterialIcons name="settings" size={24} color={colors.textInverse} />
         </TouchableOpacity>
@@ -136,7 +215,7 @@ const CommunicationBoardTemplate = () => {
       {/* Audio Items Grid */}
       <ScrollView 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
       >
         <LayoutView 
           isFlex
@@ -150,7 +229,7 @@ const CommunicationBoardTemplate = () => {
               key={item.id}
               onPress={() => handleItemPress(item.text, item.categoryId, item.textKey)}
               activeOpacity={0.7}
-              style={{ width: '48%', marginBottom: 16 }}
+              style={{ width: '49%', marginBottom: 16 }}
             >
               <LayoutView 
                 isJustifyCenter

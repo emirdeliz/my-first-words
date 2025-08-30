@@ -83,7 +83,7 @@ const lightColors: ThemeColors = {
   
   card: '#ffffff',
   cardSecondary: '#f8fafc',
-  shadow: 'rgba(0, 0, 0, 0.1)',
+  shadow: 'rgba(0, 0, 0, 0.08)',
 };
 
 // Paleta de cores para tema escuro

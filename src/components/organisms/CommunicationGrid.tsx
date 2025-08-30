@@ -4,6 +4,7 @@ import CommunicationButton from '../atoms/CommunicationButton';
 import BackButton from '../atoms/BackButton';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useLearningLevel } from '../../contexts/LearningLevelContext';
+import { useAudioConfig } from '../../contexts/AudioConfigContext';
 import AudioService from '../../services/AudioService';
 import LayoutView from '../atoms/LayoutView';
 import LayoutText from '../atoms/LayoutText';
@@ -36,6 +37,7 @@ const CommunicationGrid = ({
   const { translation, currentLanguage } = useLanguage();
   const { currentLevel } = useLearningLevel();
   const { colors, isDark } = useTheme();
+  const { audioConfig } = useAudioConfig();
 
   // Sincronizar idioma com o AudioService
   React.useEffect(() => {
@@ -80,8 +82,8 @@ const CommunicationGrid = ({
       // Update level in audio service
       AudioService.setLevel(currentLevel);
       
-      // Play audio sequence based on level
-      await AudioService.playAudioSequence(text);
+      // Play audio sequence based on level with selected voice
+      await AudioService.playAudioSequence(text, audioConfig.selectedVoice);
       
       // Call original callback
       onItemPress(text);
@@ -135,14 +137,15 @@ const CommunicationGrid = ({
     
       <ScrollView 
         showsVerticalScrollIndicator={false} 
-        style={{ backgroundColor: colors.background }}
-        contentContainerStyle={{ paddingBottom: 400, flexGrow: 1 }}
+        style={{ backgroundColor: colors.background, flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1, flex: 1 }}
       >
         <LayoutView 
           isFlexRow
           isFlexWrap
           p4
-          isJustifyBetween
+          isJustifyStart
+          customClasses="gap-6"
         >
           {category.items.map((item) => {
             const translatedText = getTranslatedText(category.id, item.textKey);

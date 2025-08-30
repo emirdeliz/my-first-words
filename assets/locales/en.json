@@ -1,0 +1,50 @@
+{
+  "app": {
+    "name": "My First Words",
+    "description": "Assistive communication app for children",
+    "version": "1.0.0"
+  },
+  "navigation": {
+    "home": "Home",
+    "settings": "Settings",
+    "parental": "Parental Configuration",
+    "back": "Back"
+  },
+  "categories": {
+    "basic": "Basic Needs",
+    "emotions": "Feelings",
+    "activities": "Activities",
+    "social": "Social"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": {
+      "title": "Language",
+      "subtitle": "Choose the interface language",
+      "current": "Current Language",
+      "changeButton": "Change Language"
+    },
+    "audio": {
+      "title": "Audio & Sound",
+      "subtitle": "Audio settings and sound feedback",
+      "voiceSelection": "Voice Selection",
+      "volume": "Volume"
+    },
+    "theme": {
+      "title": "Appearance",
+      "subtitle": "Customize the app appearance",
+      "light": "Light",
+      "dark": "Dark",
+      "auto": "Auto"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  }
+}

@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import * as Speech from 'expo-speech';
+import PlatformAwareSpeechService from './PlatformAwareSpeechService';
 
 const VOICE_NAME_IGNORE = ['Trinoids', 'Albert', 'Jester'];
 
@@ -7,7 +7,7 @@ export class SpeechService {
   static async speak(text: string, languageCode: string): Promise<void> {
     try {
       // Stop any ongoing speech first
-      await Speech.stop();
+      await PlatformAwareSpeechService.stop();
       
       console.log(`🗣️ Speaking in ${languageCode}: "${text}"`);
       
@@ -96,7 +96,7 @@ export class SpeechService {
 
   private static async speakMobile(text: string, languageCode: string): Promise<void> {
     try {
-      const voices = await Speech.getAvailableVoicesAsync();
+      const voices = await PlatformAwareSpeechService.getAvailableVoices();
       console.log(`🎤 Available mobile voices: ${voices.length}`);
       
       // Enhanced voice matching for mobile
@@ -136,7 +136,7 @@ export class SpeechService {
         console.log(`⚠️ No specific voice found for ${languageCode}, using system default`);
       }
       
-      Speech.speak(text, speechOptions);
+      await PlatformAwareSpeechService.speak(text, speechOptions);
       
     } catch (voiceError) {
       console.warn('⚠️ Voice selection error, using basic speech:', voiceError);

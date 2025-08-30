@@ -57,7 +57,7 @@ const CommunicationButton = ({
   };
 
   const getTextSize = () => {
-    if (isLarge) return { isTextSm: true };
+    if (isLarge) return { isTextXl: true };
     if (isSmall) return { isTextXs: true };
     return { isTextSm: true }; // default
   };
@@ -84,9 +84,7 @@ const CommunicationButton = ({
         {...getPadding()}
         isJustifyCenter
         isItemsCenter
-        hasMarginBottom
         isWFull
-        customClasses="mb-4"
         style={{ 
           backgroundColor: isPrimary ? colors.primary : 
                          isSecondary ? colors.success : 

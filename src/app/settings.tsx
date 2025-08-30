@@ -6,6 +6,7 @@ import { useLearningLevel } from "../contexts/LearningLevelContext";
 import { useLanguage } from "../hooks/useLanguage";
 import LayoutView from "../components/atoms/LayoutView";
 import LayoutText from "../components/atoms/LayoutText";
+import Card from "../components/atoms/Card";
 import LearningLevelSelector from "../components/molecules/LearningLevelSelector";
 import LanguageSelector from "../components/molecules/LanguageSelector";
 import VoiceSelector from '../components/molecules/VoiceSelector';
@@ -96,16 +97,7 @@ const SettingsScreen = () => {
       >
         <LayoutView p5>
           {/* Seção de Idioma */}
-          <LayoutView
-            style={{
-              backgroundColor: isDark ? colors.surface : colors.background,
-              borderRadius: 12,
-              shadowColor: colors.shadow,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-            }}
+          <Card
             customClasses="mb-6"
             p5
           >
@@ -162,19 +154,10 @@ const SettingsScreen = () => {
 
             {/* Seletor de Idioma */}
             <LanguageSelector />
-          </LayoutView>
+          </Card>
 
           {/* Seção de Nível de Aprendizado */}
-          <LayoutView
-            style={{
-              backgroundColor: isDark ? colors.surface : colors.background,
-              borderRadius: 12,
-              shadowColor: colors.shadow,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-            }}
+          <Card
             customClasses="mb-6"
             p5
           >
@@ -278,19 +261,10 @@ const SettingsScreen = () => {
 
             {/* Botão para Alterar Nível */}
             <LearningLevelSelector />
-          </LayoutView>
+          </Card>
 
           {/* Seção de Áudio */}
-          <LayoutView
-            style={{
-              backgroundColor: isDark ? colors.surface : colors.background,
-              borderRadius: 12,
-              shadowColor: colors.shadow,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-            }}
+          <Card
             customClasses="mb-6"
             p5
           >
@@ -340,21 +314,12 @@ const SettingsScreen = () => {
               >
                 Selecione a melhor voz disponível para o idioma {currentLanguage.name}. Vozes de alta qualidade soam mais naturais e são melhores para o aprendizado.
               </LayoutText>
-                          <VoiceSelector />
+              <VoiceSelector />
           </LayoutView>
-        </LayoutView>
+        </Card>
 
         {/* Seção de Aparência */}
-        <LayoutView
-          style={{
-            backgroundColor: isDark ? colors.surface : colors.background,
-            borderRadius: 12,
-            shadowColor: colors.shadow,
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            elevation: 5,
-          }}
+        <Card
           customClasses="mb-6"
           p5
         >
@@ -406,19 +371,10 @@ const SettingsScreen = () => {
               </LayoutText>
               <ThemeSelector />
             </LayoutView>
-          </LayoutView>
+          </Card>
 
           {/* Seção de Teste de Áudio */}
-          <LayoutView
-            style={{
-              backgroundColor: isDark ? colors.surface : colors.background,
-              borderRadius: 12,
-              shadowColor: colors.shadow,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-            }}
+          <Card
             customClasses="mb-6"
             p5
           >
@@ -452,19 +408,10 @@ const SettingsScreen = () => {
             </LayoutText>
 
             <AudioTestButton />
-          </LayoutView>
+          </Card>
 
           {/* Seção de Configuração Parental */}
-          <LayoutView
-            style={{
-              backgroundColor: isDark ? colors.surface : colors.background,
-              borderRadius: 12,
-              shadowColor: colors.shadow,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-            }}
+          <Card
             customClasses="mb-6"
             p5
           >
@@ -511,19 +458,10 @@ const SettingsScreen = () => {
                 Configurar Áudios Disponíveis
               </LayoutText>
             </TouchableOpacity>
-          </LayoutView>
+          </Card>
 
         {/* Sobre o App */}
-          <LayoutView
-            style={{
-              backgroundColor: isDark ? colors.surface : colors.background,
-              borderRadius: 12,
-              shadowColor: colors.shadow,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-            }}
+          <Card
             p5
           >
             <LayoutView isFlexRow isItemsCenter hasMarginBottom>
@@ -584,7 +522,7 @@ const SettingsScreen = () => {
                 App para aprendizado de comunicação através de sons e palavras
               </LayoutText>
             </LayoutView>
-          </LayoutView>
+          </Card>
         </LayoutView>
       </ScrollView>
 

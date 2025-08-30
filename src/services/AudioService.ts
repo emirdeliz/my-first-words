@@ -1,6 +1,6 @@
 import { LearningLevel } from '../contexts/LearningLevelContext';
-import * as Speech from 'expo-speech';
 import { Platform, PermissionsAndroid } from 'react-native';
+import PlatformAwareSpeechService from './PlatformAwareSpeechService';
 
 export interface AudioOptions {
   level: LearningLevel;
@@ -45,15 +45,15 @@ export class AudioService {
       console.log('🔧 Initializing audio system for iOS...');
       
       // Test with a simple speech to initialize the system
-      Speech.speak('test', {
+      await PlatformAwareSpeechService.speak('test', {
         language: 'en-US',
         rate: 1.0,
         pitch: 1.0,
-        onDone: () => {
+        onStart: () => {
           console.log('✅ iOS audio system initialized successfully');
           this.isInitialized = true;
         },
-        onError: (error) => {
+        onError: (error: any) => {
           console.error('❌ iOS audio system initialization failed:', error);
           this.isInitialized = false;
         },
@@ -97,9 +97,9 @@ export class AudioService {
   }
 
   // Get available voices with better quality
-  async getAvailableVoices(): Promise<Speech.Voice[]> {
+  async getAvailableVoices(): Promise<any[]> {
     try {
-      const voices = await Speech.getAvailableVoicesAsync();
+      const voices = await PlatformAwareSpeechService.getAvailableVoices();
       return voices;
     } catch (error) {
       console.error('Error getting voices:', error);
@@ -175,8 +175,11 @@ export class AudioService {
     return settings[language] || { pitch: 1.0, rate: 0.9 };
   }
 
-  getAudioOptions(): AudioOptions {
+  getAudioOptions(selectedVoice?: string): AudioOptions {
     const languageSettings = this.getLanguageOptimizedSettings(this.currentLanguage);
+    
+    // Use selected voice if provided, otherwise fall back to language settings
+    const voiceToUse = selectedVoice || languageSettings.voice;
     
     switch (this.currentLevel) {
       case 1:
@@ -185,7 +188,7 @@ export class AudioService {
           speed: 0.8, // Slower for basic level
           includePhrases: false,
           includeComplexSentences: false,
-          voice: languageSettings.voice,
+          voice: voiceToUse,
           pitch: languageSettings.pitch,
           rate: languageSettings.rate * 0.8, // Even slower for level 1
         };
@@ -195,7 +198,7 @@ export class AudioService {
           speed: 1.0, // Normal speed
           includePhrases: true,
           includeComplexSentences: false,
-          voice: languageSettings.voice,
+          voice: voiceToUse,
           pitch: languageSettings.pitch,
           rate: languageSettings.rate,
         };
@@ -205,7 +208,7 @@ export class AudioService {
           speed: 1.2, // Faster for advanced level
           includePhrases: true,
           includeComplexSentences: true,
-          voice: languageSettings.voice,
+          voice: voiceToUse,
           pitch: languageSettings.pitch,
           rate: languageSettings.rate * 1.1, // A bit faster for level 3
         };
@@ -215,7 +218,7 @@ export class AudioService {
           speed: 0.8,
           includePhrases: false,
           includeComplexSentences: false,
-          voice: languageSettings.voice,
+          voice: voiceToUse,
           pitch: languageSettings.pitch,
           rate: languageSettings.rate * 0.8,
         };
@@ -223,7 +226,7 @@ export class AudioService {
   }
 
   // Play audio with proper sequencing
-  async playAudioSequence(text: string): Promise<void> {
+  async playAudioSequence(text: string, selectedVoice?: string): Promise<void> {
     // If already playing, stop and clear current audio
     if (this.isPlaying) {
       console.log('🔄 Audio already playing, stopping current audio...');
@@ -232,7 +235,7 @@ export class AudioService {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
     
-    const options = this.getAudioOptions();
+    const options = this.getAudioOptions(selectedVoice);
     
     try {
       // Clear any existing queue
@@ -351,9 +354,12 @@ export class AudioService {
         rate: options.rate,
       };
 
-      await Speech.speak(audioItem.text, {
+      await PlatformAwareSpeechService.speak(audioItem.text, {
         ...iosOptions,
-        onDone: () => {
+        onStart: () => {
+          console.log(`✅ ${audioItem.type} played: "${audioItem.text}" on ${Platform.OS}`);
+        },
+        onFinish: () => {
           console.log(`✅ ${audioItem.type} played: "${audioItem.text}" on ${Platform.OS}`);
           this.isPlaying = false;
           // Play next item after a short delay
@@ -361,7 +367,7 @@ export class AudioService {
             this.playNextInQueue();
           }, 500);
         },
-        onError: (error) => {
+        onError: (error: any) => {
           console.error(`❌ Error playing ${audioItem.type} on ${Platform.OS}:`, error);
           this.isPlaying = false;
           // Try iOS fallback if on iOS
@@ -396,19 +402,22 @@ export class AudioService {
   private async playAudioAndroid(audioItem: { text: string; type: string }, options: any): Promise<void> {
     try {
       // First attempt: Standard speech
-      await Speech.speak(audioItem.text, {
+      await PlatformAwareSpeechService.speak(audioItem.text, {
         language: this.currentLanguage,
         voice: options.voice,
         pitch: options.pitch,
         rate: options.rate,
-        onDone: () => {
+        onStart: () => {
+          console.log(`✅ Android: ${audioItem.type} started: "${audioItem.text}"`);
+        },
+        onFinish: () => {
           console.log(`✅ Android: ${audioItem.type} played: "${audioItem.text}"`);
           this.isPlaying = false;
           setTimeout(() => {
             this.playNextInQueue();
           }, 500);
         },
-        onError: (error) => {
+        onError: (error: any) => {
           console.log(`⚠️ Android speech failed, trying fallback: ${error}`);
           this.tryAndroidFallback(audioItem, options);
         },
@@ -429,18 +438,21 @@ export class AudioService {
       console.log(`🔄 iOS fallback: Trying minimal options`);
       
       // iOS fallback: Try with minimal options and English
-      await Speech.speak(audioItem.text, {
+      await PlatformAwareSpeechService.speak(audioItem.text, {
         language: 'en-US', // Fallback to English
         pitch: 1.0,
         rate: 0.8,
-        onDone: () => {
+        onStart: () => {
+          console.log(`✅ iOS fallback started: "${audioItem.text}"`);
+        },
+        onFinish: () => {
           console.log(`✅ iOS fallback succeeded: "${audioItem.text}"`);
           this.isPlaying = false;
           setTimeout(() => {
             this.playNextInQueue();
           }, 500);
         },
-        onError: (error) => {
+        onError: (error: any) => {
           console.error(`❌ iOS fallback failed: ${error}`);
           this.isPlaying = false;
           // Try second fallback
@@ -464,15 +476,18 @@ export class AudioService {
       console.log(`🔄 iOS fallback 2: Trying with no options`);
       
       // iOS fallback 2: Try with absolutely no options
-      await Speech.speak(audioItem.text, {
-        onDone: () => {
+      await PlatformAwareSpeechService.speak(audioItem.text, {
+        onStart: () => {
+          console.log(`✅ iOS fallback 2 started: "${audioItem.text}"`);
+        },
+        onFinish: () => {
           console.log(`✅ iOS fallback 2 succeeded: "${audioItem.text}"`);
           this.isPlaying = false;
           setTimeout(() => {
             this.playNextInQueue();
           }, 500);
         },
-        onError: (error) => {
+        onError: (error: any) => {
           console.error(`❌ iOS fallback 2 failed: ${error}`);
           this.isPlaying = false;
           // Continue with next item even if all fallbacks fail
@@ -498,18 +513,21 @@ export class AudioService {
     try {
       // Fallback 1: Try with default language
       console.log(`🔄 Android fallback 1: Trying default language`);
-      await Speech.speak(audioItem.text, {
+      await PlatformAwareSpeechService.speak(audioItem.text, {
         language: 'en-US', // Fallback to English
         pitch: 1.0,
         rate: 0.9,
-        onDone: () => {
+        onStart: () => {
+          console.log(`✅ Android fallback 1 started: "${audioItem.text}"`);
+        },
+        onFinish: () => {
           console.log(`✅ Android fallback 1 succeeded: "${audioItem.text}"`);
           this.isPlaying = false;
           setTimeout(() => {
             this.playNextInQueue();
           }, 500);
         },
-        onError: (error) => {
+        onError: (error: any) => {
           console.log(`⚠️ Android fallback 1 failed: ${error}`);
           this.tryAndroidFallback2(audioItem);
         },
@@ -527,15 +545,18 @@ export class AudioService {
     try {
       // Fallback 2: Try with minimal options
       console.log(`🔄 Android fallback 2: Trying minimal options`);
-      await Speech.speak(audioItem.text, {
-        onDone: () => {
+      await PlatformAwareSpeechService.speak(audioItem.text, {
+        onStart: () => {
+          console.log(`✅ Android fallback 2 started: "${audioItem.text}"`);
+        },
+        onFinish: () => {
           console.log(`✅ Android fallback 2 succeeded: "${audioItem.text}"`);
           this.isPlaying = false;
           setTimeout(() => {
             this.playNextInQueue();
           }, 500);
         },
-        onError: (error) => {
+        onError: (error: any) => {
           console.error(`❌ All Android fallbacks failed: ${error}`);
           this.isPlaying = false;
           // Continue with next item even if all fallbacks fail
@@ -575,13 +596,14 @@ export class AudioService {
       // Stop any previous audio
       this.stop();
       
-      await Speech.speak(phrase, {
+      await PlatformAwareSpeechService.speak(phrase, {
         language: this.currentLanguage,
         voice: options.voice,
         pitch: options.pitch,
         rate: options.rate,
-        onDone: () => console.log(`✅ Phrase played: "${phrase}"`),
-        onError: (error) => console.error(`❌ Error playing phrase:`, error),
+        onStart: () => console.log(`✅ Phrase started: "${phrase}"`),
+        onFinish: () => console.log(`✅ Phrase played: "${phrase}"`),
+        onError: (error: any) => console.error(`❌ Error playing phrase:`, error),
         onStopped: () => console.log(`⏹️ Playback stopped: "${phrase}"`),
       });
       
@@ -605,13 +627,14 @@ export class AudioService {
       // Stop any previous audio
       this.stop();
       
-      await Speech.speak(sentence, {
+      await PlatformAwareSpeechService.speak(sentence, {
         language: this.currentLanguage,
         voice: options.voice,
         pitch: options.pitch,
         rate: options.rate,
-        onDone: () => console.log(`✅ Complex sentence played: "${sentence}"`),
-        onError: (error) => console.error(`❌ Error playing complex sentence:`, error),
+        onStart: () => console.log(`✅ Complex sentence started: "${sentence}"`),
+        onFinish: () => console.log(`✅ Complex sentence played: "${sentence}"`),
+        onError: (error: any) => console.error(`❌ Error playing complex sentence:`, error),
         onStopped: () => console.log(`⏹️ Playback stopped: "${sentence}"`),
       });
       
@@ -623,14 +646,14 @@ export class AudioService {
 
   // Stop current playback and clear queue
   stop(): void {
-    Speech.stop();
+    PlatformAwareSpeechService.stop();
     this.isPlaying = false;
     this.audioQueue = [];
   }
 
   // Check if currently speaking
   async isSpeaking(): Promise<boolean> {
-    return this.isPlaying || await Speech.isSpeakingAsync();
+    return this.isPlaying || await PlatformAwareSpeechService.isSpeaking();
   }
 
   // Test audio on iOS
@@ -641,14 +664,17 @@ export class AudioService {
       console.log('🧪 Testing audio on iOS...');
       
       // Test with a simple word
-      await Speech.speak('test', {
+      await PlatformAwareSpeechService.speak('test', {
         language: 'en-US',
         rate: 1.0,
         pitch: 1.0,
-        onDone: () => {
+        onStart: () => {
+          console.log('✅ iOS audio test started');
+        },
+        onFinish: () => {
           console.log('✅ iOS audio test successful');
         },
-        onError: (error) => {
+        onError: (error: any) => {
           console.error('❌ iOS audio test failed:', error);
         },
         onStopped: () => {
