@@ -8,6 +8,8 @@ workflows:
         GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.configureondemand=true"
         EXPO_USE_LEGACY_PACKAGING: "true"
         NEW_ARCH_ENABLED: "false"
+        ANDROID_ENABLE_JETIFIER: "true"
+        ANDROID_USE_ANDROIDX: "true"
     scripts:
       - name: Set up environment
         script: |
