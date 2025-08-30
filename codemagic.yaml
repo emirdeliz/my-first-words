@@ -6,6 +6,8 @@ workflows:
       vars:
         PACKAGE_NAME: "com.emirdeliz.myfirstwords"
         GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.configureondemand=true"
+        EXPO_USE_LEGACY_PACKAGING: "true"
+        NEW_ARCH_ENABLED: "false"
     scripts:
       - name: Set up environment
         script: |
