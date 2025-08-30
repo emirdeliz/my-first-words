@@ -1,6 +1,6 @@
 import { LearningLevel } from '../contexts/LearningLevelContext';
 import { Platform, PermissionsAndroid } from 'react-native';
-import PlatformAwareSpeechService from './PlatformAwareSpeechService';
+import HybridSpeechService from './HybridSpeechService';
 
 export interface AudioOptions {
   level: LearningLevel;
@@ -45,7 +45,7 @@ export class AudioService {
       console.log('🔧 Initializing audio system for iOS...');
       
       // Test with a simple speech to initialize the system
-      await PlatformAwareSpeechService.speak('test', {
+      await HybridSpeechService.speak('test', {
         language: 'en-US',
         rate: 1.0,
         pitch: 1.0,
@@ -99,7 +99,7 @@ export class AudioService {
   // Get available voices with better quality
   async getAvailableVoices(): Promise<any[]> {
     try {
-      const voices = await PlatformAwareSpeechService.getAvailableVoices();
+      const voices = await HybridSpeechService.getAvailableVoices();
       return voices;
     } catch (error) {
       console.error('Error getting voices:', error);
@@ -354,7 +354,7 @@ export class AudioService {
         rate: options.rate,
       };
 
-      await PlatformAwareSpeechService.speak(audioItem.text, {
+      await HybridSpeechService.speak(audioItem.text, {
         ...iosOptions,
         onStart: () => {
           console.log(`✅ ${audioItem.type} played: "${audioItem.text}" on ${Platform.OS}`);
@@ -402,7 +402,7 @@ export class AudioService {
   private async playAudioAndroid(audioItem: { text: string; type: string }, options: any): Promise<void> {
     try {
       // First attempt: Standard speech
-      await PlatformAwareSpeechService.speak(audioItem.text, {
+      await HybridSpeechService.speak(audioItem.text, {
         language: this.currentLanguage,
         voice: options.voice,
         pitch: options.pitch,
@@ -438,7 +438,7 @@ export class AudioService {
       console.log(`🔄 iOS fallback: Trying minimal options`);
       
       // iOS fallback: Try with minimal options and English
-      await PlatformAwareSpeechService.speak(audioItem.text, {
+      await HybridSpeechService.speak(audioItem.text, {
         language: 'en-US', // Fallback to English
         pitch: 1.0,
         rate: 0.8,
@@ -476,7 +476,7 @@ export class AudioService {
       console.log(`🔄 iOS fallback 2: Trying with no options`);
       
       // iOS fallback 2: Try with absolutely no options
-      await PlatformAwareSpeechService.speak(audioItem.text, {
+      await HybridSpeechService.speak(audioItem.text, {
         onStart: () => {
           console.log(`✅ iOS fallback 2 started: "${audioItem.text}"`);
         },
@@ -513,7 +513,7 @@ export class AudioService {
     try {
       // Fallback 1: Try with default language
       console.log(`🔄 Android fallback 1: Trying default language`);
-      await PlatformAwareSpeechService.speak(audioItem.text, {
+      await HybridSpeechService.speak(audioItem.text, {
         language: 'en-US', // Fallback to English
         pitch: 1.0,
         rate: 0.9,
@@ -545,7 +545,7 @@ export class AudioService {
     try {
       // Fallback 2: Try with minimal options
       console.log(`🔄 Android fallback 2: Trying minimal options`);
-      await PlatformAwareSpeechService.speak(audioItem.text, {
+      await HybridSpeechService.speak(audioItem.text, {
         onStart: () => {
           console.log(`✅ Android fallback 2 started: "${audioItem.text}"`);
         },
@@ -596,7 +596,7 @@ export class AudioService {
       // Stop any previous audio
       this.stop();
       
-      await PlatformAwareSpeechService.speak(phrase, {
+      await HybridSpeechService.speak(phrase, {
         language: this.currentLanguage,
         voice: options.voice,
         pitch: options.pitch,
@@ -627,7 +627,7 @@ export class AudioService {
       // Stop any previous audio
       this.stop();
       
-      await PlatformAwareSpeechService.speak(sentence, {
+      await HybridSpeechService.speak(sentence, {
         language: this.currentLanguage,
         voice: options.voice,
         pitch: options.pitch,
@@ -646,14 +646,14 @@ export class AudioService {
 
   // Stop current playback and clear queue
   stop(): void {
-    PlatformAwareSpeechService.stop();
+    HybridSpeechService.stop();
     this.isPlaying = false;
     this.audioQueue = [];
   }
 
   // Check if currently speaking
   async isSpeaking(): Promise<boolean> {
-    return this.isPlaying || await PlatformAwareSpeechService.isSpeaking();
+    return this.isPlaying || await HybridSpeechService.isSpeaking();
   }
 
   // Test audio on iOS
@@ -664,7 +664,7 @@ export class AudioService {
       console.log('🧪 Testing audio on iOS...');
       
       // Test with a simple word
-      await PlatformAwareSpeechService.speak('test', {
+      await HybridSpeechService.speak('test', {
         language: 'en-US',
         rate: 1.0,
         pitch: 1.0,
