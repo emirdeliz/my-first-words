@@ -211,6 +211,30 @@ dependencies {
             force 'androidx.window:window:1.2.0'
             force 'androidx.activity:activity:1.8.2'
             force 'androidx.fragment:fragment:1.6.2'
+            force 'com.facebook.react:react-android:0.79.5'
+            force 'com.facebook.react:hermes-android:0.79.5'
+            force 'com.facebook.fbjni:fbjni:0.7.0'
         }
+    }
+    
+    // Exclude problematic native libraries
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging (findProperty('expo.useLegacyPackaging')?.toBoolean() ?: false)
+        }
+        // Resolve duplicate resources
+        pickFirsts += [
+            '**/values/values.xml',
+            '**/values-*/values.xml',
+            '**/values-*/values-*.xml'
+        ]
+        excludes += [
+            '**/values/values.xml',
+            '**/values-*/values.xml',
+            '**/lib/x86/**',
+            '**/lib/x86_64/**',
+            '**/lib/arm64-v8a/**',
+            '**/lib/armeabi-v7a/**'
+        ]
     }
 }
