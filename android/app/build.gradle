@@ -184,4 +184,17 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+    
+    // Force specific versions to resolve conflicts
+    constraints {
+        implementation('androidx.core:core:1.13.1') {
+            because 'Resolve duplicate resource conflicts'
+        }
+        implementation('com.google.android.material:material:1.12.0') {
+            because 'Resolve duplicate resource conflicts'
+        }
+        implementation('androidx.window:window:1.2.0') {
+            because 'Resolve react-native-screens compatibility'
+        }
+    }
 }
