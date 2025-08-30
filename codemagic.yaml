@@ -3,8 +3,6 @@ workflows:
     name: Android Build
     max_build_duration: 120
     environment:
-      android_signing:
-        - keystore_reference
       vars:
         PACKAGE_NAME: "com.emirdeliz.myfirstwords"
         GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.configureondemand=true"
