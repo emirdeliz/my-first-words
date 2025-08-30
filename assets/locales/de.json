@@ -1,0 +1,50 @@
+{
+  "app": {
+    "name": "Meine Ersten Wörter",
+    "description": "Unterstützende Kommunikations-App für Kinder",
+    "version": "1.0.0"
+  },
+  "navigation": {
+    "home": "Start",
+    "settings": "Einstellungen",
+    "parental": "Elternkonfiguration",
+    "back": "Zurück"
+  },
+  "categories": {
+    "basic": "Grundbedürfnisse",
+    "emotions": "Gefühle",
+    "activities": "Aktivitäten",
+    "social": "Sozial"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": {
+      "title": "Sprache",
+      "subtitle": "Wähle die Interface-Sprache",
+      "current": "Aktuelle Sprache",
+      "changeButton": "Sprache ändern"
+    },
+    "audio": {
+      "title": "Audio & Ton",
+      "subtitle": "Audio-Einstellungen und Ton-Feedback",
+      "voiceSelection": "Stimmenauswahl",
+      "volume": "Lautstärke"
+    },
+    "theme": {
+      "title": "Erscheinungsbild",
+      "subtitle": "Passe das App-Erscheinungsbild an",
+      "light": "Hell",
+      "dark": "Dunkel",
+      "auto": "Automatisch"
+    }
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "confirm": "Bestätigen",
+    "loading": "Lädt...",
+    "error": "Fehler",
+    "success": "Erfolg"
+  }
+}

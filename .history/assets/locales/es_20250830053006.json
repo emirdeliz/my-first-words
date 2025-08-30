@@ -1,0 +1,50 @@
+{
+  "app": {
+    "name": "Mis Primeras Palabras",
+    "description": "Aplicación de comunicación asistiva para niños",
+    "version": "1.0.0"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "settings": "Configuración",
+    "parental": "Configuración Parental",
+    "back": "Atrás"
+  },
+  "categories": {
+    "basic": "Necesidades Básicas",
+    "emotions": "Sentimientos",
+    "activities": "Actividades",
+    "social": "Social"
+  },
+  "settings": {
+    "title": "Configuración",
+    "language": {
+      "title": "Idioma",
+      "subtitle": "Elige el idioma de la interfaz",
+      "current": "Idioma Actual",
+      "changeButton": "Cambiar Idioma"
+    },
+    "audio": {
+      "title": "Audio y Sonido",
+      "subtitle": "Configuración de audio y retroalimentación sonora",
+      "voiceSelection": "Selección de Voz",
+      "volume": "Volumen"
+    },
+    "theme": {
+      "title": "Apariencia",
+      "subtitle": "Personaliza la apariencia de la aplicación",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "auto": "Automático"
+    }
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito"
+  }
+}
