@@ -27,13 +27,10 @@ const CommunicationBoardTemplate = () => {
   // Monitor when screen comes into focus (only once per focus)
   useFocusEffect(
     React.useCallback(() => {
-      console.log('🎤 CommunicationBoardTemplate - Screen focused, current audio config:', audioConfig);
-      
       // Force refresh of audio config when screen comes into focus (only once)
       const refreshAudioConfig = async () => {
         try {
           await loadAudioConfig();
-          console.log('🔄 Audio config refreshed on focus');
         } catch (error) {
           console.error('❌ Error refreshing audio config:', error);
         }
@@ -63,9 +60,6 @@ const CommunicationBoardTemplate = () => {
 
   // Function to get translated text based on level and language
   const getTranslatedText = (categoryId: string, textKey: string): string => {
-    console.log('🌐 getTranslatedText - categoryId:', categoryId, 'textKey:', textKey, 'level:', currentLevel);
-    console.log('🌐 getTranslatedText - current language:', currentLanguage);
-    
     let translatedText = '';
     
     try {
@@ -93,11 +87,8 @@ const CommunicationBoardTemplate = () => {
         }
       }
       
-      console.log('🌐 getTranslatedText - result:', translatedText);
-      
       // Fallback to textKey if no translation found
       if (!translatedText) {
-        console.warn('⚠️ No translation found for:', categoryId, textKey, 'level:', currentLevel);
         translatedText = textKey;
       }
       
@@ -110,9 +101,6 @@ const CommunicationBoardTemplate = () => {
 
   const handleItemPress = async (text: string, categoryId: string, textKey: string) => {
     try {
-      console.log('🎤 CommunicationBoardTemplate - Selected voice:', audioConfig.selectedVoice);
-      console.log('🎤 CommunicationBoardTemplate - Audio config:', audioConfig);
-      
       // Update level in audio service
       AudioService.setLevel(currentLevel);
       

@@ -408,10 +408,9 @@ export class AudioService {
         pitch: options.pitch,
         rate: options.rate,
         onStart: () => {
-          console.log(`✅ Android: ${audioItem.type} started: "${audioItem.text}"`);
+          // Audio started
         },
         onFinish: () => {
-          console.log(`✅ Android: ${audioItem.type} played: "${audioItem.text}"`);
           this.isPlaying = false;
           setTimeout(() => {
             this.playNextInQueue();
@@ -422,7 +421,6 @@ export class AudioService {
           this.tryAndroidFallback(audioItem, options);
         },
         onStopped: () => {
-          console.log(`⏹️ Android: ${audioItem.type} stopped: "${audioItem.text}"`);
           this.isPlaying = false;
         },
       });

@@ -169,16 +169,39 @@ export class PlatformAwareSpeechService {
    */
   async getAvailableVoices(): Promise<any[]> {
     try {
+      // Garantir que o serviço está inicializado
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+
       if (this.isExpoGo) {
         const { default: ExpoGoSpeechService } = await import('./ExpoGoSpeechService');
-        return await ExpoGoSpeechService.getAvailableVoices();
+        const voices = await ExpoGoSpeechService.getAvailableVoices();
+        console.log(`🎵 Expo Go voices found: ${voices.length}`);
+        return voices;
       } else {
         const { default: TTSService } = await import('./TTSService');
-        return await TTSService.getAvailableVoices();
+        const voices = await TTSService.getAvailableVoices();
+        console.log(`🎵 Native TTS voices found: ${voices.length}`);
+        return voices;
       }
     } catch (error) {
       console.error('❌ Error getting available voices:', error);
-      return [];
+      
+      // Retornar vozes padrão em caso de erro
+      return [
+        {
+          identifier: 'system-default',
+          name: 'Voz do Sistema',
+          language: 'pt-BR',
+          quality: 'Default',
+          requiresInternet: false,
+          isOnline: false,
+          isStreaming: false,
+          isCloud: false,
+          isNetwork: false
+        }
+      ];
     }
   }
 

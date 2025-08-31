@@ -37,20 +37,14 @@ export function AudioConfigProvider({ children }: { children: ReactNode }) {
 
   const loadAudioConfig = async () => {
     try {
-      console.log('🔊 Loading saved audio config...');
       const savedConfig = await AsyncStorage.getItem(AUDIO_CONFIG_STORAGE_KEY);
-      console.log('🔊 Raw saved config:', savedConfig);
       
       if (savedConfig) {
         const parsedConfig = JSON.parse(savedConfig);
-        console.log('🔊 Parsed config:', parsedConfig);
         setAudioConfig({
           ...parsedConfig,
           lastUpdated: new Date(parsedConfig.lastUpdated),
         });
-        console.log('✅ Audio config loaded successfully');
-      } else {
-        console.log('📝 No saved audio config, using defaults');
       }
     } catch (error) {
       console.error('❌ Error loading audio config:', error);
@@ -65,20 +59,15 @@ export function AudioConfigProvider({ children }: { children: ReactNode }) {
         lastUpdated: new Date(),
       };
       
-      console.log('💾 AudioConfigContext - Saving config:', configToSave);
       await AsyncStorage.setItem(AUDIO_CONFIG_STORAGE_KEY, JSON.stringify(configToSave));
       setAudioConfig(configToSave);
-      console.log('💾 Audio config saved successfully');
     } catch (error) {
       console.error('❌ Error saving audio config:', error);
     }
   };
 
   const setSelectedVoice = async (voiceId: string) => {
-    console.log('🎤 AudioConfigContext - Setting selected voice:', voiceId);
-    console.log('🎤 AudioConfigContext - Previous config:', audioConfig);
     await saveAudioConfig({ selectedVoice: voiceId });
-    console.log('🎤 AudioConfigContext - Voice updated, new config:', audioConfig);
   };
 
   const setPitch = async (pitch: number) => {

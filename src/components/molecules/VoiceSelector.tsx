@@ -28,37 +28,32 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
       
       // Filter voices for the current language and offline availability
       const filteredVoices = voices.filter(voice => {
+        // Defensive check for voice properties
+        if (!voice || !voice.language || !voice.identifier) {
+          console.log('🎵 Skipping invalid voice:', voice);
+          return false;
+        }
+        
         const voiceLang = voice.language.toLowerCase();
         const targetLang = currentLanguage.code.toLowerCase();
         
-        // First, check if voice is offline (not requiring internet)
-        // Different TTS engines may have different properties for offline detection
+        // Simplified offline check - be more permissive to include system voices
+        // Most system voices are offline by default
         const isOffline = !voice.requiresInternet && 
                          !voice.isOnline && 
                          !voice.isStreaming && 
                          !voice.isCloud && 
                          !voice.isNetwork &&
-                         !voice.isStreaming &&
                          !voice.isRemote &&
                          !voice.isExternal &&
                          !voice.isWeb &&
-                         !voice.isBrowser &&
-                         !voice.isChrome &&
-                         !voice.isSafari &&
-                         !voice.isEdge &&
-                         !voice.isFirefox &&
-                         voice.identifier !== 'default-voice' && // Skip default voice as it might be cloud-based
-                         !voice.identifier.includes('cloud') &&
-                         !voice.identifier.includes('online') &&
-                         !voice.identifier.includes('web') &&
-                         !voice.identifier.includes('streaming') &&
-                         !voice.identifier.includes('remote') &&
-                         !voice.identifier.includes('external') &&
-                         !voice.identifier.includes('browser') &&
-                         !voice.identifier.includes('chrome') &&
-                         !voice.identifier.includes('safari') &&
-                         !voice.identifier.includes('edge') &&
-                         !voice.identifier.includes('firefox');
+                         !voice.isBrowser;
+        
+        // If we have explicit online indicators, skip them
+        if (voice.requiresInternet || voice.isOnline || voice.isStreaming || voice.isCloud) {
+          console.log('🎵 Skipping explicitly online voice:', voice.name || voice.identifier);
+          return false;
+        }
         
         // If voice requires internet, skip it
         if (!isOffline) {
@@ -66,20 +61,15 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
           return false;
         }
         
-        // Additional offline checks for common online indicators
+        // Only skip obvious cloud/AI voices, be more permissive with system voices
         const voiceName = (voice.name || '').toLowerCase();
         const voiceId = (voice.identifier || '').toLowerCase();
         
-        if (voiceName.includes('google') || voiceId.includes('google') ||
-            voiceName.includes('siri') || voiceId.includes('siri') ||
-            voiceName.includes('alexa') || voiceId.includes('alexa') ||
-            voiceName.includes('cortana') || voiceId.includes('cortana') ||
-            voiceName.includes('bixby') || voiceId.includes('bixby') ||
-            voiceName.includes('assistant') || voiceId.includes('assistant') ||
-            voiceName.includes('ai') || voiceId.includes('ai') ||
-            voiceName.includes('neural') || voiceId.includes('neural') ||
-            voiceName.includes('cloud') || voiceId.includes('cloud')) {
-          console.log('🎵 Skipping AI/cloud voice:', voice.name || voice.identifier);
+        // Skip only the most obvious cloud/AI voices
+        if ((voiceName && voiceName.includes('google')) || (voiceId && voiceId.includes('google')) ||
+            (voiceName && voiceName.includes('siri')) || (voiceId && voiceId.includes('siri')) ||
+            (voiceName && voiceName.includes('alexa')) || (voiceId && voiceId.includes('alexa'))) {
+          console.log('🎵 Skipping obvious cloud voice:', voice.name || voice.identifier);
           return false;
         }
         
@@ -99,10 +89,6 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         
         return false;
       });
-      
-      console.log('🎵 All available voices:', voices);
-      console.log('🎵 Target language:', currentLanguage.code);
-      console.log('🎵 Offline voices found:', filteredVoices.length);
       
       // Check for different types of duplicates
       const duplicateCheck = new Map();
@@ -139,27 +125,14 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         }
       });
       
-      if (duplicates.length > 0) {
-        console.log('⚠️ Exact duplicate voices found:', duplicates);
+      // Log only if there are issues
+      if (duplicates.length > 0 || similarVoices.length > 0) {
+        console.log('⚠️ Voice duplicates found:', { duplicates: duplicates.length, similar: similarVoices.length });
       }
-      
-      if (similarVoices.length > 0) {
-        console.log('⚠️ Similar voices found (potential duplicates):', similarVoices);
-      }
-      
-      if (duplicates.length === 0 && similarVoices.length === 0) {
-        console.log('✅ No duplicate voices found');
-      }
-      
-      console.log('🎵 Voice examples:');
-      filteredVoices.slice(0, 3).forEach(voice => {
-        console.log(`  - ${getFriendlyVoiceName(voice)} (${getVoiceDescription(voice)})`);
-        console.log(`    Código: ${generateVoiceCode(voice, 0)}`);
-      });
       
       // Remove duplicates before setting available voices
       const uniqueVoices = removeDuplicateVoices(filteredVoices);
-      console.log('🎵 Unique voices after deduplication:', uniqueVoices.length);
+      // Remove duplicates before setting available voices
       
       // Ensure we have a good mix of male and female voices
       const maleVoices = uniqueVoices.filter(voice => {
@@ -180,7 +153,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
                name.toLowerCase().includes('mulher');
       });
       
-      console.log(`🎵 Male voices: ${maleVoices.length}, Female voices: ${femaleVoices.length}`);
+      // Log voice distribution for debugging
       
       // If we have both male and female voices, prioritize them in the list
       let finalVoices = [...uniqueVoices];
@@ -200,6 +173,49 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         });
       }
       
+      // If no voices found after filtering, create default voices
+      if (finalVoices.length === 0) {
+        console.log('⚠️ No voices found after filtering, creating default voices');
+        const defaultVoices = [
+          {
+            identifier: 'system-default-pt-br',
+            name: 'Voz Padrão do Sistema',
+            language: currentLanguage.code,
+            quality: 'Default',
+            requiresInternet: false,
+            isOnline: false,
+            isStreaming: false,
+            isCloud: false,
+            isNetwork: false
+          },
+          {
+            identifier: 'system-male-pt-br',
+            name: 'Voz Masculina do Sistema',
+            language: currentLanguage.code,
+            quality: 'Default',
+            requiresInternet: false,
+            isOnline: false,
+            isStreaming: false,
+            isCloud: false,
+            isNetwork: false
+          },
+          {
+            identifier: 'system-female-pt-br',
+            name: 'Voz Feminina do Sistema',
+            language: currentLanguage.code,
+            quality: 'Default',
+            requiresInternet: false,
+            isOnline: false,
+            isStreaming: false,
+            isCloud: false,
+            isNetwork: false
+          }
+        ];
+        
+        finalVoices.push(...defaultVoices);
+        console.log('✅ Added default voices:', defaultVoices.length);
+      }
+      
       setAvailableVoices(finalVoices);
       
       // Select the best available voice for the current language
@@ -216,17 +232,39 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         
         const selectedVoice = maleVoice || finalVoices[0];
         saveSelectedVoice(selectedVoice.identifier);
-        console.log('🎯 Selected best voice:', selectedVoice);
       }
     } catch (error) {
       console.error('❌ Error loading voices:', error);
-      // Create a default offline voice list if unable to load
+      
+      // Create a comprehensive default offline voice list if unable to load
       const defaultVoices = [
         {
-          identifier: 'offline-default-voice',
+          identifier: 'error-fallback-default',
           name: 'Voz Padrão do Sistema',
           language: currentLanguage.code,
-          quality: 'Offline',
+          quality: 'Default',
+          requiresInternet: false,
+          isOnline: false,
+          isStreaming: false,
+          isCloud: false,
+          isNetwork: false
+        },
+        {
+          identifier: 'error-fallback-male',
+          name: 'Voz Masculina Padrão',
+          language: currentLanguage.code,
+          quality: 'Default',
+          requiresInternet: false,
+          isOnline: false,
+          isStreaming: false,
+          isCloud: false,
+          isNetwork: false
+        },
+        {
+          identifier: 'error-fallback-female',
+          name: 'Voz Feminina Padrão',
+          language: currentLanguage.code,
+          quality: 'Default',
           requiresInternet: false,
           isOnline: false,
           isStreaming: false,
@@ -235,7 +273,9 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         }
       ];
       
+      console.log('🎵 Using default voices due to error:', error instanceof Error ? error.message : String(error));
       console.log('🎵 Default voice code:', generateVoiceCode(defaultVoices[0], 0));
+      
       setAvailableVoices(defaultVoices);
       saveSelectedVoice('offline-default-voice');
     }
@@ -269,8 +309,9 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
       }
       console.log(`🎵 Testing voice: ${voiceId} with text: "${testText}"`);
       
-      const speechOptions: any = {
+      const speechOptions = {
         language: currentLanguage.code,
+        voice: voiceId,
         pitch: 1.0,
         rate: 0.9,
         onStart: () => { console.log(`✅ Voice test started: ${voiceId}`); },
@@ -278,7 +319,6 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         onError: (error: any) => { console.error(`❌ Error testing voice:`, error); setTestingVoice(null); },
         onStopped: () => { console.log(`⏹️ Test stopped: ${voiceId}`); setTestingVoice(null); },
       };
-      if (voiceId !== 'offline-default-voice') { speechOptions.voice = voiceId; }
       await PlatformAwareSpeechService.speak(testText, speechOptions);
       
     } catch (error) {
