@@ -4,7 +4,7 @@ export default ({ config }) => ({
   slug: 'my-first-words',
   version: '1.0.0',
   orientation: 'portrait',
-  icon: './assets/images/app-icon-fun.svg',
+  icon: './assets/images/app-icon-fun.png',
   scheme: 'myfirstwordsapp',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
@@ -61,7 +61,7 @@ export default ({ config }) => ({
 
   android: {
     adaptiveIcon: {
-      foregroundImage: './assets/images/app-icon-fun.svg',
+      foregroundImage: './assets/images/app-icon-fun.png',
       backgroundColor: '#ffffff',
     },
     edgeToEdgeEnabled: true,
@@ -70,6 +70,16 @@ export default ({ config }) => ({
       'android.permission.MODIFY_AUDIO_SETTINGS',
     ],
     package: 'com.emirdeliz.myfirstwords',
+    
+    // Build configuration to resolve conflicts
+    buildConfigFields: {
+      VERSION_NAME: '1.0.0',
+      VERSION_CODE: '1',
+    },
+    
+    // Gradle configuration
+    gradleCommand: 'assembleDebug',
+    
     // Multi-language support for Android
     locales: {
       'pt-BR': {
@@ -127,6 +137,30 @@ export default ({ config }) => ({
       },
     ],
     'expo-font',
+    [
+      'expo-build-properties',
+      {
+        android: {
+          // Force specific AndroidX versions to resolve conflicts
+          compileSdkVersion: 34,
+          targetSdkVersion: 34,
+          buildToolsVersion: '34.0.0',
+          // Exclude problematic support libraries
+          exclude: [
+            'com.android.support',
+            'androidx.versionedparcelable'
+          ],
+          // Force specific dependency versions
+          dependencies: {
+            'androidx.core:core': '1.13.1',
+            'androidx.window:window': '1.2.0',
+            'androidx.activity:activity': '1.8.2',
+            'androidx.fragment:fragment': '1.6.2',
+            'com.google.android.material:material': '1.12.0'
+          }
+        }
+      }
+    ]
   ],
 
   experiments: {

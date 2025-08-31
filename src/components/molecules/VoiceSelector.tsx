@@ -550,7 +550,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
               {availableVoices.length > 0 ? (
                 availableVoices.map((voice, index) => (
                   <TouchableOpacity
-                    key={voice.identifier}
+                    key={index}
                     onPress={() => selectVoice(voice.identifier)}
                     style={{
                       flexDirection: 'row',
