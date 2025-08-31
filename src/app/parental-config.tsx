@@ -263,6 +263,7 @@ const ParentalConfigScreen = () => {
       >
         <LayoutView
           isFlex
+          isHFull
           style={{
             backgroundColor: "rgba(0, 0, 0, 0.5)",
             justifyContent: "center",
