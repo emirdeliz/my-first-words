@@ -121,6 +121,17 @@ export class TTSService {
         ttsOptions.pitch = options.pitch;
       }
 
+      // Set specific voice if provided
+      if (options.voice) {
+        try {
+          // Try to set the specific voice
+          await Tts.setDefaultVoice(options.voice);
+          console.log(`🎤 Voice set to: ${options.voice}`);
+        } catch (voiceError) {
+          console.warn(`⚠️ Could not set voice ${options.voice}, using default:`, voiceError);
+        }
+      }
+
       // Start speaking
       await Tts.speak(text, ttsOptions);
       

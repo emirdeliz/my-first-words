@@ -309,7 +309,11 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         case 'de': testText = 'Hallo'; break;
         default: testText = 'Hello';
       }
-      console.log(`🎵 Testing voice: ${voiceId} with text: "${testText}"`);
+      
+      // Find the voice object to get more details
+      const voiceObject = availableVoices.find(v => v.identifier === voiceId);
+      console.log(`🎵 Testing voice: ${voiceId} (${voiceObject?.name || 'Unknown'}) with text: "${testText}"`);
+      console.log(`🎵 Voice details:`, voiceObject);
       
       const speechOptions = {
         language: currentLanguage.code,
@@ -321,6 +325,8 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         onError: (error: any) => { console.error(`❌ Error testing voice:`, error); setTestingVoice(null); },
         onStopped: () => { console.log(`⏹️ Test stopped: ${voiceId}`); setTestingVoice(null); },
       };
+      
+      console.log(`🎵 Speech options:`, speechOptions);
       await PlatformAwareSpeechService.speak(testText, speechOptions);
       
     } catch (error) {
