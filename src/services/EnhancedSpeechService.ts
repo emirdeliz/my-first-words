@@ -97,7 +97,7 @@ export class EnhancedSpeechService {
       const androidOptions = {
         language: options.language || this.currentLanguage,
         pitch: options.pitch || 1.0,
-        rate: options.rate || 0.8,
+        rate: options.rate || 0.3, // Extremely slow default rate
         voice: options.voice,
       };
 

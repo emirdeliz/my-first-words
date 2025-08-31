@@ -147,32 +147,32 @@ export class AudioService {
     const settings: Record<string, { pitch: number; rate: number; voice?: string }> = {
       'pt-BR': {
         pitch: 1.1,        // Slightly higher pitch to sound more natural
-        rate: 0.85,        // Slightly slower speed for clarity
+        rate: 0.3,         // Very slow speed for maximum clarity
         voice: this.getBestVoiceForLanguage(language)
       },
       'pt': {
         pitch: 1.05,       // Natural pitch for European Portuguese
-        rate: 0.9,         // Moderate speed
+        rate: 0.35,        // Very slow speed for clarity
         voice: this.getBestVoiceForLanguage(language)
       },
       'en': {
         pitch: 1.0,        // Natural pitch for English
-        rate: 0.95,        // Natural speed
+        rate: 0.4,         // Very slow speed for clarity
         voice: this.getBestVoiceForLanguage(language)
       },
       'es': {
         pitch: 1.05,       // Slightly higher pitch for Spanish
-        rate: 0.9,         // Moderate speed
+        rate: 0.35,        // Very slow speed for clarity
         voice: this.getBestVoiceForLanguage(language)
       },
       'de': {
         pitch: 1.0,        // Natural pitch for German
-        rate: 0.9,         // Moderate speed
+        rate: 0.35,        // Very slow speed for clarity
         voice: this.getBestVoiceForLanguage(language)
       }
     };
 
-    return settings[language] || { pitch: 1.0, rate: 0.9 };
+    return settings[language] || { pitch: 1.0, rate: 0.35 };
   }
 
   getAudioOptions(selectedVoice?: string): AudioOptions {
@@ -185,17 +185,17 @@ export class AudioService {
       case 1:
         return {
           level: 1,
-          speed: 0.8, // Slower for basic level
+          speed: 0.2, // Extremely slow for basic level
           includePhrases: false,
           includeComplexSentences: false,
           voice: voiceToUse,
           pitch: languageSettings.pitch,
-          rate: languageSettings.rate * 0.8, // Even slower for level 1
+          rate: languageSettings.rate * 0.5, // Extremely slow for level 1
         };
       case 2:
         return {
           level: 2,
-          speed: 1.0, // Normal speed
+          speed: 0.3, // Very slow speed for intermediate level
           includePhrases: true,
           includeComplexSentences: false,
           voice: voiceToUse,
@@ -205,22 +205,22 @@ export class AudioService {
       case 3:
         return {
           level: 3,
-          speed: 1.2, // Faster for advanced level
+          speed: 0.5, // Slow speed for advanced level
           includePhrases: true,
           includeComplexSentences: true,
           voice: voiceToUse,
           pitch: languageSettings.pitch,
-          rate: languageSettings.rate * 1.1, // A bit faster for level 3
+          rate: languageSettings.rate * 1.1, // Slightly faster for level 3
         };
       default:
         return {
           level: 1,
-          speed: 0.8,
+          speed: 0.2,
           includePhrases: false,
           includeComplexSentences: false,
           voice: voiceToUse,
           pitch: languageSettings.pitch,
-          rate: languageSettings.rate * 0.8,
+          rate: languageSettings.rate * 0.5,
         };
     }
   }

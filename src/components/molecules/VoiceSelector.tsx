@@ -38,11 +38,48 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
                          !voice.isStreaming && 
                          !voice.isCloud && 
                          !voice.isNetwork &&
-                         voice.identifier !== 'default-voice'; // Skip default voice as it might be cloud-based
+                         !voice.isStreaming &&
+                         !voice.isRemote &&
+                         !voice.isExternal &&
+                         !voice.isWeb &&
+                         !voice.isBrowser &&
+                         !voice.isChrome &&
+                         !voice.isSafari &&
+                         !voice.isEdge &&
+                         !voice.isFirefox &&
+                         voice.identifier !== 'default-voice' && // Skip default voice as it might be cloud-based
+                         !voice.identifier.includes('cloud') &&
+                         !voice.identifier.includes('online') &&
+                         !voice.identifier.includes('web') &&
+                         !voice.identifier.includes('streaming') &&
+                         !voice.identifier.includes('remote') &&
+                         !voice.identifier.includes('external') &&
+                         !voice.identifier.includes('browser') &&
+                         !voice.identifier.includes('chrome') &&
+                         !voice.identifier.includes('safari') &&
+                         !voice.identifier.includes('edge') &&
+                         !voice.identifier.includes('firefox');
         
         // If voice requires internet, skip it
         if (!isOffline) {
           console.log('🎵 Skipping online voice:', voice.name || voice.identifier, voice);
+          return false;
+        }
+        
+        // Additional offline checks for common online indicators
+        const voiceName = (voice.name || '').toLowerCase();
+        const voiceId = (voice.identifier || '').toLowerCase();
+        
+        if (voiceName.includes('google') || voiceId.includes('google') ||
+            voiceName.includes('siri') || voiceId.includes('siri') ||
+            voiceName.includes('alexa') || voiceId.includes('alexa') ||
+            voiceName.includes('cortana') || voiceId.includes('cortana') ||
+            voiceName.includes('bixby') || voiceId.includes('bixby') ||
+            voiceName.includes('assistant') || voiceId.includes('assistant') ||
+            voiceName.includes('ai') || voiceId.includes('ai') ||
+            voiceName.includes('neural') || voiceId.includes('neural') ||
+            voiceName.includes('cloud') || voiceId.includes('cloud')) {
+          console.log('🎵 Skipping AI/cloud voice:', voice.name || voice.identifier);
           return false;
         }
         
@@ -124,34 +161,62 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
       const uniqueVoices = removeDuplicateVoices(filteredVoices);
       console.log('🎵 Unique voices after deduplication:', uniqueVoices.length);
       
-      setAvailableVoices(uniqueVoices);
+      // Ensure we have a good mix of male and female voices
+      const maleVoices = uniqueVoices.filter(voice => {
+        const identifier = voice.identifier || '';
+        const name = voice.name || '';
+        return identifier.toLowerCase().includes('male') || 
+               name.toLowerCase().includes('male') ||
+               identifier.toLowerCase().includes('homem') || 
+               name.toLowerCase().includes('homem');
+      });
+      
+      const femaleVoices = uniqueVoices.filter(voice => {
+        const identifier = voice.identifier || '';
+        const name = voice.name || '';
+        return identifier.toLowerCase().includes('female') || 
+               name.toLowerCase().includes('female') ||
+               identifier.toLowerCase().includes('mulher') || 
+               name.toLowerCase().includes('mulher');
+      });
+      
+      console.log(`🎵 Male voices: ${maleVoices.length}, Female voices: ${femaleVoices.length}`);
+      
+      // If we have both male and female voices, prioritize them in the list
+      let finalVoices = [...uniqueVoices];
+      if (maleVoices.length > 0 && femaleVoices.length > 0) {
+        // Sort to show male voices first, then female, then others
+        finalVoices.sort((a, b) => {
+          const isMaleA = maleVoices.includes(a);
+          const isMaleB = maleVoices.includes(b);
+          const isFemaleA = femaleVoices.includes(a);
+          const isFemaleB = femaleVoices.includes(b);
+          
+          if (isMaleA && !isMaleB) return -1;
+          if (!isMaleA && isMaleB) return 1;
+          if (isFemaleA && !isFemaleB) return -1;
+          if (!isFemaleA && isFemaleB) return 1;
+          return 0;
+        });
+      }
+      
+      setAvailableVoices(finalVoices);
       
       // Select the best available voice for the current language
-      if (filteredVoices.length > 0) {
-        // Sort voices to prioritize exact language matches and higher quality
-        const sortedVoices = filteredVoices.sort((a, b) => {
-          const aLang = a.language.toLowerCase();
-          const bLang = b.language.toLowerCase();
-          const targetLang = currentLanguage.code.toLowerCase();
-          
-          // Priority 1: Exact language match
-          if (aLang === targetLang && bLang !== targetLang) return -1;
-          if (bLang === targetLang && aLang !== targetLang) return 1;
-          
-          // Priority 2: Language family match (e.g., 'pt' for 'pt-br')
-          if (aLang === targetLang.split('-')[0] && bLang !== targetLang.split('-')[0]) return -1;
-          if (bLang === targetLang.split('-')[0] && aLang !== targetLang.split('-')[0]) return 1;
-          
-          // Priority 3: Higher quality voices first
-          const qualityOrder = { 'Enhanced': 3, 'Premium': 3, 'High': 2, 'Default': 1 };
-          const aQuality = qualityOrder[a.quality as keyof typeof qualityOrder] || 1;
-          const bQuality = qualityOrder[b.quality as keyof typeof qualityOrder] || 1;
-          
-          return bQuality - aQuality;
+      if (finalVoices.length > 0) {
+        // Try to find a male voice first, then fall back to any available voice
+        const maleVoice = finalVoices.find(voice => {
+          const identifier = voice.identifier || '';
+          const name = voice.name || '';
+          return identifier.toLowerCase().includes('male') || 
+                 name.toLowerCase().includes('male') ||
+                 identifier.toLowerCase().includes('homem') || 
+                 name.toLowerCase().includes('homem');
         });
         
-        saveSelectedVoice(sortedVoices[0].identifier);
-        console.log('🎯 Selected best voice:', sortedVoices[0]);
+        const selectedVoice = maleVoice || finalVoices[0];
+        saveSelectedVoice(selectedVoice.identifier);
+        console.log('🎯 Selected best voice:', selectedVoice);
       }
     } catch (error) {
       console.error('❌ Error loading voices:', error);
@@ -407,27 +472,82 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
 
   const removeDuplicateVoices = (voices: any[]): any[] => {
     const uniqueVoices = new Map();
+    const seenIdentifiers = new Set();
+    const seenNames = new Set();
     
     voices.forEach(voice => {
-      // Create a unique key based on multiple properties
-      const key = `${voice.language}-${voice.identifier}-${voice.name || ''}`;
+      const identifier = voice.identifier || '';
+      const name = voice.name || '';
+      const language = voice.language || '';
       
-      // If we already have this voice, keep the one with better quality
-      if (uniqueVoices.has(key)) {
-        const existingVoice = uniqueVoices.get(key);
-        const existingQuality = getVoiceQualityScore(existingVoice);
-        const currentQuality = getVoiceQualityScore(voice);
-        
-        // Keep the voice with higher quality
-        if (currentQuality > existingQuality) {
-          uniqueVoices.set(key, voice);
-        }
+      // Create multiple keys to catch different types of duplicates
+      const key1 = `${language}-${identifier}`;
+      const key2 = `${language}-${name}`;
+      const key3 = `${identifier}`;
+      const key4 = `${name}`;
+      
+      // Check if this is a duplicate based on multiple criteria
+      const isDuplicate = uniqueVoices.has(key1) || 
+                         uniqueVoices.has(key2) || 
+                         seenIdentifiers.has(identifier) || 
+                         seenNames.has(name) ||
+                         (identifier && identifier.length > 0 && seenIdentifiers.has(identifier)) ||
+                         (name && name.length > 0 && seenNames.has(name));
+      
+      if (!isDuplicate) {
+        // Add to all tracking maps
+        uniqueVoices.set(key1, voice);
+        uniqueVoices.set(key2, voice);
+        if (identifier) seenIdentifiers.add(identifier);
+        if (name) seenNames.add(name);
       } else {
-        uniqueVoices.set(key, voice);
+        // If duplicate, keep the one with better quality
+        const existingVoice = uniqueVoices.get(key1) || uniqueVoices.get(key2);
+        if (existingVoice) {
+          const existingQuality = getVoiceQualityScore(existingVoice);
+          const currentQuality = getVoiceQualityScore(voice);
+          
+          // Keep the voice with higher quality
+          if (currentQuality > existingQuality) {
+            // Replace in all tracking maps
+            uniqueVoices.set(key1, voice);
+            uniqueVoices.set(key2, voice);
+            if (identifier) seenIdentifiers.add(identifier);
+            if (name) seenNames.add(name);
+          }
+        }
       }
     });
     
-    return Array.from(uniqueVoices.values());
+    // Return unique voices, prioritizing diversity (male/female, different qualities)
+    const uniqueArray = Array.from(uniqueVoices.values());
+    
+    // Sort by quality and ensure gender diversity
+    return uniqueArray.sort((a, b) => {
+      const qualityA = getVoiceQualityScore(a);
+      const qualityB = getVoiceQualityScore(b);
+      
+      // First sort by quality (higher first)
+      if (qualityA !== qualityB) {
+        return qualityB - qualityA;
+      }
+      
+      // Then ensure male voices are included by prioritizing them
+      const isMaleA = (a.identifier || '').toLowerCase().includes('male') || 
+                     (a.name || '').toLowerCase().includes('male') ||
+                     (a.identifier || '').toLowerCase().includes('homem') || 
+                     (a.name || '').toLowerCase().includes('homem');
+      const isMaleB = (b.identifier || '').toLowerCase().includes('male') || 
+                     (b.name || '').toLowerCase().includes('male') ||
+                     (b.identifier || '').toLowerCase().includes('homem') || 
+                     (b.name || '').toLowerCase().includes('homem');
+      
+      // Prioritize male voices to ensure they appear in the list
+      if (isMaleA && !isMaleB) return -1;
+      if (!isMaleA && isMaleB) return 1;
+      
+      return 0;
+    });
   };
 
   const getVoiceQualityScore = (voice: any): number => {
@@ -544,6 +664,16 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
               customClasses="mb-5"
             >
               Selecionar Voz (Offline)
+            </LayoutText>
+            
+            <LayoutText
+              isTextSm
+              isTextCenter
+              hasMarginBottom
+              isTextGray500
+              customClasses="mb-4"
+            >
+              Apenas vozes offline disponíveis • Inclui opções masculinas e femininas
             </LayoutText>
 
             <ScrollView style={{ maxHeight: 400 }}>

@@ -27,7 +27,7 @@ export class SpeechService {
       window.speechSynthesis.cancel();
       
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.7;
+      utterance.rate = 0.2; // Extremely slow rate for maximum clarity
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
       

@@ -21,7 +21,7 @@ const AUDIO_CONFIG_STORAGE_KEY = '@my_first_words:audio_config';
 const defaultAudioConfig: AudioConfig = {
   selectedVoice: '',
   pitch: 1.0,
-  rate: 0.9,
+  rate: 0.3, // Extremely slow default rate for maximum clarity
   lastUpdated: new Date(),
 };
 

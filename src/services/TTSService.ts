@@ -42,7 +42,7 @@ export class TTSService {
 
       // Initialize TTS
       await Tts.setDefaultLanguage(this.currentLanguage);
-      await Tts.setDefaultRate(0.8);
+      await Tts.setDefaultRate(0.3); // Extremely slow default rate
       await Tts.setDefaultPitch(1.0);
 
       // Get available voices
@@ -255,11 +255,8 @@ export class TTSService {
       
       // Android-specific initialization
       await Tts.setDefaultLanguage('pt-BR');
-      await Tts.setDefaultRate(0.8);
+      await Tts.setDefaultRate(0.3); // Extremely slow default rate
       await Tts.setDefaultPitch(1.0);
-      
-      // Test TTS
-      await Tts.speak('Teste de inicialização');
       
       console.log('✅ Android TTS initialized successfully');
       return true;
@@ -277,7 +274,7 @@ export class TTSService {
       
       // iOS-specific initialization
       await Tts.setDefaultLanguage('pt-BR');
-      await Tts.setDefaultRate(0.8);
+      await Tts.setDefaultRate(0.3); // Extremely slow default rate
       await Tts.setDefaultPitch(1.0);
       
       console.log('✅ iOS TTS initialized successfully');

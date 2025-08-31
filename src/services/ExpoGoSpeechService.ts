@@ -60,7 +60,7 @@ export class ExpoGoSpeechService {
       // Converter opções para formato do expo-speech
       const expoOptions = {
         language: options.language || 'pt-BR',
-        rate: options.rate || 0.8,
+        rate: options.rate || 0.3, // Extremely slow default rate
         pitch: options.pitch || 1.0,
         voice: options.voice,
         onDone: options.onFinish || options.onEnd,

@@ -209,7 +209,7 @@ export class HybridSpeechService {
   private async speakWithExpoSpeech(text: string, options: SpeechOptions): Promise<void> {
     const expoOptions: any = {
       language: options.language || this.currentLanguage,
-      rate: options.rate || 0.8,
+      rate: options.rate || 0.3, // Extremely slow default rate
       pitch: options.pitch || 1.0,
       onDone: options.onEnd,
       onError: options.onError,
@@ -338,7 +338,7 @@ export class HybridSpeechService {
       // Android-specific initialization
       if (this.currentEngine === 'react-native-tts') {
         await Tts.setDefaultLanguage('pt-BR');
-        await Tts.setDefaultRate(0.8);
+        await Tts.setDefaultRate(0.3); // Extremely slow default rate
         await Tts.setDefaultPitch(1.0);
       }
       
