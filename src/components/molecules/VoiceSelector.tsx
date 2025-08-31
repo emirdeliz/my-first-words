@@ -177,47 +177,33 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         });
       }
       
-      // If no voices found after filtering, create default voices
+      // If no voices found after filtering, try to get any available voices for the language
       if (finalVoices.length === 0) {
-        console.log('⚠️ No voices found after filtering, creating default voices');
-        const defaultVoices = [
-          {
-            identifier: 'system-default-pt-br',
-            name: 'Voz Padrão do Sistema',
-            language: currentLanguage.code,
-            quality: 'Default',
-            requiresInternet: false,
-            isOnline: false,
-            isStreaming: false,
-            isCloud: false,
-            isNetwork: false
-          },
-          {
-            identifier: 'system-male-pt-br',
-            name: 'Voz Masculina do Sistema',
-            language: currentLanguage.code,
-            quality: 'Default',
-            requiresInternet: false,
-            isOnline: false,
-            isStreaming: false,
-            isCloud: false,
-            isNetwork: false
-          },
-          {
-            identifier: 'system-female-pt-br',
-            name: 'Voz Feminina do Sistema',
-            language: currentLanguage.code,
-            quality: 'Default',
-            requiresInternet: false,
-            isOnline: false,
-            isStreaming: false,
-            isCloud: false,
-            isNetwork: false
-          }
-        ];
+        console.log('⚠️ No voices found after filtering, trying to get any available voices for language:', currentLanguage.code);
         
-        finalVoices.push(...defaultVoices);
-        console.log('✅ Added default voices:', defaultVoices.length);
+        // Get all voices and filter by language more broadly
+        const allVoices = await PlatformAwareSpeechService.getAvailableVoices();
+        const broadFilteredVoices = allVoices.filter(voice => {
+          if (!voice || !voice.language || !voice.identifier) return false;
+          
+          const voiceLang = voice.language.toLowerCase();
+          const targetLang = currentLanguage.code.toLowerCase();
+          
+          // More permissive language matching
+          if (voiceLang === targetLang) return true;
+          if (targetLang.includes('-')) {
+            const baseLang = targetLang.split('-')[0];
+            return voiceLang === baseLang || voiceLang.startsWith(baseLang);
+          }
+          return voiceLang.includes(targetLang) || targetLang.includes(voiceLang);
+        });
+        
+        if (broadFilteredVoices.length > 0) {
+          finalVoices.push(...broadFilteredVoices);
+          console.log('✅ Found voices with broader filtering:', broadFilteredVoices.length);
+        } else {
+          console.log('⚠️ No voices found even with broad filtering');
+        }
       }
       
       setAvailableVoices(finalVoices);
@@ -240,48 +226,8 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
     } catch (error) {
       console.error('❌ Error loading voices:', error);
       
-      // Create a comprehensive default offline voice list if unable to load
-      const defaultVoices = [
-        {
-          identifier: 'error-fallback-default',
-          name: 'Voz Padrão do Sistema',
-          language: currentLanguage.code,
-          quality: 'Default',
-          requiresInternet: false,
-          isOnline: false,
-          isStreaming: false,
-          isCloud: false,
-          isNetwork: false
-        },
-        {
-          identifier: 'error-fallback-male',
-          name: 'Voz Masculina Padrão',
-          language: currentLanguage.code,
-          quality: 'Default',
-          requiresInternet: false,
-          isOnline: false,
-          isStreaming: false,
-          isCloud: false,
-          isNetwork: false
-        },
-        {
-          identifier: 'error-fallback-female',
-          name: 'Voz Feminina Padrão',
-          language: currentLanguage.code,
-          quality: 'Default',
-          requiresInternet: false,
-          isOnline: false,
-          isStreaming: false,
-          isCloud: false,
-          isNetwork: false
-        }
-      ];
-      
-      console.log('🎵 Using default voices due to error:', error instanceof Error ? error.message : String(error));
-      console.log('🎵 Default voice code:', generateVoiceCode(defaultVoices[0], 0));
-      
-      setAvailableVoices(defaultVoices);
-      saveSelectedVoice('offline-default-voice');
+      console.log('⚠️ No voices available after error, will use system default');
+      setAvailableVoices([]);
     }
   };
 

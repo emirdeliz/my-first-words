@@ -121,12 +121,20 @@ export class TTSService {
         ttsOptions.pitch = options.pitch;
       }
 
-      // Set specific voice if provided
+      // Set specific voice if provided and it exists in available voices
       if (options.voice) {
         try {
-          // Try to set the specific voice
-          await Tts.setDefaultVoice(options.voice);
-          console.log(`🎤 Voice set to: ${options.voice}`);
+          // Check if the voice actually exists in our available voices
+          const voiceExists = this.availableVoices.some(voice => 
+            voice.id === options.voice || voice.identifier === options.voice
+          );
+          
+          if (voiceExists) {
+            await Tts.setDefaultVoice(options.voice);
+            console.log(`🎤 Voice set to: ${options.voice}`);
+          } else {
+            console.warn(`⚠️ Voice ${options.voice} not found in available voices, using default`);
+          }
         } catch (voiceError) {
           console.warn(`⚠️ Could not set voice ${options.voice}, using default:`, voiceError);
         }
