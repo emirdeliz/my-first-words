@@ -33,6 +33,8 @@ export class TTSService {
   private async initializeTTS(): Promise<void> {
     try {
       console.log('🔧 Initializing TTS Service...');
+      console.log('🔧 Platform:', Platform.OS);
+      console.log('🔧 Current language:', this.currentLanguage);
 
       // Set up TTS event listeners
       Tts.addEventListener('tts-start', this.handleTTSStart.bind(this));
@@ -40,23 +42,71 @@ export class TTSService {
       Tts.addEventListener('tts-cancel', this.handleTTSCancel.bind(this));
       Tts.addEventListener('tts-error', this.handleTTSError.bind(this));
 
-      // Initialize TTS
-      await Tts.setDefaultLanguage(this.currentLanguage);
-      await Tts.setDefaultRate(0.3); // Extremely slow default rate
-      await Tts.setDefaultPitch(1.0);
+      console.log('🔧 TTS event listeners set up');
+
+      // Initialize TTS with error handling for each step
+      try {
+        await Tts.setDefaultLanguage(this.currentLanguage);
+        console.log('✅ Default language set to:', this.currentLanguage);
+      } catch (langError) {
+        console.error('❌ Error setting default language:', langError);
+        // Try with base language
+        const baseLang = this.currentLanguage.split('-')[0];
+        try {
+          await Tts.setDefaultLanguage(baseLang);
+          console.log('✅ Fallback language set to:', baseLang);
+        } catch (fallbackError) {
+          console.error('❌ Error setting fallback language:', fallbackError);
+        }
+      }
+
+      try {
+        await Tts.setDefaultRate(0.3); // Extremely slow default rate
+        console.log('✅ Default rate set to 0.3');
+      } catch (rateError) {
+        console.error('❌ Error setting default rate:', rateError);
+      }
+
+      try {
+        await Tts.setDefaultPitch(1.0);
+        console.log('✅ Default pitch set to 1.0');
+      } catch (pitchError) {
+        console.error('❌ Error setting default pitch:', pitchError);
+      }
 
       // Get available voices
-      if (Platform.OS === 'android') {
-        this.availableVoices = await Tts.voices();
-        console.log(`🎤 Available Android voices: ${this.availableVoices.length}`);
-      } else {
-        // iOS voices are handled differently
-        this.availableVoices = await Tts.voices();
-        console.log(`🎤 Available iOS voices: ${this.availableVoices.length}`);
+      try {
+        if (Platform.OS === 'android') {
+          this.availableVoices = await Tts.voices();
+          console.log(`🎤 Available Android voices: ${this.availableVoices.length}`);
+          if (this.availableVoices.length > 0) {
+            console.log('🎤 Sample Android voices:', this.availableVoices.slice(0, 3).map(v => ({
+              id: v.id,
+              name: v.name,
+              language: v.language
+            })));
+          }
+        } else {
+          // iOS voices are handled differently
+          this.availableVoices = await Tts.voices();
+          console.log(`🎤 Available iOS voices: ${this.availableVoices.length}`);
+        }
+      } catch (voicesError) {
+        console.error('❌ Error getting available voices:', voicesError);
+        this.availableVoices = [];
       }
 
       this.isInitialized = true;
       console.log('✅ TTS Service initialized successfully');
+
+      // Test TTS with a simple sound
+      try {
+        console.log('🔊 Testing TTS with simple sound...');
+        await Tts.speak('Teste');
+        console.log('✅ TTS test sound played successfully');
+      } catch (testError) {
+        console.error('❌ TTS test sound failed:', testError);
+      }
 
     } catch (error) {
       console.error('❌ Error initializing TTS Service:', error);

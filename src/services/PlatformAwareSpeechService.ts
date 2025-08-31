@@ -189,11 +189,50 @@ export class PlatformAwareSpeechService {
       console.error('❌ Error getting available voices:', error);
       
       // Retornar vozes padrão em caso de erro
-      return [
+      console.log('🎵 PlatformAwareSpeechService: Returning fallback voices due to error');
+      
+      const fallbackVoices = [
         {
-          identifier: 'system-default',
-          name: 'Voz do Sistema',
+          id: 'fallback-pt-br-female',
+          identifier: 'fallback-pt-br-female',
+          name: 'Voz Feminina PT-BR (Fallback)',
           language: 'pt-BR',
+          quality: 'Default',
+          requiresInternet: false,
+          isOnline: false,
+          isStreaming: false,
+          isCloud: false,
+          isNetwork: false
+        },
+        {
+          id: 'fallback-pt-br-male',
+          identifier: 'fallback-pt-br-male',
+          name: 'Voz Masculina PT-BR (Fallback)',
+          language: 'pt-BR',
+          quality: 'Default',
+          requiresInternet: false,
+          isOnline: false,
+          isStreaming: false,
+          isCloud: false,
+          isNetwork: false
+        },
+        {
+          id: 'fallback-en-female',
+          identifier: 'fallback-en-female',
+          name: 'Female Voice EN (Fallback)',
+          language: 'en',
+          quality: 'Default',
+          requiresInternet: false,
+          isOnline: false,
+          isStreaming: false,
+          isCloud: false,
+          isNetwork: false
+        },
+        {
+          id: 'fallback-en-male',
+          identifier: 'fallback-en-male',
+          name: 'Male Voice EN (Fallback)',
+          language: 'en',
           quality: 'Default',
           requiresInternet: false,
           isOnline: false,
@@ -202,6 +241,9 @@ export class PlatformAwareSpeechService {
           isNetwork: false
         }
       ];
+      
+      console.log(`🎵 PlatformAwareSpeechService: Returning ${fallbackVoices.length} fallback voices`);
+      return fallbackVoices;
     }
   }
 

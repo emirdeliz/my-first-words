@@ -96,10 +96,63 @@ export class ExpoGoSpeechService {
    */
   async getAvailableVoices(): Promise<any[]> {
     try {
-      if (this.Speech && this.Speech.getAvailableVoicesAsync) {
-        return await this.Speech.getAvailableVoicesAsync();
-      }
-      return [];
+      // expo-speech não tem getAvailableVoicesAsync, então retornamos vozes padrão
+      console.log('🎵 Expo Go: Returning default voices since getAvailableVoicesAsync is not available');
+      
+      const defaultVoices = [
+        {
+          id: 'expo-pt-br-female',
+          identifier: 'expo-pt-br-female',
+          name: 'Voz Feminina PT-BR',
+          language: 'pt-BR',
+          quality: 'Default',
+          requiresInternet: false,
+          isOnline: false,
+          isStreaming: false,
+          isCloud: false,
+          isNetwork: false
+        },
+        {
+          id: 'expo-pt-br-male',
+          identifier: 'expo-pt-br-male',
+          name: 'Voz Masculina PT-BR',
+          language: 'pt-BR',
+          quality: 'Default',
+          requiresInternet: false,
+          isOnline: false,
+          isStreaming: false,
+          isCloud: false,
+          isNetwork: false
+        },
+        {
+          id: 'expo-en-female',
+          identifier: 'expo-en-female',
+          name: 'Female Voice EN',
+          language: 'en',
+          quality: 'Default',
+          requiresInternet: false,
+          isOnline: false,
+          isStreaming: false,
+          isCloud: false,
+          isNetwork: false
+        },
+        {
+          id: 'expo-en-male',
+          identifier: 'expo-en-male',
+          name: 'Male Voice EN',
+          language: 'en',
+          quality: 'Default',
+          requiresInternet: false,
+          isOnline: false,
+          isStreaming: false,
+          isCloud: false,
+          isNetwork: false
+        }
+      ];
+      
+      console.log(`🎵 Expo Go: Returning ${defaultVoices.length} default voices`);
+      return defaultVoices;
+      
     } catch (error) {
       console.error('❌ Error getting available voices:', error);
       return [];

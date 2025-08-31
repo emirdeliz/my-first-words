@@ -39,24 +39,53 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
 
   const checkConnectivity = async () => {
     try {
-      // Simple connectivity check using fetch
-      const response = await fetch('https://www.google.com', { 
-        method: 'HEAD',
-        mode: 'no-cors'
-      });
-      setIsOnline(true);
-      console.log('🌐 Device is online');
+      // Try multiple connectivity checks
+      const checks = [
+        fetch('https://www.google.com', { method: 'HEAD' }),
+        fetch('https://www.cloudflare.com', { method: 'HEAD' }),
+        fetch('https://httpbin.org/status/200', { method: 'HEAD' })
+      ];
+      
+      // Use Promise.race to get the first successful response
+      const response = await Promise.race(checks);
+      
+      if (response && response.status >= 200 && response.status < 400) {
+        setIsOnline(true);
+        console.log('🌐 Device is online');
+      } else {
+        setIsOnline(false);
+        console.log('📱 Device connectivity uncertain');
+      }
     } catch (error) {
+      // If all checks fail, assume offline but be more permissive
       setIsOnline(false);
-      console.log('📱 Device is offline');
+      console.log('📱 Device appears offline, but will show all available voices');
     }
   };
 
   const loadAvailableVoices = async () => {
     try {
+      console.log('🎵 VoiceSelector: Starting to load available voices...');
+      console.log('🎵 VoiceSelector: Current language:', currentLanguage.code);
+      console.log('🎵 VoiceSelector: Is online:', isOnline);
+      
       const voices = await PlatformAwareSpeechService.getAvailableVoices();
-      console.log(`🎵 Total voices received: ${voices.length}`);
-      console.log(`🎵 Current language: ${currentLanguage.code}`);
+      console.log(`🎵 VoiceSelector: Total voices received: ${voices.length}`);
+      console.log(`🎵 VoiceSelector: Current language: ${currentLanguage.code}`);
+      
+      // Log all voices for debugging
+      if (voices.length > 0) {
+        console.log('🎵 VoiceSelector: All voices received:', voices.map(v => ({
+          id: v.id,
+          identifier: v.identifier,
+          name: v.name,
+          language: v.language,
+          requiresInternet: v.requiresInternet,
+          isOnline: v.isOnline
+        })));
+      } else {
+        console.log('🎵 VoiceSelector: No voices received from service');
+      }
       
       // Log first few voices for debugging
       if (voices.length > 0) {
@@ -87,18 +116,22 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
                                 voice.isCloud === true || 
                                 voice.isNetwork === true;
         
-        // If device is offline, only accept offline voices
-        if (!isOnline && requiresInternet) {
-          console.log('🎵 Skipping online voice (device offline):', voice.name || voice.id);
+        // Be more permissive with voice selection - show all available voices
+        // Only skip obvious cloud/AI voices that definitely won't work offline
+        const voiceName = (voice.name || '').toLowerCase();
+        const voiceId = (voice.id || '').toLowerCase();
+        
+        // Skip only the most obvious cloud/AI voices that definitely won't work
+        if ((voiceName && voiceName.includes('google')) || (voiceId && voiceId.includes('google')) ||
+            (voiceName && voiceName.includes('siri')) || (voiceId && voiceId.includes('siri')) ||
+            (voiceName && voiceName.includes('alexa')) || (voiceId && voiceId.includes('alexa')) ||
+            (voiceName && voiceName.includes('cloud')) || (voiceId && voiceId.includes('cloud'))) {
+          console.log('🎵 Skipping obvious cloud voice:', voice.name || voice.id);
           return false;
         }
         
-        // If device is online, accept both offline and online voices
-        if (isOnline) {
-          console.log('🎵 Accepting voice (device online):', voice.name || voice.id, requiresInternet ? '(online)' : '(offline)');
-        } else {
-          console.log('🎵 Accepting offline voice (device offline):', voice.name || voice.id);
-        }
+        // Accept most voices, be more permissive
+        console.log('🎵 Accepting voice:', voice.name || voice.id, requiresInternet ? '(may require internet)' : '(offline)');
         
         // Only skip obvious cloud/AI voices, be more permissive with system voices
         // const voiceName = (voice.name || '').toLowerCase();
@@ -257,10 +290,12 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         }
       }
       
+      console.log(`🎵 VoiceSelector: Final voices after processing: ${finalVoices.length}`);
       setAvailableVoices(finalVoices);
       
       // Select the best available voice for the current language
       if (finalVoices.length > 0) {
+        console.log('🎵 VoiceSelector: Voices available, selecting best voice...');
         // Try to find a male voice first, then fall back to any available voice
         const maleVoice = finalVoices.find(voice => {
           const id = voice.id || '';
@@ -272,7 +307,10 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         });
         
         const selectedVoice = maleVoice || finalVoices[0];
+        console.log('🎵 VoiceSelector: Selected voice:', selectedVoice.name || selectedVoice.id);
         saveSelectedVoice(selectedVoice.id);
+      } else {
+        console.log('🎵 VoiceSelector: No voices available after processing');
       }
     } catch (error) {
       console.error('❌ Error loading voices:', error);
