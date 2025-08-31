@@ -12,20 +12,3 @@
 -keep class com.facebook.react.turbomodule.** { *; }
 
 # Add any project specific keep options here:
-
-# Preserve TTS and audio related classes
--keep class net.no_mad.tts.** { *; }
--keep class com.facebook.react.bridge.** { *; }
--keep class com.facebook.react.modules.core.** { *; }
-
-# Preserve audio permissions and settings
--keep class android.media.** { *; }
--keep class android.media.audiofx.** { *; }
-
-# Preserve React Native audio modules
--keep class com.facebook.react.modules.audio.** { *; }
--keep class expo.modules.audio.** { *; }
-
-# Preserve voice and speech related classes
--keep class * implements android.speech.tts.TextToSpeech$OnInitListener { *; }
--keep class * implements android.speech.tts.TextToSpeech$OnUtteranceCompletedListener { *; }

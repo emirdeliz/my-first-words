@@ -166,7 +166,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     
-    // Exclude problematic support libraries
+    // Force AndroidX and exclude all support libraries
     configurations.all {
         exclude group: 'com.android.support'
         exclude group: 'android.support'
