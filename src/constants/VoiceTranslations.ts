@@ -31,6 +31,11 @@ export interface VoiceTranslations {
   tipChildVoices: string;
   tipAdultVoices: string;
   
+  // Additional UI elements
+  offlineOnly: string;
+  includesMaleFemale: string;
+  close: string;
+  
   // Test text for different languages
   testText: {
     'pt-BR': string;
@@ -69,6 +74,11 @@ export const VOICE_TRANSLATIONS: Record<string, VoiceTranslations> = {
     tipChildVoices: 'Dica: Vozes infantis são ideais para crianças,',
     tipAdultVoices: 'enquanto vozes de homem ou mulher são melhores para aprendizado avançado.',
     
+    // Additional translations
+    offlineOnly: 'Apenas vozes offline disponíveis',
+    includesMaleFemale: 'Inclui opções masculinas e femininas',
+    close: 'Fechar',
+    
     testText: {
       'pt-BR': 'Olá',
       'pt': 'Olá',
@@ -104,6 +114,11 @@ export const VOICE_TRANSLATIONS: Record<string, VoiceTranslations> = {
     checkInstalledVoices: 'Check if there are voices installed on your device.',
     tipChildVoices: 'Tip: Child voices are ideal for children,',
     tipAdultVoices: 'while male or female voices are better for advanced learning.',
+    
+    // Additional translations
+    offlineOnly: 'Offline voices only available',
+    includesMaleFemale: 'Includes male and female options',
+    close: 'Close',
     
     testText: {
       'pt-BR': 'Olá',
@@ -141,6 +156,11 @@ export const VOICE_TRANSLATIONS: Record<string, VoiceTranslations> = {
     tipChildVoices: 'Consejo: Las voces infantiles son ideales para niños,',
     tipAdultVoices: 'mientras que las voces masculinas o femeninas son mejores para el aprendizaje avanzado.',
     
+    // Additional translations
+    offlineOnly: 'Solo voces sin conexión disponibles',
+    includesMaleFemale: 'Incluye opciones masculinas y femeninas',
+    close: 'Cerrar',
+    
     testText: {
       'pt-BR': 'Olá',
       'pt': 'Olá',
@@ -176,6 +196,11 @@ export const VOICE_TRANSLATIONS: Record<string, VoiceTranslations> = {
     checkInstalledVoices: 'Überprüfen Sie, ob Stimmen auf Ihrem Gerät installiert sind.',
     tipChildVoices: 'Tipp: Kinderstimmen sind ideal für Kinder,',
     tipAdultVoices: 'während männliche oder weibliche Stimmen besser für fortgeschrittenes Lernen sind.',
+    
+    // Additional translations
+    offlineOnly: 'Nur Offline-Stimmen verfügbar',
+    includesMaleFemale: 'Enthält männliche und weibliche Optionen',
+    close: 'Schließen',
     
     testText: {
       'pt-BR': 'Olá',

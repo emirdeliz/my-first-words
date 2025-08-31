@@ -6,6 +6,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { useAudioConfig } from '../../contexts/AudioConfigContext';
 import LayoutView from '../atoms/LayoutView';
 import LayoutText from '../atoms/LayoutText';
+import { VOICE_TRANSLATIONS } from '../../constants/VoiceTranslations';
 
 interface VoiceSelectorProps {
   onVoiceSelect?: (voice: string) => void;
@@ -17,8 +18,9 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [availableVoices, setAvailableVoices] = useState<any[]>([]);
   const [testingVoice, setTestingVoice] = useState<string | null>(null);
-  const [isOnline, setIsOnline] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  
+  // Get voice translations for current language
+  const voiceTranslations = VOICE_TRANSLATIONS[currentLanguage.code] || VOICE_TRANSLATIONS['en'];
 
   useEffect(() => {
     loadAvailableVoices();
@@ -302,13 +304,8 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
       setTestingVoice(voiceId); // Set loading state
       PlatformAwareSpeechService.stop(); // Stop any previous speech
       
-      let testText = 'Hello'; // Default in English
-      switch (currentLanguage.code) {
-        case 'pt-BR': case 'pt': testText = 'Olá'; break;
-        case 'es': testText = 'Hola'; break;
-        case 'de': testText = 'Hallo'; break;
-        default: testText = 'Hello';
-      }
+      // Use voice translations for test text
+      const testText = voiceTranslations.testText[currentLanguage.code as keyof typeof voiceTranslations.testText] || voiceTranslations.testText['en'];
       
       // Find the voice object to get more details
       const voiceObject = availableVoices.find(v => v.identifier === voiceId);
@@ -711,7 +708,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
               isTextGray800
               customClasses="mb-5"
             >
-              Selecionar Voz (Offline)
+              {voiceTranslations.selectVoiceOffline}
             </LayoutText>
             
             <LayoutText
@@ -721,7 +718,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
               isTextGray500
               customClasses="mb-4"
             >
-              Apenas vozes offline disponíveis • Inclui opções masculinas e femininas
+              {voiceTranslations.offlineOnly} • {voiceTranslations.includesMaleFemale}
             </LayoutText>
 
             <ScrollView style={{ maxHeight: 400 }}>
@@ -789,7 +786,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
                             audioConfig.selectedVoice === voice.identifier ? 'text-gray-500' : 'text-gray-400'
                           } mt-1 font-mono`}
                         >
-                          Código: {generateVoiceCode(voice, index)}
+                          {voiceTranslations.code}: {generateVoiceCode(voice, index)}
                         </LayoutText>
                       </LayoutView>
                     </LayoutView>
@@ -831,7 +828,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
                     isTextCenter
                     customClasses="mb-2"
                   >
-                    Nenhuma voz offline disponível
+                    {voiceTranslations.noOfflineVoicesAvailable}
                   </LayoutText>
                   <LayoutText
                     isTextSm
@@ -839,14 +836,14 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
                     isTextCenter
                     customClasses="mb-2"
                   >
-                    Este idioma não possui vozes offline. Verifique se há vozes instaladas no seu dispositivo.
+                    {voiceTranslations.languageNoOfflineVoices} {voiceTranslations.checkInstalledVoices}
                   </LayoutText>
                   <LayoutText
                     isTextSm
                     isTextGray
                     isTextCenter
                   >
-                    Dica: Vozes infantis são ideais para crianças, enquanto vozes de homem ou mulher são melhores para aprendizado avançado.
+                    {voiceTranslations.tipChildVoices} {voiceTranslations.tipAdultVoices}
                   </LayoutText>
                 </LayoutView>
               )}
@@ -868,7 +865,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
                 isFontSemibold
                 isTextCenter
               >
-                {translation.settings?.modal?.close || 'Fechar'}
+                {voiceTranslations.close}
               </LayoutText>
             </TouchableOpacity>
           </LayoutView>
