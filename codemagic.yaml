@@ -1,0 +1,42 @@
+workflows:
+  android-build:
+    name: Android Build
+    max_build_duration: 120
+    environment:
+      vars:
+        PACKAGE_NAME: "com.emirdeliz.myfirstwords"
+        GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.configureondemand=true"
+        EXPO_USE_LEGACY_PACKAGING: "true"
+        NEW_ARCH_ENABLED: "false"
+        ANDROID_ENABLE_JETIFIER: "true"
+        ANDROID_USE_ANDROIDX: "true"
+        ANDROID_ENABLE_RESOURCE_MERGING: "false"
+    scripts:
+      - name: Set up environment
+        script: |
+          node --version
+          npm --version
+          java -version
+      - name: Install dependencies
+        script: |
+          npm install --legacy-peer-deps
+      - name: Setup Expo
+        script: |
+          npx expo install --fix
+      - name: Prebuild
+        script: |
+          npx expo prebuild --platform android --clean
+      - name: Build APK
+        script: |
+          cd android
+          # Add resource conflict resolution
+          echo "android.packagingOptions.pickFirsts += ['**/values/values.xml', '**/values-*/values.xml']" >> app/build.gradle
+          echo "android.packagingOptions.excludes += ['**/values/values.xml', '**/values-*/values.xml']" >> app/build.gradle
+          ./gradlew assembleRelease --no-daemon --stacktrace
+    artifacts:
+      - android/app/build/outputs/apk/release/*.apk
+      - android/app/build/outputs/mapping/release/*.txt
+    publishing:
+      email:
+        recipients:
+          - "emirdeliz@gmail.com"

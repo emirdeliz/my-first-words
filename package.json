@@ -8,7 +8,7 @@
     "android": "expo run:android",
     "web": "expo start --web",
     "lint": "expo lint",
-    "build:android:apk": "cd android && clear && ./gradlew assembleRelease --stacktrace",
+    "build:android:apk": "cd android && clear && ./gradlew clean && ./gradlew assembleRelease --stacktrace && cd ..",
     "prebuild:clean": "expo prebuild --clean"
   },
   "dependencies": {
