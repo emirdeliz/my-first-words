@@ -142,9 +142,9 @@ export default ({ config }) => ({
       {
         android: {
           // Force specific AndroidX versions to resolve conflicts
-          compileSdkVersion: 34,
-          targetSdkVersion: 34,
-          buildToolsVersion: '34.0.0',
+          compileSdkVersion: 35,
+          targetSdkVersion: 35,
+          buildToolsVersion: '35.0.0',
           // Exclude problematic support libraries
           exclude: [
             'com.android.support',
@@ -157,6 +157,18 @@ export default ({ config }) => ({
             'androidx.activity:activity': '1.8.2',
             'androidx.fragment:fragment': '1.6.2',
             'com.google.android.material:material': '1.12.0'
+          },
+          // Packaging options to resolve duplicate classes
+          packagingOptions: {
+            pickFirsts: [
+              '**/META-INF/androidx.localbroadcastmanager_localbroadcastmanager.version',
+              '**/META-INF/androidx.versionedparcelable_versionedparcelable.version',
+              '**/META-INF/androidx.core_core.version'
+            ],
+            excludes: [
+              '**/META-INF/com.android.support*',
+              '**/META-INF/android.support*'
+            ]
           }
         }
       }
