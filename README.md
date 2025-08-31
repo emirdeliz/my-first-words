@@ -14,10 +14,13 @@
 
 - **Visual Communication Board**: Intuitive icons and symbols for basic needs, emotions, activities, and social interactions
 - **Multilingual Support**: Available in English, Portuguese, Spanish, and German
-- **Speech Synthesis**: Text-to-speech functionality to help children learn pronunciation
+- **Advanced Speech Synthesis**: Multiple TTS services with voice selection and customization
+- **Voice Management**: Offline and online voice support with gender and quality indicators
 - **Category-Based Organization**: Organized into logical categories (Basic Needs, Emotions, Activities, Social)
 - **Accessible Design**: Large, clear buttons with high contrast for easy navigation
 - **Customizable Interface**: Adaptable to different communication levels and preferences
+- **Audio Configuration**: Adjustable speech rate, pitch, and voice selection
+- **Cross-Platform**: Works on Android, iOS, and Web
 
 ### Target Audience
 
@@ -31,9 +34,10 @@
 - **Frontend**: React Native with Expo
 - **Styling**: NativeWind (Tailwind CSS for React Native)
 - **Navigation**: Expo Router
-- **Speech**: Expo Speech API
+- **Speech**: Multiple TTS services (Expo Speech, React Native TTS, Web Speech API)
 - **Languages**: TypeScript
 - **State Management**: React Context API
+- **Build**: Gradle (Android), Xcode (iOS)
 
 ---
 
@@ -47,10 +51,13 @@
 
 - **Quadro de Comunicação Visual**: Ícones e símbolos intuitivos para necessidades básicas, emoções, atividades e interações sociais
 - **Suporte Multilíngue**: Disponível em Inglês, Português, Espanhol e Alemão
-- **Síntese de Voz**: Funcionalidade de texto para fala para ajudar as crianças a aprenderem pronúncia
+- **Síntese de Voz Avançada**: Múltiplos serviços TTS com seleção e personalização de voz
+- **Gerenciamento de Voz**: Suporte a vozes offline e online com indicadores de gênero e qualidade
 - **Organização por Categorias**: Organizado em categorias lógicas (Necessidades Básicas, Emoções, Atividades, Social)
 - **Design Acessível**: Botões grandes e claros com alto contraste para fácil navegação
 - **Interface Personalizável**: Adaptável a diferentes níveis de comunicação e preferências
+- **Configuração de Áudio**: Taxa de fala, tom e seleção de voz ajustáveis
+- **Multiplataforma**: Funciona em Android, iOS e Web
 
 ### Público-Alvo
 
@@ -64,9 +71,10 @@
 - **Frontend**: React Native com Expo
 - **Estilização**: NativeWind (Tailwind CSS para React Native)
 - **Navegação**: Expo Router
-- **Voz**: API Expo Speech
+- **Voz**: Múltiplos serviços TTS (Expo Speech, React Native TTS, Web Speech API)
 - **Linguagens**: TypeScript
 - **Gerenciamento de Estado**: React Context API
+- **Build**: Gradle (Android), Xcode (iOS)
 
 ---
 
@@ -80,10 +88,13 @@
 
 - **Tablero de Comunicación Visual**: Iconos y símbolos intuitivos para necesidades básicas, emociones, actividades e interacciones sociales
 - **Soporte Multilingüe**: Disponible en Inglés, Portugués, Español y Alemán
-- **Síntesis de Voz**: Funcionalidad de texto a voz para ayudar a los niños a aprender pronunciación
+- **Síntesis de Voz Avanzada**: Múltiples servicios TTS con selección y personalización de voz
+- **Gestión de Voz**: Soporte para voces offline y online con indicadores de género y calidad
 - **Organización por Categorías**: Organizado en categorías lógicas (Necesidades Básicas, Emociones, Actividades, Social)
 - **Diseño Accesible**: Botones grandes y claros con alto contraste para fácil navegación
 - **Interfaz Personalizable**: Adaptable a diferentes niveles de comunicación y preferencias
+- **Configuración de Audio**: Velocidad de habla, tono y selección de voz ajustables
+- **Multiplataforma**: Funciona en Android, iOS y Web
 
 ### Público Objetivo
 
@@ -97,9 +108,10 @@
 - **Frontend**: React Native con Expo
 - **Estilos**: NativeWind (Tailwind CSS para React Native)
 - **Navegación**: Expo Router
-- **Voz**: API Expo Speech
+- **Voz**: Múltiples servicios TTS (Expo Speech, React Native TTS, Web Speech API)
 - **Lenguajes**: TypeScript
 - **Gestión de Estado**: React Context API
+- **Build**: Gradle (Android), Xcode (iOS)
 
 ---
 
@@ -113,10 +125,13 @@
 
 - **Visuelles Kommunikationsboard**: Intuitive Icons und Symbole für Grundbedürfnisse, Emotionen, Aktivitäten und soziale Interaktionen
 - **Mehrsprachige Unterstützung**: Verfügbar in Englisch, Portugiesisch, Spanisch und Deutsch
-- **Sprachsynthese**: Text-zu-Sprache-Funktionalität, um Kindern bei der Aussprache zu helfen
+- **Erweiterte Sprachsynthese**: Mehrere TTS-Dienste mit Sprachauswahl und Anpassung
+- **Sprachverwaltung**: Offline- und Online-Sprachunterstützung mit Geschlechts- und Qualitätsindikatoren
 - **Kategoriebasierte Organisation**: Organisiert in logische Kategorien (Grundbedürfnisse, Emotionen, Aktivitäten, Sozial)
 - **Barrierefreies Design**: Große, klare Buttons mit hohem Kontrast für einfache Navigation
 - **Anpassbare Benutzeroberfläche**: Anpassbar an verschiedene Kommunikationsniveaus und Präferenzen
+- **Audio-Konfiguration**: Einstellbare Sprechgeschwindigkeit, Tonhöhe und Sprachauswahl
+- **Multiplattform**: Funktioniert auf Android, iOS und Web
 
 ### Zielgruppe
 
@@ -130,9 +145,10 @@
 - **Frontend**: React Native mit Expo
 - **Styling**: NativeWind (Tailwind CSS für React Native)
 - **Navigation**: Expo Router
-- **Sprache**: Expo Speech API
+- **Sprache**: Mehrere TTS-Dienste (Expo Speech, React Native TTS, Web Speech API)
 - **Sprachen**: TypeScript
 - **Zustandsverwaltung**: React Context API
+- **Build**: Gradle (Android), Xcode (iOS)
 
 ---
 
@@ -140,10 +156,12 @@
 
 ### Prerequisites / Pré-requisitos / Prerrequisitos / Voraussetzungen
 
-- Node.js (v16 or higher / v16 ou superior / v16 o superior / v16 oder höher)
+- Node.js (v18 or higher / v18 ou superior / v18 o superior / v18 oder höher)
 - npm or yarn
 - Expo CLI
 - iOS Simulator or Android Emulator
+- Android Studio (for Android builds)
+- Xcode (for iOS builds, macOS only)
 
 ### Installation
 
@@ -161,17 +179,101 @@ npm install
 npm start
 ```
 
+### Available Scripts / Scripts Disponíveis / Scripts Disponibles / Verfügbare Skripte
+
+```bash
+# Development
+npm start              # Start Expo development server
+npm run android        # Run on Android emulator
+npm run ios            # Run on iOS simulator
+npm run web            # Run on web browser
+
+# Building
+npm run build:android:apk    # Build Android APK release
+npm run android:full         # Full Android build with clean
+npm run android:clean        # Clean Android build
+
+# Testing
+npm test               # Run tests
+npm run lint           # Run ESLint
+npm run type-check     # Run TypeScript check
+```
+
+### Building APK Release / Gerando APK Release / Generando APK Release / APK Release erstellen
+
+#### Option 1: Native Build (Recommended / Recomendado / Recomendado / Empfohlen)
+
+```bash
+# Clean previous builds
+cd android && ./gradlew clean && cd ..
+
+# Build release APK
+cd android && ./gradlew assembleRelease && cd ..
+
+# APK will be generated at:
+# android/app/build/outputs/apk/release/app-release.apk
+```
+
+#### Option 2: Using npm script
+
+```bash
+npm run build:android:apk
+```
+
+#### Option 3: EAS Build (Cloud)
+
+```bash
+# Install EAS CLI
+npm install -g @expo/eas-cli
+
+# Build APK
+eas build --platform android --profile preview
+```
+
 ### Project Structure / Estrutura do Projeto / Estructura del Proyecto / Projektstruktur
 
 ```
 src/
-├── app/           # Routes and screens
-├── components/    # React components
-├── constants/     # Constants and configurations
-├── contexts/      # React contexts
-├── hooks/         # Custom hooks
-└── services/      # Services (Speech, etc.)
+├── app/                    # Routes and screens
+├── components/             # React components
+│   ├── atoms/             # Basic UI components
+│   ├── molecules/          # Complex UI components
+│   └── templates/          # Page templates
+├── constants/              # Constants and configurations
+│   ├── Languages.ts        # Language definitions
+│   └── VoiceTranslations.ts # Voice-related translations
+├── contexts/               # React contexts
+│   ├── AudioConfigContext.tsx    # Audio configuration
+│   └── LanguageContext.tsx       # Language management
+├── hooks/                  # Custom hooks
+├── services/               # Services
+│   ├── AudioService.ts           # Audio management
+│   ├── TTSService.ts             # Text-to-Speech
+│   ├── PlatformAwareSpeechService.ts # Cross-platform speech
+│   ├── HybridSpeechService.ts    # Hybrid speech approach
+│   ├── ExpoGoSpeechService.ts    # Expo Go speech
+│   ├── EnhancedSpeechService.ts  # Enhanced speech features
+│   └── speechService.ts          # Web speech service
+└── types/                  # TypeScript type definitions
+
+android/                    # Android native code
+├── app/                    # Android app module
+│   ├── build.gradle        # App build configuration
+│   └── src/main/           # Main source code
+├── gradle.properties       # Gradle properties
+└── build.gradle            # Project build configuration
 ```
+
+### Voice Features / Funcionalidades de Voz / Funciones de Voz / Sprachfunktionen
+
+- **Multiple TTS Services**: Expo Speech, React Native TTS, Web Speech API
+- **Voice Selection**: Choose from available system voices
+- **Gender Detection**: Automatic detection of male/female voices
+- **Quality Indicators**: Premium, High Quality, Standard, Offline
+- **Language Support**: pt-BR, en, es, de with proper filtering
+- **Offline Support**: Works without internet connection
+- **Customizable Speed**: Adjustable speech rate for better understanding
+- **Voice Testing**: Test voices before selection
 
 ---
 
