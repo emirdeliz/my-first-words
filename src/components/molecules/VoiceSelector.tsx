@@ -18,22 +18,61 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [availableVoices, setAvailableVoices] = useState<any[]>([]);
   const [testingVoice, setTestingVoice] = useState<string | null>(null);
+  const [isOnline, setIsOnline] = useState(false);
   
   // Get voice translations for current language
   const voiceTranslations = VOICE_TRANSLATIONS[currentLanguage.code] || VOICE_TRANSLATIONS['en'];
 
   useEffect(() => {
     loadAvailableVoices();
-  }, [currentLanguage.code]);
+  }, [currentLanguage.code, isOnline]);
+
+  // Check internet connectivity
+  useEffect(() => {
+    checkConnectivity();
+    
+    // Check connectivity every 30 seconds
+    const interval = setInterval(checkConnectivity, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const checkConnectivity = async () => {
+    try {
+      // Simple connectivity check using fetch
+      const response = await fetch('https://www.google.com', { 
+        method: 'HEAD',
+        mode: 'no-cors'
+      });
+      setIsOnline(true);
+      console.log('🌐 Device is online');
+    } catch (error) {
+      setIsOnline(false);
+      console.log('📱 Device is offline');
+    }
+  };
 
   const loadAvailableVoices = async () => {
     try {
       const voices = await PlatformAwareSpeechService.getAvailableVoices();
+      console.log(`🎵 Total voices received: ${voices.length}`);
+      console.log(`🎵 Current language: ${currentLanguage.code}`);
+      
+      // Log first few voices for debugging
+      if (voices.length > 0) {
+        console.log('🎵 Sample voices:', voices.slice(0, 3).map(v => ({
+          identifier: v.identifier,
+          name: v.name,
+          language: v.language,
+          requiresInternet: v.requiresInternet,
+          isOnline: v.isOnline
+        })));
+      }
       
       // Filter voices for the current language and offline availability
       const filteredVoices = voices.filter(voice => {
         // Defensive check for voice properties
-        if (!voice || !voice.language || !voice.identifier) {
+        if (!voice || !voice.language) {
           console.log('🎵 Skipping invalid voice:', voice);
           return false;
         }
@@ -41,28 +80,24 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         const voiceLang = voice.language.toLowerCase();
         const targetLang = currentLanguage.code.toLowerCase();
         
-        // Simplified offline check - be more permissive to include system voices
-        // Most system voices are offline by default
-        const isOffline = !voice.requiresInternet && 
-                         !voice.isOnline && 
-                         !voice.isStreaming && 
-                         !voice.isCloud && 
-                         !voice.isNetwork &&
-                         !voice.isRemote &&
-                         !voice.isExternal &&
-                         !voice.isWeb &&
-                         !voice.isBrowser;
+        // Check if voice requires internet
+        const requiresInternet = voice.requiresInternet === true || 
+                                voice.isOnline === true || 
+                                voice.isStreaming === true || 
+                                voice.isCloud === true || 
+                                voice.isNetwork === true;
         
-        // If we have explicit online indicators, skip them
-        if (voice.requiresInternet || voice.isOnline || voice.isStreaming || voice.isCloud) {
-          console.log('🎵 Skipping explicitly online voice:', voice.name || voice.identifier);
+        // If device is offline, only accept offline voices
+        if (!isOnline && requiresInternet) {
+          console.log('🎵 Skipping online voice (device offline):', voice.name || voice.identifier);
           return false;
         }
         
-        // If voice requires internet, skip it
-        if (!isOffline) {
-          console.log('🎵 Skipping online voice:', voice.name || voice.identifier, voice);
-          return false;
+        // If device is online, accept both offline and online voices
+        if (isOnline) {
+          console.log('🎵 Accepting voice (device online):', voice.name || voice.identifier, requiresInternet ? '(online)' : '(offline)');
+        } else {
+          console.log('🎵 Accepting offline voice (device offline):', voice.name || voice.identifier);
         }
         
         // Only skip obvious cloud/AI voices, be more permissive with system voices
@@ -77,22 +112,26 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         //   return false;
         // }
         
-        // For Portuguese, be more specific to avoid mixing PT-PT and PT-BR
+        // For Portuguese, be more permissive
         if (targetLang === 'pt-br') {
-          // Prefer PT-BR, but also accept generic PT if no PT-BR available
+          // Accept PT-BR, PT, and similar variations
           return voiceLang === 'pt-br' || voiceLang === 'pt_br' || 
-                 (voiceLang === 'pt' && !voiceLang.includes('pt-pt') && !voiceLang.includes('pt_pt'));
+                 voiceLang === 'pt' || voiceLang.startsWith('pt') ||
+                 voiceLang.includes('portuguese') || voiceLang.includes('portugues');
         }
         
-        // For other languages, use exact match or language family
+        // For other languages, be more permissive
         if (voiceLang === targetLang) return true;
         if (targetLang.includes('-')) {
           const baseLang = targetLang.split('-')[0];
-          return voiceLang === baseLang;
+          return voiceLang === baseLang || voiceLang.startsWith(baseLang);
         }
         
-        return false;
+        // Accept any voice that might be compatible
+        return true;
       });
+      
+      console.log(`🎵 Voices after filtering: ${filteredVoices.length}`);
       
       // Check for different types of duplicates
       const duplicateCheck = new Map();
@@ -654,7 +693,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
               isTextGray800
               customClasses="mb-5"
             >
-              {voiceTranslations.selectVoiceOffline}
+              {isOnline ? voiceTranslations.selectVoice : voiceTranslations.selectVoiceOffline}
             </LayoutText>
             
             <LayoutText
@@ -664,8 +703,27 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
               isTextGray500
               customClasses="mb-4"
             >
-              {voiceTranslations.offlineOnly} • {voiceTranslations.includesMaleFemale}
+              {isOnline 
+                ? `${voiceTranslations.onlineAndOffline} • ${voiceTranslations.includesMaleFemale}`
+                : `${voiceTranslations.offlineOnly} • ${voiceTranslations.includesMaleFemale}`
+              }
             </LayoutText>
+            
+            {/* Connectivity status indicator */}
+            <LayoutView isFlexRow isItemsCenter isJustifyCenter customClasses="mb-4">
+              <MaterialIcons
+                name={isOnline ? "wifi" : "wifi-off"}
+                size={16}
+                color={isOnline ? "#3b82f6" : "#6b7280"}
+                style={{ marginRight: 8 }}
+              />
+              <LayoutText
+                isTextXs
+                customClasses={`${isOnline ? 'text-blue-600' : 'text-gray-500'}`}
+              >
+                {isOnline ? voiceTranslations.connectedToInternet : voiceTranslations.noInternetConnection}
+              </LayoutText>
+            </LayoutView>
 
             <ScrollView style={{ maxHeight: 400 }}>
               {availableVoices.length > 0 ? (
@@ -689,25 +747,25 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
                       isItemsCenter
                       isFlex1
                     >
-                      <LayoutView isFlexRow isItemsCenter>
-                        <MaterialIcons
-                          name={getVoiceQualityIcon(voice)}
-                          size={20}
-                          color={getVoiceQualityColor(voice)}
-                        />
-                        <MaterialIcons
-                          name="wifi-off"
-                          size={16}
-                          color="#10b981"
-                          style={{ marginLeft: 4 }}
-                        />
-                        <MaterialIcons
-                          name={getAgeGroupIcon(voice)}
-                          size={16}
-                          color={getAgeGroupColor(voice)}
-                          style={{ marginLeft: 4 }}
-                        />
-                      </LayoutView>
+                                              <LayoutView isFlexRow isItemsCenter>
+                          <MaterialIcons
+                            name={getVoiceQualityIcon(voice)}
+                            size={20}
+                            color={getVoiceQualityColor(voice)}
+                          />
+                          <MaterialIcons
+                            name={voice.requiresInternet || voice.isOnline || voice.isStreaming || voice.isCloud || voice.isNetwork ? "wifi" : "wifi-off"}
+                            size={16}
+                            color={voice.requiresInternet || voice.isOnline || voice.isStreaming || voice.isCloud || voice.isNetwork ? "#3b82f6" : "#10b981"}
+                            style={{ marginLeft: 4 }}
+                          />
+                          <MaterialIcons
+                            name={getAgeGroupIcon(voice)}
+                            size={16}
+                            color={getAgeGroupColor(voice)}
+                            style={{ marginLeft: 4 }}
+                          />
+                        </LayoutView>
                       <LayoutView hasMarginLeft isFlex1>
                         <LayoutText
                           isTextLg
@@ -746,7 +804,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
                     )}
 
                     <TouchableOpacity
-                      onPress={() => testVoice(voice.identifier)}
+                      onPress={() => testVoice(voice.)}
                       disabled={testingVoice === voice.identifier}
                       style={{
                         marginLeft: 12,

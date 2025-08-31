@@ -33,8 +33,11 @@ export interface VoiceTranslations {
   
   // Additional UI elements
   offlineOnly: string;
+  onlineAndOffline: string;
   includesMaleFemale: string;
   close: string;
+  connectedToInternet: string;
+  noInternetConnection: string;
   
   // Test text for different languages
   testText: {
@@ -76,8 +79,11 @@ export const VOICE_TRANSLATIONS: Record<string, VoiceTranslations> = {
     
     // Additional translations
     offlineOnly: 'Apenas vozes offline disponíveis',
+    onlineAndOffline: 'Vozes online e offline disponíveis',
     includesMaleFemale: 'Inclui opções masculinas e femininas',
     close: 'Fechar',
+    connectedToInternet: 'Conectado à internet',
+    noInternetConnection: 'Sem conexão com internet',
     
     testText: {
       'pt-BR': 'Olá',
@@ -117,8 +123,11 @@ export const VOICE_TRANSLATIONS: Record<string, VoiceTranslations> = {
     
     // Additional translations
     offlineOnly: 'Offline voices only available',
+    onlineAndOffline: 'Online and offline voices available',
     includesMaleFemale: 'Includes male and female options',
     close: 'Close',
+    connectedToInternet: 'Connected to internet',
+    noInternetConnection: 'No internet connection',
     
     testText: {
       'pt-BR': 'Olá',
@@ -158,8 +167,11 @@ export const VOICE_TRANSLATIONS: Record<string, VoiceTranslations> = {
     
     // Additional translations
     offlineOnly: 'Solo voces sin conexión disponibles',
+    onlineAndOffline: 'Voces online y sin conexión disponibles',
     includesMaleFemale: 'Incluye opciones masculinas y femeninas',
     close: 'Cerrar',
+    connectedToInternet: 'Conectado a internet',
+    noInternetConnection: 'Sin conexión a internet',
     
     testText: {
       'pt-BR': 'Olá',
@@ -199,8 +211,11 @@ export const VOICE_TRANSLATIONS: Record<string, VoiceTranslations> = {
     
     // Additional translations
     offlineOnly: 'Nur Offline-Stimmen verfügbar',
+    onlineAndOffline: 'Online- und Offline-Stimmen verfügbar',
     includesMaleFemale: 'Enthält männliche und weibliche Optionen',
     close: 'Schließen',
+    connectedToInternet: 'Mit Internet verbunden',
+    noInternetConnection: 'Keine Internetverbindung',
     
     testText: {
       'pt-BR': 'Olá',

@@ -141,7 +141,7 @@ export class TTSService {
       }
 
       // Start speaking
-      await Tts.speak(text, ttsOptions);
+      Tts.speak(text, ttsOptions);
       
     } catch (error) {
       console.error('❌ Error starting TTS speech:', error);
