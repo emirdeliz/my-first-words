@@ -17,6 +17,8 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [availableVoices, setAvailableVoices] = useState<any[]>([]);
   const [testingVoice, setTestingVoice] = useState<string | null>(null);
+  const [isOnline, setIsOnline] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'checking' | 'online' | 'offline'>('checking');
 
   useEffect(() => {
     loadAvailableVoices();
@@ -62,16 +64,16 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         }
         
         // Only skip obvious cloud/AI voices, be more permissive with system voices
-        const voiceName = (voice.name || '').toLowerCase();
-        const voiceId = (voice.identifier || '').toLowerCase();
+        // const voiceName = (voice.name || '').toLowerCase();
+        // const voiceId = (voice.identifier || '').toLowerCase();
         
         // Skip only the most obvious cloud/AI voices
-        if ((voiceName && voiceName.includes('google')) || (voiceId && voiceId.includes('google')) ||
-            (voiceName && voiceName.includes('siri')) || (voiceId && voiceId.includes('siri')) ||
-            (voiceName && voiceName.includes('alexa')) || (voiceId && voiceId.includes('alexa'))) {
-          console.log('🎵 Skipping obvious cloud voice:', voice.name || voice.identifier);
-          return false;
-        }
+        // if ((voiceName && voiceName.includes('google')) || (voiceId && voiceId.includes('google')) ||
+        //     (voiceName && voiceName.includes('siri')) || (voiceId && voiceId.includes('siri')) ||
+        //     (voiceName && voiceName.includes('alexa')) || (voiceId && voiceId.includes('alexa'))) {
+        //   console.log('🎵 Skipping obvious cloud voice:', voice.name || voice.identifier);
+        //   return false;
+        // }
         
         // For Portuguese, be more specific to avoid mixing PT-PT and PT-BR
         if (targetLang === 'pt-br') {
