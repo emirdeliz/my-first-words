@@ -68,6 +68,8 @@ export default ({ config }) => ({
     permissions: [
       'android.permission.RECORD_AUDIO',
       'android.permission.MODIFY_AUDIO_SETTINGS',
+      'android.permission.INTERNET',
+      'android.permission.ACCESS_NETWORK_STATE',
     ],
     package: 'com.emirdeliz.myfirstwords',
     
