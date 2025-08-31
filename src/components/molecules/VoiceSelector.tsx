@@ -61,7 +61,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
       // Log first few voices for debugging
       if (voices.length > 0) {
         console.log('🎵 Sample voices:', voices.slice(0, 3).map(v => ({
-          identifier: v.identifier,
+          id: v.id,
           name: v.name,
           language: v.language,
           requiresInternet: v.requiresInternet,
@@ -89,35 +89,47 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         
         // If device is offline, only accept offline voices
         if (!isOnline && requiresInternet) {
-          console.log('🎵 Skipping online voice (device offline):', voice.name || voice.identifier);
+          console.log('🎵 Skipping online voice (device offline):', voice.name || voice.id);
           return false;
         }
         
         // If device is online, accept both offline and online voices
         if (isOnline) {
-          console.log('🎵 Accepting voice (device online):', voice.name || voice.identifier, requiresInternet ? '(online)' : '(offline)');
+          console.log('🎵 Accepting voice (device online):', voice.name || voice.id, requiresInternet ? '(online)' : '(offline)');
         } else {
-          console.log('🎵 Accepting offline voice (device offline):', voice.name || voice.identifier);
+          console.log('🎵 Accepting offline voice (device offline):', voice.name || voice.id);
         }
         
         // Only skip obvious cloud/AI voices, be more permissive with system voices
         // const voiceName = (voice.name || '').toLowerCase();
-        // const voiceId = (voice.identifier || '').toLowerCase();
+        // const voiceId = (voice.id || '').toLowerCase();
         
         // Skip only the most obvious cloud/AI voices
         // if ((voiceName && voiceName.includes('google')) || (voiceId && voiceId.includes('google')) ||
         //     (voiceName && voiceName.includes('siri')) || (voiceId && voiceId.includes('siri')) ||
         //     (voiceName && voiceName.includes('alexa')) || (voiceId && voiceId.includes('alexa'))) {
-        //   console.log('🎵 Skipping obvious cloud voice:', voice.name || voice.identifier);
+        //   console.log('🎵 Skipping obvious cloud voice:', voice.name || voice.id);
         //   return false;
         // }
         
-        // For Portuguese, be more permissive
+        // For Portuguese, be more specific to avoid mixing PT-PT and PT-BR
         if (targetLang === 'pt-br') {
-          // Accept PT-BR, PT, and similar variations
-          return voiceLang === 'pt-br' || voiceLang === 'pt_br' || 
-                 voiceLang === 'pt' || voiceLang.startsWith('pt') ||
-                 voiceLang.includes('portuguese') || voiceLang.includes('portugues');
+          // Prefer PT-BR, but also accept generic PT if no PT-BR available
+          // However, explicitly exclude PT-PT to avoid mixing
+          if (voiceLang === 'pt-br' || voiceLang === 'pt_br') {
+            console.log('🎵 Accepting PT-BR voice:', voice.name || voice.id, voiceLang);
+            return true; // Accept PT-BR
+          }
+          if (voiceLang === 'pt' && !voiceLang.includes('pt-pt') && !voiceLang.includes('pt_pt')) {
+            console.log('🎵 Accepting generic PT voice:', voice.name || voice.id, voiceLang);
+            return true; // Accept generic PT but not PT-PT
+          }
+          if (voiceLang.includes('portuguese') || voiceLang.includes('portugues')) {
+            console.log('🎵 Accepting Portuguese voice:', voice.name || voice.id, voiceLang);
+            return true; // Accept Portuguese variations
+          }
+          console.log('🎵 Rejecting voice (likely PT-PT):', voice.name || voice.id, voiceLang);
+          return false; // Reject PT-PT and other variations
         }
         
         // For other languages, be more permissive
@@ -139,8 +151,8 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
       const similarVoices: any[] = [];
       
       filteredVoices.forEach(voice => {
-        // Check for exact duplicates (same identifier)
-        const exactKey = `${voice.language}-${voice.identifier}`;
+        // Check for exact duplicates (same id)
+        const exactKey = `${voice.language}-${voice.id}`;
         if (duplicateCheck.has(exactKey)) {
           duplicates.push({ 
             type: 'exact', 
@@ -156,7 +168,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         if (similarKey !== exactKey) {
           const existing = Array.from(duplicateCheck.values()).find(v => 
             v.language === voice.language && 
-            (v.name === voice.name || v.identifier === voice.identifier)
+            (v.name === voice.name || v.id === voice.id)
           );
           if (existing) {
             similarVoices.push({ 
@@ -179,20 +191,20 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
       
       // Ensure we have a good mix of male and female voices
       const maleVoices = uniqueVoices.filter(voice => {
-        const identifier = voice.identifier || '';
+        const id = voice.id || '';
         const name = voice.name || '';
-        return identifier.toLowerCase().includes('male') || 
+        return id.toLowerCase().includes('male') || 
                name.toLowerCase().includes('male') ||
-               identifier.toLowerCase().includes('homem') || 
+               id.toLowerCase().includes('homem') || 
                name.toLowerCase().includes('homem');
       });
       
       const femaleVoices = uniqueVoices.filter(voice => {
-        const identifier = voice.identifier || '';
+        const id = voice.id || '';
         const name = voice.name || '';
-        return identifier.toLowerCase().includes('female') || 
+        return id.toLowerCase().includes('female') || 
                name.toLowerCase().includes('female') ||
-               identifier.toLowerCase().includes('mulher') || 
+               id.toLowerCase().includes('mulher') || 
                name.toLowerCase().includes('mulher');
       });
       
@@ -223,7 +235,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
         // Get all voices and filter by language more broadly
         const allVoices = await PlatformAwareSpeechService.getAvailableVoices();
         const broadFilteredVoices = allVoices.filter(voice => {
-          if (!voice || !voice.language || !voice.identifier) return false;
+          if (!voice || !voice.language || !voice.id) return false;
           
           const voiceLang = voice.language.toLowerCase();
           const targetLang = currentLanguage.code.toLowerCase();
@@ -251,16 +263,16 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
       if (finalVoices.length > 0) {
         // Try to find a male voice first, then fall back to any available voice
         const maleVoice = finalVoices.find(voice => {
-          const identifier = voice.identifier || '';
+          const id = voice.id || '';
           const name = voice.name || '';
-          return identifier.toLowerCase().includes('male') || 
+          return id.toLowerCase().includes('male') || 
                  name.toLowerCase().includes('male') ||
-                 identifier.toLowerCase().includes('homem') || 
+                 id.toLowerCase().includes('homem') || 
                  name.toLowerCase().includes('homem');
         });
         
         const selectedVoice = maleVoice || finalVoices[0];
-        saveSelectedVoice(selectedVoice.identifier);
+        saveSelectedVoice(selectedVoice.id);
       }
     } catch (error) {
       console.error('❌ Error loading voices:', error);
@@ -293,7 +305,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
       const testText = voiceTranslations.testText[currentLanguage.code as keyof typeof voiceTranslations.testText] || voiceTranslations.testText['en'];
       
       // Find the voice object to get more details
-      const voiceObject = availableVoices.find(v => v.identifier === voiceId);
+      const voiceObject = availableVoices.find(v => v.id === voiceId);
       console.log(`🎵 Testing voice: ${voiceId} (${voiceObject?.name || 'Unknown'}) with text: "${testText}"`);
       console.log(`🎵 Voice details:`, voiceObject);
       
@@ -320,25 +332,25 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
   };
 
   const getFriendlyVoiceName = (voice: any): string => {
-    // Extract language and region from voice identifier or language
+    // Extract language and region from voice id or language
     const lang = voice.language || '';
-    const identifier = voice.identifier || '';
+    const id = voice.id || '';
     
     // Handle specific voice names
-    if (voice.name && voice.name !== voice.identifier) {
+    if (voice.name && voice.name !== voice.id) {
       return voice.name;
     }
     
     // Handle special cases
-    if (identifier === 'offline-default-voice') {
+    if (id === 'offline-default-voice') {
       return 'Voz Padrão do Sistema';
     }
     
-    // Extract gender from identifier or name
+    // Extract gender from id or name
     let gender = '';
-    if (identifier.toLowerCase().includes('female') || identifier.toLowerCase().includes('mulher')) {
+    if (id.toLowerCase().includes('female') || id.toLowerCase().includes('mulher')) {
       gender = 'Feminina';
-    } else if (identifier.toLowerCase().includes('male') || identifier.toLowerCase().includes('homem')) {
+    } else if (id.toLowerCase().includes('male') || id.toLowerCase().includes('homem')) {
       gender = 'Masculina';
     }
     
@@ -381,7 +393,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
     }
     
     // Add number if it's a numbered voice
-    const voiceNumber = identifier.match(/\d+/);
+    const voiceNumber = id.match(/\d+/);
     if (voiceNumber) {
       friendlyName += ` ${voiceNumber[0]}`;
     }
@@ -409,18 +421,29 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
     }
     
     // Add age group and gender (combined to avoid duplication)
-    const identifier = voice.identifier || '';
-    if (identifier.toLowerCase().includes('child') || identifier.toLowerCase().includes('criança') || 
-        identifier.toLowerCase().includes('kid') || identifier.toLowerCase().includes('infantil') ||
-        identifier.toLowerCase().includes('young') || identifier.toLowerCase().includes('jovem') ||
-        identifier.toLowerCase().includes('teen') || identifier.toLowerCase().includes('adolescente')) {
+    const id = voice.id || '';
+    if (id.toLowerCase().includes('child') || id.toLowerCase().includes('criança') || 
+        id.toLowerCase().includes('kid') || id.toLowerCase().includes('infantil') ||
+        id.toLowerCase().includes('young') || id.toLowerCase().includes('jovem') ||
+        id.toLowerCase().includes('teen') || id.toLowerCase().includes('adolescente')) {
       parts.push('Infantil');
     } else {
       // For adult voices, show gender instead of "Adulto"
-      if (identifier.toLowerCase().includes('female') || identifier.toLowerCase().includes('mulher')) {
-        parts.push('Mulher');
-      } else if (identifier.toLowerCase().includes('male') || identifier.toLowerCase().includes('homem')) {
-        parts.push('Homem');
+      const name = voice.name || '';
+      if (id.toLowerCase().includes('female') || id.toLowerCase().includes('mulher') ||
+          id.toLowerCase().includes('feminina') || id.toLowerCase().includes('femenina') ||
+          id.toLowerCase().includes('weiblich') ||
+          name.toLowerCase().includes('female') || name.toLowerCase().includes('mulher') ||
+          name.toLowerCase().includes('feminina') || name.toLowerCase().includes('femenina') ||
+          name.toLowerCase().includes('weiblich')) {
+        parts.push('Voz Feminina');
+      } else if (id.toLowerCase().includes('male') || id.toLowerCase().includes('homem') ||
+                 id.toLowerCase().includes('masculina') || id.toLowerCase().includes('männlich') ||
+                 name.toLowerCase().includes('male') || name.toLowerCase().includes('homem') ||
+                 name.toLowerCase().includes('masculina') || name.toLowerCase().includes('männlich')) {
+        parts.push('Voz Masculina');
+      } else {
+        parts.push('Voz Adulta');
       }
     }
     
@@ -462,18 +485,30 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
     }
   };
 
+  const getVoiceQualityText = (voice: any): string => {
+    if (voice.quality === 'Enhanced' || voice.quality === 'Premium') {
+      return voiceTranslations.premium;
+    } else if (voice.quality === 'High') {
+      return voiceTranslations.highQuality;
+    } else if (voice.quality === 'Offline') {
+      return voiceTranslations.offline;
+    } else {
+      return voiceTranslations.standard;
+    }
+  };
+
   const getAgeGroupIcon = (voice: any) => {
-    const identifier = voice.identifier || '';
-    if (identifier.toLowerCase().includes('child') || identifier.toLowerCase().includes('criança') || 
-        identifier.toLowerCase().includes('kid') || identifier.toLowerCase().includes('infantil') ||
-        identifier.toLowerCase().includes('young') || identifier.toLowerCase().includes('jovem') ||
-        identifier.toLowerCase().includes('teen') || identifier.toLowerCase().includes('adolescente')) {
+    const id = voice.id || '';
+    if (id.toLowerCase().includes('child') || id.toLowerCase().includes('criança') || 
+        id.toLowerCase().includes('kid') || id.toLowerCase().includes('infantil') ||
+        id.toLowerCase().includes('young') || id.toLowerCase().includes('jovem') ||
+        id.toLowerCase().includes('teen') || id.toLowerCase().includes('adolescente')) {
       return 'child-care'; // Icon for child voices
     } else {
       // For adult voices, show gender-specific icons
-      if (identifier.toLowerCase().includes('female') || identifier.toLowerCase().includes('mulher')) {
+      if (id.toLowerCase().includes('female') || id.toLowerCase().includes('mulher')) {
         return 'face'; // Icon for female voices
-      } else if (identifier.toLowerCase().includes('male') || identifier.toLowerCase().includes('homem')) {
+      } else if (id.toLowerCase().includes('male') || id.toLowerCase().includes('homem')) {
         return 'person'; // Icon for male voices
       } else {
         return 'person-outline'; // Generic icon for unspecified gender
@@ -482,17 +517,17 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
   };
 
   const getAgeGroupColor = (voice: any) => {
-    const identifier = voice.identifier || '';
-    if (identifier.toLowerCase().includes('child') || identifier.toLowerCase().includes('criança') || 
-        identifier.toLowerCase().includes('kid') || identifier.toLowerCase().includes('infantil') ||
-        identifier.toLowerCase().includes('young') || identifier.toLowerCase().includes('jovem') ||
-        identifier.toLowerCase().includes('teen') || identifier.toLowerCase().includes('adolescente')) {
+    const id = voice.id || '';
+    if (id.toLowerCase().includes('child') || id.toLowerCase().includes('criança') || 
+        id.toLowerCase().includes('kid') || id.toLowerCase().includes('infantil') ||
+        id.toLowerCase().includes('young') || id.toLowerCase().includes('jovem') ||
+        id.toLowerCase().includes('teen') || id.toLowerCase().includes('adolescente')) {
       return '#ec4899'; // Pink for child voices
     } else {
       // For adult voices, show gender-specific colors
-      if (identifier.toLowerCase().includes('female') || identifier.toLowerCase().includes('mulher')) {
+      if (id.toLowerCase().includes('female') || id.toLowerCase().includes('mulher')) {
         return '#ec4899'; // Pink for female voices
-      } else if (identifier.toLowerCase().includes('male') || identifier.toLowerCase().includes('homem')) {
+      } else if (id.toLowerCase().includes('male') || id.toLowerCase().includes('homem')) {
         return '#3b82f6'; // Blue for male voices
       } else {
         return '#6b7280'; // Gray for unspecified gender
@@ -506,29 +541,29 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
     const seenNames = new Set();
     
     voices.forEach(voice => {
-      const identifier = voice.identifier || '';
+      const id = voice.id || '';
       const name = voice.name || '';
       const language = voice.language || '';
       
       // Create multiple keys to catch different types of duplicates
-      const key1 = `${language}-${identifier}`;
+      const key1 = `${language}-${id}`;
       const key2 = `${language}-${name}`;
-      const key3 = `${identifier}`;
+      const key3 = `${id}`;
       const key4 = `${name}`;
       
       // Check if this is a duplicate based on multiple criteria
       const isDuplicate = uniqueVoices.has(key1) || 
                          uniqueVoices.has(key2) || 
-                         seenIdentifiers.has(identifier) || 
+                         seenIdentifiers.has(id) || 
                          seenNames.has(name) ||
-                         (identifier && identifier.length > 0 && seenIdentifiers.has(identifier)) ||
+                         (id && id.length > 0 && seenIdentifiers.has(id)) ||
                          (name && name.length > 0 && seenNames.has(name));
       
       if (!isDuplicate) {
         // Add to all tracking maps
         uniqueVoices.set(key1, voice);
         uniqueVoices.set(key2, voice);
-        if (identifier) seenIdentifiers.add(identifier);
+        if (id) seenIdentifiers.add(id);
         if (name) seenNames.add(name);
       } else {
         // If duplicate, keep the one with better quality
@@ -542,7 +577,7 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
             // Replace in all tracking maps
             uniqueVoices.set(key1, voice);
             uniqueVoices.set(key2, voice);
-            if (identifier) seenIdentifiers.add(identifier);
+            if (id) seenIdentifiers.add(id);
             if (name) seenNames.add(name);
           }
         }
@@ -563,13 +598,13 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
       }
       
       // Then ensure male voices are included by prioritizing them
-      const isMaleA = (a.identifier || '').toLowerCase().includes('male') || 
+      const isMaleA = (a.id || '').toLowerCase().includes('male') || 
                      (a.name || '').toLowerCase().includes('male') ||
-                     (a.identifier || '').toLowerCase().includes('homem') || 
+                     (a.id || '').toLowerCase().includes('homem') || 
                      (a.name || '').toLowerCase().includes('homem');
-      const isMaleB = (b.identifier || '').toLowerCase().includes('male') || 
+      const isMaleB = (b.id || '').toLowerCase().includes('male') || 
                      (b.name || '').toLowerCase().includes('male') ||
-                     (b.identifier || '').toLowerCase().includes('homem') || 
+                     (b.id || '').toLowerCase().includes('homem') || 
                      (b.name || '').toLowerCase().includes('homem');
       
       // Prioritize male voices to ensure they appear in the list
@@ -585,8 +620,44 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
     return qualityOrder[voice.quality as keyof typeof qualityOrder] || 1;
   };
 
+  const getGenderLabel = (voice: any): string | null => {
+    const id = voice.id || '';
+    const name = voice.name || '';
+    
+    // Check for female indicators (multiple languages)
+    if (id.toLowerCase().includes('female') || 
+        id.toLowerCase().includes('mulher') ||
+        id.toLowerCase().includes('feminina') ||
+        id.toLowerCase().includes('femenina') ||
+        id.toLowerCase().includes('weiblich') ||
+        name.toLowerCase().includes('female') || 
+        name.toLowerCase().includes('mulher') ||
+        name.toLowerCase().includes('feminina') ||
+        name.toLowerCase().includes('femenina') ||
+        name.toLowerCase().includes('weiblich')) {
+      return voiceTranslations.feminine;
+    }
+    
+    // Check for male indicators (multiple languages)
+    if (id.toLowerCase().includes('male') || 
+        id.toLowerCase().includes('homem') ||
+        id.toLowerCase().includes('masculina') ||
+        id.toLowerCase().includes('masculina') ||
+        id.toLowerCase().includes('männlich') ||
+        name.toLowerCase().includes('male') || 
+        name.toLowerCase().includes('homem') ||
+        name.toLowerCase().includes('masculina') ||
+        name.toLowerCase().includes('masculina') ||
+        name.toLowerCase().includes('männlich')) {
+      return voiceTranslations.masculine;
+    }
+    
+    // No gender detected
+    return null;
+  };
+
   const generateVoiceCode = (voice: any, index: number): string => {
-    const identifier = voice.identifier || '';
+    const id = voice.id || '';
     const lang = voice.language || '';
     
     // Extract language code
@@ -607,9 +678,9 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
     
     // Extract gender code
     let genderCode = '';
-    if (identifier.toLowerCase().includes('female') || identifier.toLowerCase().includes('mulher')) {
+    if (id.toLowerCase().includes('female') || id.toLowerCase().includes('mulher')) {
       genderCode = 'F';
-    } else if (identifier.toLowerCase().includes('male') || identifier.toLowerCase().includes('homem')) {
+    } else if (id.toLowerCase().includes('male') || id.toLowerCase().includes('homem')) {
       genderCode = 'M';
     } else {
       genderCode = 'U'; // Unknown/Unspecified
@@ -617,10 +688,10 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
     
     // Extract age group code
     let ageCode = '';
-    if (identifier.toLowerCase().includes('child') || identifier.toLowerCase().includes('criança') || 
-        identifier.toLowerCase().includes('kid') || identifier.toLowerCase().includes('infantil') ||
-        identifier.toLowerCase().includes('young') || identifier.toLowerCase().includes('jovem') ||
-        identifier.toLowerCase().includes('teen') || identifier.toLowerCase().includes('adolescente')) {
+    if (id.toLowerCase().includes('child') || id.toLowerCase().includes('criança') || 
+        id.toLowerCase().includes('kid') || id.toLowerCase().includes('infantil') ||
+        id.toLowerCase().includes('young') || id.toLowerCase().includes('jovem') ||
+        id.toLowerCase().includes('teen') || id.toLowerCase().includes('adolescente')) {
       ageCode = 'C'; // Child
     } else {
       ageCode = 'A'; // Adult
@@ -730,16 +801,16 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
                 availableVoices.map((voice, index) => (
                   <TouchableOpacity
                     key={index}
-                    onPress={() => selectVoice(voice.identifier)}
+                    onPress={() => selectVoice(voice.id)}
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
                       padding: 16,
                       marginBottom: 8,
-                      backgroundColor: audioConfig.selectedVoice === voice.identifier ? '#f3f4f6' : 'white',
+                      backgroundColor: audioConfig.selectedVoice === voice.id ? '#f3f4f6' : 'white',
                       borderRadius: 8,
                       borderWidth: 1,
-                      borderColor: audioConfig.selectedVoice === voice.identifier ? '#8b5cf6' : '#e5e7eb',
+                      borderColor: audioConfig.selectedVoice === voice.id ? '#8b5cf6' : '#e5e7eb',
                     }}
                   >
                     <LayoutView
@@ -747,55 +818,95 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
                       isItemsCenter
                       isFlex1
                     >
-                                              <LayoutView isFlexRow isItemsCenter>
-                          <MaterialIcons
-                            name={getVoiceQualityIcon(voice)}
-                            size={20}
-                            color={getVoiceQualityColor(voice)}
-                          />
-                          <MaterialIcons
-                            name={voice.requiresInternet || voice.isOnline || voice.isStreaming || voice.isCloud || voice.isNetwork ? "wifi" : "wifi-off"}
-                            size={16}
-                            color={voice.requiresInternet || voice.isOnline || voice.isStreaming || voice.isCloud || voice.isNetwork ? "#3b82f6" : "#10b981"}
-                            style={{ marginLeft: 4 }}
-                          />
-                          <MaterialIcons
-                            name={getAgeGroupIcon(voice)}
-                            size={16}
-                            color={getAgeGroupColor(voice)}
-                            style={{ marginLeft: 4 }}
-                          />
-                        </LayoutView>
-                      <LayoutView hasMarginLeft isFlex1>
-                        <LayoutText
-                          isTextLg
-                          isFontBold
-                          customClasses={`${
-                            audioConfig.selectedVoice === voice.identifier ? 'text-gray-800' : 'text-gray-700'
-                          }`}
-                        >
-                          {getFriendlyVoiceName(voice)}
-                        </LayoutText>
-                        <LayoutText
-                          isTextSm
-                          customClasses={`${
-                            audioConfig.selectedVoice === voice.identifier ? 'text-gray-600' : 'text-gray-500'
-                          } mt-1`}
-                        >
-                          {getVoiceDescription(voice)}
-                        </LayoutText>
-                        <LayoutText
-                          isTextXs
-                          customClasses={`${
-                            audioConfig.selectedVoice === voice.identifier ? 'text-gray-500' : 'text-gray-400'
-                          } mt-1 font-mono`}
-                        >
-                          {voiceTranslations.code}: {generateVoiceCode(voice, index)}
-                        </LayoutText>
+                      {/* Icons section */}
+                      <LayoutView isFlexRow isItemsCenter>
+                        <MaterialIcons
+                          name={getVoiceQualityIcon(voice)}
+                          size={20}
+                          color={getVoiceQualityColor(voice)}
+                        />
+                        <MaterialIcons
+                          name={voice.requiresInternet || voice.isOnline || voice.isStreaming || voice.isCloud || voice.isNetwork ? "wifi" : "wifi-off"}
+                          size={16}
+                          color={voice.requiresInternet || voice.isOnline || voice.isStreaming || voice.isCloud || voice.isNetwork ? "#3b82f6" : "#10b981"}
+                          style={{ marginLeft: 4 }}
+                        />
+                        <MaterialIcons
+                          name={getAgeGroupIcon(voice)}
+                          size={16}
+                          color={getAgeGroupColor(voice)}
+                          style={{ marginLeft: 4 }}
+                        />
                       </LayoutView>
+                      
+                      {/* Voice info section */}
+                      <LayoutView hasMarginLeft isFlex1>
+                          <LayoutView isFlexRow isItemsCenter customClasses="mb-1">
+                            <LayoutText
+                              isTextLg
+                              isFontBold
+                              customClasses={`${
+                                audioConfig.selectedVoice === voice.id ? 'text-gray-800' : 'text-gray-700'
+                              }`}
+                            >
+                              {getFriendlyVoiceName(voice)}
+                            </LayoutText>
+                            
+                            {/* Gender label */}
+                            {getGenderLabel(voice) && (
+                              <LayoutView
+                                customClasses={`ml-2 px-2 py-1 rounded-full ${
+                                  getGenderLabel(voice) === voiceTranslations.feminine
+                                    ? 'bg-pink-100 border border-pink-300' 
+                                    : 'bg-blue-100 border border-blue-300'
+                                }`}
+                              >
+                                <LayoutText
+                                  isTextXs
+                                  customClasses={`${
+                                    getGenderLabel(voice) === voiceTranslations.feminine
+                                      ? 'text-pink-700' 
+                                      : 'text-blue-700'
+                                  } font-medium`}
+                                >
+                                  {getGenderLabel(voice)}
+                                </LayoutText>
+                              </LayoutView>
+                            )}
+                          </LayoutView>
+                          
+                          <LayoutText
+                            isTextSm
+                            customClasses={`${
+                              audioConfig.selectedVoice === voice.id ? 'text-gray-600' : 'text-gray-500'
+                            } mt-1`}
+                          >
+                            {getVoiceDescription(voice)}
+                          </LayoutText>
+                          
+                          {/* Gender info line */}
+                          {getGenderLabel(voice) && (
+                            <LayoutText
+                              isTextSm
+                              customClasses={`${
+                                audioConfig.selectedVoice === voice.id ? 'text-gray-600' : 'text-gray-500'
+                              } mt-1 font-medium`}
+                            >
+                              🎤 {getGenderLabel(voice)} • {voiceTranslations.quality}: {getVoiceQualityText(voice)}
+                            </LayoutText>
+                          )}
+                          <LayoutText
+                            isTextXs
+                            customClasses={`${
+                              audioConfig.selectedVoice === voice.id ? 'text-gray-500' : 'text-gray-400'
+                            } mt-1 font-mono`}
+                          >
+                            {voiceTranslations.code}: {generateVoiceCode(voice, index)}
+                          </LayoutText>
+                        </LayoutView>
                     </LayoutView>
 
-                    {audioConfig.selectedVoice === voice.identifier && (
+                    {audioConfig.selectedVoice === voice.id && (
                       <MaterialIcons
                         name="check-circle"
                         size={24}
@@ -804,18 +915,18 @@ const VoiceSelector = ({ onVoiceSelect }: VoiceSelectorProps) => {
                     )}
 
                     <TouchableOpacity
-                      onPress={() => testVoice(voice.)}
-                      disabled={testingVoice === voice.identifier}
+                      onPress={() => testVoice(voice.id)}
+                      disabled={testingVoice === voice.id}
                       style={{
                         marginLeft: 12,
                         padding: 8,
-                        backgroundColor: testingVoice === voice.identifier ? '#9ca3af' : '#10b981',
+                        backgroundColor: testingVoice === voice.id ? '#9ca3af' : '#10b981',
                         borderRadius: 6,
-                        opacity: testingVoice === voice.identifier ? 0.6 : 1,
+                        opacity: testingVoice === voice.id ? 0.6 : 1,
                       }}
                     >
                       <MaterialIcons
-                        name={testingVoice === voice.identifier ? 'hourglass-empty' : 'play-arrow'}
+                        name={testingVoice === voice.id ? 'hourglass-empty' : 'play-arrow'}
                         size={20}
                         color="white"
                       />

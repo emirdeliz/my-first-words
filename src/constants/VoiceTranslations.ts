@@ -9,12 +9,15 @@ export interface VoiceTranslations {
   male: string;
   child: string;
   adult: string;
+  feminine: string;
+  masculine: string;
   
   // Voice quality
   premium: string;
   highQuality: string;
   offline: string;
   standard: string;
+  quality: string;
   
   // Voice descriptions
   code: string;
@@ -59,11 +62,14 @@ export const VOICE_TRANSLATIONS: Record<string, VoiceTranslations> = {
     male: 'Masculina',
     child: 'Infantil',
     adult: 'Adulto',
+    feminine: 'Feminina',
+    masculine: 'Masculina',
     
     premium: 'Premium',
     highQuality: 'Alta Qualidade',
     offline: 'Offline',
     standard: 'Padrão',
+    quality: 'Qualidade',
     
     code: 'Código',
     offlineIndicator: 'Offline',
@@ -103,11 +109,14 @@ export const VOICE_TRANSLATIONS: Record<string, VoiceTranslations> = {
     male: 'Male',
     child: 'Child',
     adult: 'Adult',
+    feminine: 'Feminine',
+    masculine: 'Masculine',
     
     premium: 'Premium',
     highQuality: 'High Quality',
     offline: 'Offline',
     standard: 'Standard',
+    quality: 'Quality',
     
     code: 'Code',
     offlineIndicator: 'Offline',
@@ -147,11 +156,14 @@ export const VOICE_TRANSLATIONS: Record<string, VoiceTranslations> = {
     male: 'Masculina',
     child: 'Infantil',
     adult: 'Adulto',
+    feminine: 'Femenina',
+    masculine: 'Masculina',
     
     premium: 'Premium',
     highQuality: 'Alta Calidad',
     offline: 'Sin Conexión',
     standard: 'Estándar',
+    quality: 'Calidad',
     
     code: 'Código',
     offlineIndicator: 'Sin Conexión',
@@ -191,11 +203,14 @@ export const VOICE_TRANSLATIONS: Record<string, VoiceTranslations> = {
     male: 'Männlich',
     child: 'Kind',
     adult: 'Erwachsen',
+    feminine: 'Weiblich',
+    masculine: 'Männlich',
     
     premium: 'Premium',
     highQuality: 'Hohe Qualität',
     offline: 'Offline',
     standard: 'Standard',
+    quality: 'Qualität',
     
     code: 'Code',
     offlineIndicator: 'Offline',
